@@ -4,5 +4,8 @@
     {
         public static bool IsNull<TEntity>(TEntity theItem)
             where TEntity : class => theItem is null;
+
+        public static bool IsEmpty(string theItem) =>
+            string.IsNullOrWhiteSpace(theItem);
     }
 }

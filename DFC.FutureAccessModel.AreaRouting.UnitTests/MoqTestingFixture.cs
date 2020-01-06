@@ -1,10 +1,25 @@
-﻿using System;
+﻿using System.IO;
+using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace DFC.FutureAccessModel.AreaRouting
 {
     public abstract class MoqTestingFixture
     {
+        //protected IConfiguration Config { get; }
+
+        //protected MoqTestingFixture()
+        //{
+        //    Config = LoadConfiguration();
+        //}
+
+        //public static IConfiguration LoadConfiguration() =>
+        //    new ConfigurationBuilder()
+        //        .SetBasePath(Directory.GetCurrentDirectory())
+        //        .AddJsonFile("test.settings.json", false, true)
+        //        .AddEnvironmentVariables()
+        //        .Build();
+
         /// <summary>
         /// make strict mock
         /// </summary>

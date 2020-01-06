@@ -7,7 +7,7 @@ using DFC.Swagger.Standard;
 using Microsoft.AspNetCore.Http;
 using Xunit;
 
-namespace DFC.FutureAccessModel.AreaRouting.APIDefinition.Tests
+namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
     /// <summary>
     /// the api (document generating) definition test fixture
@@ -22,7 +22,7 @@ namespace DFC.FutureAccessModel.AreaRouting.APIDefinition.Tests
         public void APIDefinitionTitleMeetsExpectation()
         {
             // arrange / act / assert
-            Assert.Equal("AreaRouting", ApiDefinition.ApiTitle);
+            Assert.Equal("areas", ApiDefinition.ApiTitle);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace DFC.FutureAccessModel.AreaRouting.APIDefinition.Tests
         public void APIDefinitionNameMeetsExpectation()
         {
             // arrange / act / assert
-            Assert.Equal("API-Definition", ApiDefinition.ApiDefinitionName);
+            Assert.Equal("api-definition", ApiDefinition.ApiDefinitionName);
         }
 
         /// <summary>
