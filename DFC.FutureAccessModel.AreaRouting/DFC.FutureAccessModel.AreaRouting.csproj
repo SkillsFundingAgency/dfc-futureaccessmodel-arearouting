@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
+    <ProjectGuid>{AABF51F1-63C6-4C6A-928F-22175D866A59}</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DFC.Common.Standard" Version="0.1.4" />
