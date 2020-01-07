@@ -1,7 +1,12 @@
 variables:
-    SolutionBaseName: 'DFC.FutureAccessModel.AreaRouting'
-    BuildPlatform: 'any cpu'
-    BuildConfiguration: 'release'
+- name: SolutionBaseName
+  value: 'DFC.FutureAccessModel.AreaRouting'
+- name: BuildPlatform
+  value: 'any cpu'
+- name: BuildConfiguration
+  value: 'release'
+- group: dfc-shared-all
+- group: dfc-futureaccessmodel-shared-all
 
 resources:
   repositories:
@@ -23,6 +28,11 @@ stages:
       - msbuild
       - visualstudio
     steps:
+    - template: AzureDevOpsTemplates/Build/StepTemplates/dfc-arm-build.yml@dfc-devops
+      parameters:
+        ArmTemplateRoot: '$(Build.SourcesDirectory)\Resources\ArmTemplates'
+        SolutionBaseName: $(SolutionBaseName)
+        PublishPipelineArtifact: true
     - template: AzureDevOpsTemplates\Build\StepTemplates\dfc-dotnetcore-build-sonar.yml@dfc-devops
       parameters:
         SolutionBaseName: $(SolutionBaseName)
