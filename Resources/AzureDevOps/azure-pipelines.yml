@@ -38,3 +38,16 @@ stages:
         SolutionBaseName: $(SolutionBaseName)
         BuildPlatform: 'any cpu'
         BuildConfiguration: 'release'
+
+- stage: DeployTo_DEV
+  displayName: Deploy ARM resources to DEV_FUTUREACCESSMODEL environment
+  condition: ne(variables['Build.Reason'], 'PullRequest')
+  variables:
+  - group: dfc-shared-dev
+  - group: dfc-futureaccessmodel-shared-dev
+  - template: VariableTemplates\DevEnvironmentVariables.yml
+  jobs:
+  - template: JobTemplates/Deploy.yml
+    parameters:
+      AzureSubscription: 'SFA-CDH-Dev/Test (962cae10-2950-412a-93e3-d8ae92b17896)'
+      Environment: DEV_FUTUREACCESSMODEL
