@@ -1,8 +1,10 @@
 parameters:
   AzureSubscription: ''
   Environment: ''
+  FunctionAppName: ''
   ResourceGroup: ''
   ArmTemplateRoot: '$(Pipeline.Workspace)/Dfc.FutureAccessModel.AreaRouting.Resources.ArmTemplates'
+  FunctionAppPackage: '$(Pipeline.Workspace)/Dfc.FutureAccessModel.AreaRouting/DeploymentPackages/Dfc.FutureAccessModel.AreaRouting.zip'
   EnvironmentTag: $(EnvironmentTag)
   ParentBusinessTag: $(ParentBusiness)
   ServiceOfferingTag: $(ServiceOffering)
@@ -24,3 +26,20 @@ jobs:
             ParentBusinessTag: ${{ parameters.ParentBusinessTag }}
             ResourceGroup: ${{ parameters.ResourceGroup }}
             ServiceOfferingTag: ${{ parameters.ServiceOfferingTag }}
+        - task: AzureFunctionApp@1
+          displayName: 'Azure Function App Deploy: ${{ parameters.FunctionAppName }}'
+          inputs:
+            azureSubscription: ${{ parameters.AzureSubscription }}
+            appType: functionApp
+            appName: ${{ parameters.FunctionAppName }}
+            deployToSlotOrASE: true
+            resourceGroupName: ${{ parameters.ResourceGroup }}
+            slotName: staging
+            package: ${{ parameters.FunctionAppPackage }}
+        - task: AzureAppServiceManage@0
+          displayName: 'Swap Slots: ${{ parameters.FunctionAppName }} staging to production'
+          inputs:
+            azureSubscription: ${{ parameters.AzureSubscription }}
+            WebAppName: ${{ parameters.FunctionAppName }}
+            ResourceGroupName: ${{ parameters.ResourceGroup }}
+            SourceSlot: staging
