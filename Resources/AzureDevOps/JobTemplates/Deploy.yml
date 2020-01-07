@@ -1,10 +1,10 @@
 parameters:
   AzureSubscription: ''
   Environment: ''
+  ResourceGroup: ''
   ArmTemplateRoot: '$(Pipeline.Workspace)/Dfc.FutureAccessModel.AreaRouting.Resources.ArmTemplates'
   EnvironmentTag: $(EnvironmentTag)
   ParentBusinessTag: $(ParentBusiness)
-  ResourceGroup: $(famSharedResourceGroup)
   ServiceOfferingTag: $(ServiceOffering)
 
 jobs:
