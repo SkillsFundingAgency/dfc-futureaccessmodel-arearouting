@@ -192,6 +192,9 @@
                     "collectionName": {
                         "value": "[variables('cosmosCollectionName')]"
                     },
+                    "provisionRequestUnits": {
+                        "value": false
+                    },
                     "partitionKey": {
                         "value": "[variables('cosmosCollectionPartitionKey')]"
                     }
