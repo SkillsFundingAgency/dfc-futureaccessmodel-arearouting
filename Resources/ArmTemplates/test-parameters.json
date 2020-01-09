@@ -9,10 +9,10 @@
             "value": "dfcdevfamsharedstr"
         },
         "cosmosDbAccountName": {
-            "value": "dfc-foo-fam-shared-cdb"
+            "value": "dfc-dev-fam-shared-cdb"
         },
         "cosmosDbResourceGroup": {
-            "value": "dfc-foo-fam-shared-rg"
+            "value": "dfc-dev-fam-shared-rg"
         },
         "environment": {
             "value": "FOO"
