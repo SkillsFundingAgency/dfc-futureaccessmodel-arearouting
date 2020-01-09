@@ -28,6 +28,9 @@
             "type": "string",
             "defaultValue": ""
         },
+        "cosmosDbAccountName": {
+            "type": "string"
+        },
         "environment": {
             "type": "string"
         },
@@ -44,6 +47,8 @@
         "appServicePlanName": "[if(greater(length(parameters('sharedAppServicePlanName')), 0), parameters('sharedAppServicePlanName'), concat(variables('resourcePrefix'), '-asp'))]",
         "appServicePlanResourceGroup": "[if(greater(length(parameters('SharedAppServicePlanResourceGroup')), 0), parameters('SharedAppServicePlanResourceGroup'), resourceGroup().name)]",
         "buildingBlocksDfcBaseUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/ArmTemplates/",
+        "cosmosCollectionName": "Areas",
+        "cosmosDatabaseName": "dfc-prime-contractor-areas-db",
         "resourcePrefix": "[tolower(concat('dfc-', parameters('Environment'), '-fam-arearoute'))]",
         "functionAppName": "[concat(variables('ResourcePrefix'), '-fa')]",
         "functionAppInsightsName": "[concat(variables('functionAppName'), '-ai')]"
@@ -161,6 +166,29 @@
             "dependsOn": [
                 "[variables('functionAppInsightsName')]"
             ]
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "famAreasCosmosCollection",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('buildingBlocksDfcBaseUrl'), 'CosmosDb/cosmos-collection.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "accountName ": {
+                        "value": "[parameters('cosmosDbAccountName')]"
+                    },
+                    "databaseName": {
+                        "value": "[variables('cosmosDatabaseName')]"
+                    },
+                    "collectionName": {
+                        "value": "[variables('cosmosCollectionName')]"
+                    }
+                }
+            }
         }
     ],
     "outputs": {

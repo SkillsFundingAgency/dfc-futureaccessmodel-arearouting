@@ -8,6 +8,9 @@
         "appSharedStorageAccountName": {
             "value": "dfcdevfamsharedstr"
         },
+        "cosmosDbAccountName": {
+            "value": "dfc-foo-fam-shared-cdb"
+        },
         "environment": {
             "value": "FOO"
         },
