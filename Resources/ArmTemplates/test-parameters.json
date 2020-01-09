@@ -11,6 +11,9 @@
         "cosmosDbAccountName": {
             "value": "dfc-foo-fam-shared-cdb"
         },
+        "cosmosDbResourceGroup": {
+            "value": "dfc-foo-fam-shared-rg"
+        },
         "environment": {
             "value": "FOO"
         },

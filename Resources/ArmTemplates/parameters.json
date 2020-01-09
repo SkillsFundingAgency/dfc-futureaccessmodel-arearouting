@@ -17,6 +17,9 @@
         "cosmosDbAccountName": {
             "value": "__famSharedCosmosAccount__"
         },
+        "cosmosDbResourceGroup": {
+            "value": "__famSharedResourceGroup__"
+        },
         "environment": {
             "value": "__ReleaseEnvironmentName__",
             "metadata": {

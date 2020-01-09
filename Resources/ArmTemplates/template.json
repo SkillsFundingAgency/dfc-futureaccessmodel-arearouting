@@ -31,6 +31,9 @@
         "cosmosDbAccountName": {
             "type": "string"
         },
+        "cosmosDbResourceGroup": {
+            "type": "string"
+        },
         "environment": {
             "type": "string"
         },
@@ -170,6 +173,7 @@
         {
             "apiVersion": "2017-05-10",
             "name": "famAreasCosmosCollection",
+            "resourceGroup": "[parameters('cosmosDbResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
