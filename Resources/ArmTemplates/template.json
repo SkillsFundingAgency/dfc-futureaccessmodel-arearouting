@@ -190,6 +190,9 @@
                     },
                     "collectionName": {
                         "value": "[variables('cosmosCollectionName')]"
+                    },
+                    "partitionKey": {
+                        "value": "TouchpointID"
                     }
                 }
             }
