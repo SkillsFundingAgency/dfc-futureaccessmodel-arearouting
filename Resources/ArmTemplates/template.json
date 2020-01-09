@@ -178,7 +178,7 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "accountName ": {
+                    "accountName": {
                         "value": "[parameters('cosmosDbAccountName')]"
                     },
                     "databaseName": {
