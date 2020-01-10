@@ -8,6 +8,12 @@
         "appSharedStorageAccountName": {
             "value": "dfcdevfamsharedstr"
         },
+        "cosmosDbAccountName": {
+            "value": "dfc-dev-fam-shared-cdb"
+        },
+        "cosmosDbResourceGroup": {
+            "value": "dfc-dev-fam-shared-rg"
+        },
         "environment": {
             "value": "FOO"
         },

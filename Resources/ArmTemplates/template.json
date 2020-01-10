@@ -28,6 +28,12 @@
             "type": "string",
             "defaultValue": ""
         },
+        "cosmosDbAccountName": {
+            "type": "string"
+        },
+        "cosmosDbResourceGroup": {
+            "type": "string"
+        },
         "environment": {
             "type": "string"
         },
@@ -44,6 +50,9 @@
         "appServicePlanName": "[if(greater(length(parameters('sharedAppServicePlanName')), 0), parameters('sharedAppServicePlanName'), concat(variables('resourcePrefix'), '-asp'))]",
         "appServicePlanResourceGroup": "[if(greater(length(parameters('SharedAppServicePlanResourceGroup')), 0), parameters('SharedAppServicePlanResourceGroup'), resourceGroup().name)]",
         "buildingBlocksDfcBaseUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/ArmTemplates/",
+        "cosmosCollectionName": "Areas",
+        "cosmosCollectionPartitionKey": "/TouchpointID",
+        "cosmosDatabaseName": "dfc-prime-contractor-areas-db",
         "resourcePrefix": "[tolower(concat('dfc-', parameters('Environment'), '-fam-arearoute'))]",
         "functionAppName": "[concat(variables('ResourcePrefix'), '-fa')]",
         "functionAppInsightsName": "[concat(variables('functionAppName'), '-ai')]"
@@ -153,6 +162,26 @@
                             {
                                 "name": "FUNCTIONS_WORKER_RUNTIME",
                                 "value": "dotnet"
+                            },
+                            {
+                                "name": "DocumentStoreID",
+                                "value": "[variables('cosmosDatabaseName')]"
+                            },
+                            {
+                                "name": "RoutingDetailCollectionID",
+                                "value": "[variables('cosmosCollectionName')]"
+                            },
+                            {
+                                "name": "LocalAuthorityCollectionID",
+                                "value": "LocalAuthorities"
+                            },
+                            {
+                                "name": "DocumentStoreEndpointAddress",
+                                "value": "[concat('https://',parameters('cosmosDbAccountName'),'.documents.azure.com:443/')]"
+                            },
+                            {
+                                "name": "DocumentStoreAccountKey",
+                                "value": "[listKeys(resourceId(parameters('appSharedResourceGroup'), 'Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName')), providers('Microsoft.DocumentDB', 'databaseAccounts').apiVersions[0]).primaryMasterKey]"
                             }
                         ]
                     }
@@ -161,6 +190,36 @@
             "dependsOn": [
                 "[variables('functionAppInsightsName')]"
             ]
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "famAreasCosmosCollection",
+            "resourceGroup": "[parameters('cosmosDbResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('buildingBlocksDfcBaseUrl'), 'CosmosDb/cosmos-collection.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "accountName": {
+                        "value": "[parameters('cosmosDbAccountName')]"
+                    },
+                    "databaseName": {
+                        "value": "[variables('cosmosDatabaseName')]"
+                    },
+                    "collectionName": {
+                        "value": "[variables('cosmosCollectionName')]"
+                    },
+                    "provisionRequestUnits": {
+                        "value": false
+                    },
+                    "partitionKey": {
+                        "value": "[variables('cosmosCollectionPartitionKey')]"
+                    }
+                }
+            }
         }
     ],
     "outputs": {
