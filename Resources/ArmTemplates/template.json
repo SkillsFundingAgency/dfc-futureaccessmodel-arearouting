@@ -162,6 +162,26 @@
                             {
                                 "name": "FUNCTIONS_WORKER_RUNTIME",
                                 "value": "dotnet"
+                            },
+                            {
+                                "name": "DocumentStoreID",
+                                "value": "[variables('cosmosDatabaseName')]"
+                            },
+                            {
+                                "name": "RoutingDetailCollectionID",
+                                "value": "[variables('cosmosCollectionName')]"
+                            },
+                            {
+                                "name": "LocalAuthorityCollectionID",
+                                "value": "LocalAuthorities"
+                            },
+                            {
+                                "name": "DocumentStoreEndpointAddress",
+                                "value": "[concat('https://',parameters('cosmosDbAccountName'),'.documents.azure.com:443/')]"
+                            },
+                            {
+                                "name": "DocumentStoreAccountKey",
+                                "value": "[listKeys(resourceId(parameters('appSharedResourceGroup'), 'Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName')), providers('Microsoft.DocumentDB', 'databaseAccounts')).primaryMasterKey]"
                             }
                         ]
                     }
