@@ -181,7 +181,7 @@
                             },
                             {
                                 "name": "DocumentStoreAccountKey",
-                                "value": "[listKeys(resourceId(parameters('appSharedResourceGroup'), 'Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName')), providers('Microsoft.DocumentDB', 'databaseAccounts')).primaryMasterKey]"
+                                "value": "[listKeys(resourceId(parameters('appSharedResourceGroup'), 'Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName')), providers('Microsoft.DocumentDB', 'databaseAccounts').apiVersions[0]).primaryMasterKey]"
                             }
                         ]
                     }
