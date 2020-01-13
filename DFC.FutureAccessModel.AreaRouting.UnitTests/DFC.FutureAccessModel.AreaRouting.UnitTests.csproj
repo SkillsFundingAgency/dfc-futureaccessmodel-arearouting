@@ -1,36 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+<Project
+    Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>netcoreapp3.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <RootNamespace>DFC.FutureAccessModel.AreaRouting</RootNamespace>
+        <ProjectGuid>{A06867DA-D978-466F-83C8-6205FBE88D40}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
-        <PackageReference Include="Moq" Version="4.13.1" />
-        <PackageReference Include="xunit" Version="2.4.1" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference
+            Include="Microsoft.NET.Test.Sdk"
+            Version="16.4.0" />
+        <PackageReference
+            Include="Moq"
+            Version="4.13.1" />
+        <PackageReference
+            Include="xunit"
+            Version="2.4.1" />
+        <PackageReference
+            Include="xunit.runner.visualstudio"
+            Version="2.4.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Storage\" />
-      <Folder Include="Storage\Internal\" />
-      <Folder Include="Functions\" />
-      <Folder Include="Functions\Internal\" />
-      <Folder Include="Factories\" />
-      <Folder Include="Factories\Internal\" />
-      <Folder Include="Providers\" />
-      <Folder Include="Providers\Internal\" />
+        <Folder
+            Include="Storage\" />
+        <Folder
+            Include="Storage\Internal\" />
+        <Folder
+            Include="Functions\" />
+        <Folder
+            Include="Functions\Internal\" />
+        <Folder
+            Include="Factories\" />
+        <Folder
+            Include="Factories\Internal\" />
+        <Folder
+            Include="Providers\" />
+        <Folder
+            Include="Providers\Internal\" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\DFC.FutureAccessModel.AreaRouting\DFC.FutureAccessModel.AreaRouting.csproj" />
+        <ProjectReference
+            Include="..\DFC.FutureAccessModel.AreaRouting\DFC.FutureAccessModel.AreaRouting.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <None Update="local.settings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-      </None>
+        <None
+            Update="local.settings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
     </ItemGroup>
 </Project>
