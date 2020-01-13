@@ -1,14 +1,13 @@
-﻿using DFC.Functions.DI.Standard.Attributes;
+﻿using System;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
+using DFC.Functions.DI.Standard.Attributes;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.Swagger.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {

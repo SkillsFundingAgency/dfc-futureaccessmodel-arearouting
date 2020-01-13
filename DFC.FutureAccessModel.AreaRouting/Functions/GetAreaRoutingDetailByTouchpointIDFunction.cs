@@ -2,16 +2,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard.Attributes;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
+using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Logging;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
@@ -27,18 +26,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Display(Name = "Get", Description = "Ability to return a Routing Detail for the given Touchpoint.")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/{touchpointID}")]HttpRequest theRequest,
-            ILogger log,
             string touchpointID,
-            [Inject] ILoggerHelper logHelper,
-            [Inject] IGetAreaRoutingDetailByTouchpointID routingDetailAdapter)
+            [Inject] ICreateLoggingContextScopes logging,
+            [Inject] IGetAreaRoutingDetailByTouchpointID adapter)
         {
-            logHelper.LogMethodEnter(log);
-
-            var message = await routingDetailAdapter.GetAreaRoutingDetailFor(theRequest, touchpointID);
-
-            logHelper.LogMethodExit(log);
-
-            return message;
+            using (var scope = await logging.BeginScopeFor(theRequest))
+            {
+                return await adapter.GetAreaRoutingDetailFor(touchpointID, scope);
+            }
         }
     }
 }

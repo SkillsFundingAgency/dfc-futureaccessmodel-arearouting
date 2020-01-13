@@ -12,7 +12,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
     /// <summary>
     /// the api (document generating) definition test fixture
     /// </summary>
-    public class ApiDefinitionFixture :
+    public sealed class ApiDefinitionFixture :
         MoqTestingFixture
     {
         /// <summary>

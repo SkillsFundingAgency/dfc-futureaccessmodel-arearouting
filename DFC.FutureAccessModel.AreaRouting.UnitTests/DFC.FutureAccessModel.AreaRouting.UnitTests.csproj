@@ -4,7 +4,6 @@
         <TargetFramework>netcoreapp3.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <RootNamespace>DFC.FutureAccessModel.AreaRouting</RootNamespace>
-        <ProjectGuid>{A06867DA-D978-466F-83C8-6205FBE88D40}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
@@ -16,9 +15,14 @@
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="APIDefinition\" />
       <Folder Include="Storage\" />
       <Folder Include="Storage\Internal\" />
+      <Folder Include="Functions\" />
+      <Folder Include="Functions\Internal\" />
+      <Folder Include="Factories\" />
+      <Folder Include="Factories\Internal\" />
+      <Folder Include="Providers\" />
+      <Folder Include="Providers\Internal\" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\DFC.FutureAccessModel.AreaRouting\DFC.FutureAccessModel.AreaRouting.csproj" />
@@ -27,9 +31,6 @@
       <None Update="local.settings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-      </None>
-      <None Update="test.settings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 </Project>

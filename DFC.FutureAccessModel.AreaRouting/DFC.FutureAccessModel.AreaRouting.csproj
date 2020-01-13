@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
-    <ProjectGuid>{AABF51F1-63C6-4C6A-928F-22175D866A59}</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DFC.Common.Standard" Version="0.1.4" />
@@ -29,7 +28,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="local.settings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
@@ -37,5 +35,10 @@
     <Folder Include="Adapters\Internal\" />
     <Folder Include="Functions\" />
     <Folder Include="Registration\" />
+    <Folder Include="Providers\" />
+    <Folder Include="Providers\Internal\" />
+    <Folder Include="Faults\" />
+    <Folder Include="Factories\" />
+    <Folder Include="Factories\Internal\" />
   </ItemGroup>
 </Project>

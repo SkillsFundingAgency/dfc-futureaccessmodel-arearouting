@@ -1,42 +1,63 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
+using DFC.FutureAccessModel.AreaRouting.Factories;
+using DFC.FutureAccessModel.AreaRouting.Faults;
+using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
+using DFC.FutureAccessModel.AreaRouting.Providers;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 {
-    public class GetAreaRoutingDetailByTouchpointIDFunctionAdapter :
+    internal sealed class GetAreaRoutingDetailByTouchpointIDFunctionAdapter :
         IGetAreaRoutingDetailByTouchpointID
     {
-        public IProvideStorageAccess StorageProvider { get; }
-        public ILogger Log { get; }
-        public IHttpRequestHelper RequestHelper { get; }
+        public IProvideDocumentStorage StorageProvider { get; }
+        public IProvideFaultResponses Faults { get; }
+        public IProvideSafeOperations SafeOperations { get; }
         public IHttpResponseMessageHelper ResponseHelper { get; }
+
         public IJsonHelper JsonHelper { get; }
 
-
         public GetAreaRoutingDetailByTouchpointIDFunctionAdapter(
-            IProvideStorageAccess storageProvider,
-            ILogger log,
-            IHttpRequestHelper httpRequestHelper,
+            IProvideDocumentStorage storageProvider,
             IHttpResponseMessageHelper httpResponseMessageHelper,
+            IProvideFaultResponses faultResponses,
+            IProvideSafeOperations safeOperations,
             IJsonHelper jsonHelper)
         {
             StorageProvider = storageProvider;
-            Log = log;
-            RequestHelper = httpRequestHelper;
             ResponseHelper = httpResponseMessageHelper;
+            Faults = faultResponses;
+            SafeOperations = safeOperations;
             JsonHelper = jsonHelper;
         }
 
-        public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(HttpRequest theRequest, string usingTouchpointID)
-        {
-            var result = await StorageProvider.GetAreaRoutingDetail(usingTouchpointID);
+        /// <summary>
+        /// get (the) area routing detail for...
+        /// </summary>
+        /// <param name="theTouchpointID">the touchpoint id</param>
+        /// <param name="useLoggingScope">use (the) logging scope</param>
+        /// <returns>the currently running task containing the response message (success or fail)</returns>
+        public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext useLoggingScope) =>
+            await SafeOperations.Try(() => ProcessGetAreaRoutingDetailFor(theTouchpointID, useLoggingScope), x => Faults.GetResponseFor(x, useLoggingScope));
 
+        /// <summary>
+        /// get (the) area routing detail for...
+        /// </summary>
+        /// <param name="theTouchpointID">the touchpoint id</param>
+        /// <param name="useLoggingScope">use (the) logging scope</param>
+        /// <returns>the currently running task containing the response message (success only)</returns>
+        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext useLoggingScope)
+        {
+            await useLoggingScope.EnterMethod();
+
+            It.IsEmpty(theTouchpointID)
+                .AsGuard<MalformedRequestException>();
+
+            var result = await StorageProvider.GetAreaRoutingDetail(theTouchpointID);
             /*
             var correlationId = httpRequestHelper.GetDssCorrelationId(req);
             if (string.IsNullOrEmpty(correlationId))
