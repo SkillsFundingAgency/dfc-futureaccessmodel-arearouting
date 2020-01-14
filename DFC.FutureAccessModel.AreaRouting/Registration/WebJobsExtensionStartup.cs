@@ -31,8 +31,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration
             builder.Services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
             builder.Services.AddSingleton<IHttpResponseMessageHelper, HttpResponseMessageHelper>();
             builder.Services.AddSingleton<IJsonHelper, JsonHelper>();
-
-            // TODO: check why this was added under a scope
             builder.Services.AddSingleton<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();
 
             // project level
@@ -49,7 +47,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration
             builder.Services.AddSingleton<IProvideSafeOperations, SafeOperationsProvider>();
 
             // storage
-            builder.Services.AddSingleton<IProvideDocumentStorage, DocumentStorageProvider>();
+            builder.Services.AddSingleton<IStoreAreaRoutingDetails, AreaRoutingDetailStore>();
             builder.Services.AddSingleton<IStoreDocuments, DocumentStore>();
             builder.Services.AddSingleton<IProvideStoragePaths, StoragePathProvider>();
         }

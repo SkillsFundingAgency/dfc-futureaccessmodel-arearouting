@@ -10,6 +10,9 @@ using Microsoft.Azure.Documents;
 
 namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 {
+    /// <summary>
+    ///  the document store
+    /// </summary>
     internal sealed class DocumentStore :
         IStoreDocuments
     {
@@ -41,7 +44,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public IProvideSafeOperations SafeOperations { get; }
 
         /// <summary>
-        /// initialises an instance of the document store
+        /// initialises an instance of the <see cref="DocumentStore"/>
         /// </summary>
         /// <param name="usingEnvironment">using environment variables</param>
         public DocumentStore(
@@ -77,7 +80,31 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>the currently running task</returns>
         public async Task AddDocument<TDocument>(TDocument theDocument, Uri usingStoragePath)
             where TDocument : class =>
+            await SafeOperations.Try(
+                () => ProcessAddDocument(usingStoragePath, theDocument),
+                x => ProcessAddDocumentErrorHandler(x));
+
+        /// <summary>
+        /// process add document
+        /// </summary>
+        /// <typeparam name="TDocument">the document type</typeparam>
+        /// <param name="usingStoragePath">using (the) storage path</param>
+        /// <param name="theDocument">the document</param>
+        /// <returns>the currently running task</returns>
+        internal async Task ProcessAddDocument<TDocument>(Uri usingStoragePath, TDocument theDocument)
+            where TDocument : class =>
             await Client.CreateDocumentAsync(usingStoragePath, theDocument);
+
+        /// <summary>
+        /// process add document error handler. 
+        /// safe handling and exception transformation into something the API can deal with. 
+        /// an incoming null is likely to be the result of an argument null 
+        /// exception for an 'invalid' uri in the read document call. 
+        /// </summary>
+        /// <param name="theException">the exception</param>
+        /// <returns>the currently running task</returns>
+        internal async Task ProcessAddDocumentErrorHandler(Exception theException) =>
+            await Task.Run(() => ProcessError(theException as DocumentClientException));
 
         /// <summary>
         /// get (a) document (from the document store)
@@ -89,7 +116,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             where TDocument : class =>
             await SafeOperations.Try(
                 () => ProcessGetDocument<TDocument>(usingStoragePath),
-                x => ProcessGetDocumentErrorHandler<TDocument>(x as DocumentClientException));
+                x => ProcessGetDocumentErrorHandler<TDocument>(x));
 
         /// <summary>
         /// process get document
@@ -105,34 +132,44 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// process get document error handler.
-        /// an incoming null is likely to be the result of an argument null
-        /// exception for a null uri in the read dosument call
+        /// process get document error handler. 
+        /// safe handling and exception transformation into something the API can deal with. 
+        /// an incoming null is likely to be the result of an argument null 
+        /// exception for an 'invalid' uri in the read document call. 
         /// </summary>
         /// <typeparam name="TDocument"></typeparam>
         /// <param name="theException"></param>
-        /// <returns></returns>
-        internal async Task<TDocument> ProcessGetDocumentErrorHandler<TDocument>(DocumentClientException theException)
+        /// <returns>nothing, the expectation is to throw an 'application' exception</returns>
+        internal async Task<TDocument> ProcessGetDocumentErrorHandler<TDocument>(Exception theException)
             where TDocument : class =>
             await Task.Run(() =>
             {
-                if (It.IsNull(theException))
-                {
-                    throw new MalformedRequestException();
-                }
-
-                if (HttpStatusCode.NotFound == theException.StatusCode.Value)
-                {
-                    throw new NoContentException();
-                }
-
-                if (LocalHttpStatusCode.TooManyRequests.ComparesTo(theException.StatusCode))
-                {
-                    throw new MalformedRequestException();
-                }
+                ProcessError(theException as DocumentClientException);
 
                 // we don't expect to ever get here...
                 return default(TDocument);
             });
+
+        /// <summary>
+        /// process (the) error
+        /// </summary>
+        /// <param name="theException">the exception</param>
+        internal void ProcessError(DocumentClientException theException)
+        {
+            if (It.IsNull(theException))
+            {
+                throw new MalformedRequestException();
+            }
+
+            if (HttpStatusCode.NotFound == theException.StatusCode)
+            {
+                throw new NoContentException();
+            }
+
+            if (LocalHttpStatusCode.TooManyRequests.ComparesTo(theException.StatusCode))
+            {
+                throw new MalformedRequestException();
+            }
+        }
     }
 }

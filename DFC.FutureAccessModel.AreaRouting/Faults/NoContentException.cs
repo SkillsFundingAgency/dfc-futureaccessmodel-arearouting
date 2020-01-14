@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace DFC.FutureAccessModel.AreaRouting.Faults
 {
     /// <summary>
     /// no content exception
     /// </summary>
-    public sealed class NoContentException :
-        Exception
+    [Serializable]
+    public class NoContentException :
+            Exception
     {
         public NoContentException() :
             base(GetMessage())
@@ -15,6 +17,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
 
         public NoContentException(string parentResource) :
             base(GetMessage(parentResource))
+        {
+        }
+
+        public NoContentException(string message, Exception innerException) :
+            base(message, innerException)
+        {
+        }
+
+        protected NoContentException(SerializationInfo info, StreamingContext context) :
+            base(info, context)
         {
         }
 

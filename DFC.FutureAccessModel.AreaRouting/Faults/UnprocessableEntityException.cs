@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace DFC.FutureAccessModel.AreaRouting.Faults
 {
     /// <summary>
     /// unprocessable entity exception
     /// </summary>
-    public sealed class UnprocessableEntityException :
-        Exception
+    [Serializable]
+    public class UnprocessableEntityException :
+            Exception
     {
         public UnprocessableEntityException() :
             base(GetMessage())
@@ -17,6 +19,21 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
 
         public UnprocessableEntityException(IReadOnlyDictionary<string, string> errors) :
             base(GetMessage(errors))
+        {
+        }
+
+        public UnprocessableEntityException(string message) :
+            base(message)
+        {
+        }
+
+        public UnprocessableEntityException(string message, Exception innerException) :
+            base(message, innerException)
+        {
+        }
+
+        protected UnprocessableEntityException(SerializationInfo info, StreamingContext context) :
+            base(info, context)
         {
         }
 

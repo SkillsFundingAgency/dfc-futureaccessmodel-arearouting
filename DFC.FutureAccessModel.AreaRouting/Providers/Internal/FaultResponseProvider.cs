@@ -19,7 +19,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <summary>
         /// the fault action map
         /// </summary>
-        private Dictionary<Type, Func<Exception, HttpResponseMessage>> _faultActionMap = new Dictionary<Type, Func<Exception, HttpResponseMessage>>();
+        private readonly Dictionary<Type, Func<Exception, HttpResponseMessage>> _faultActionMap = new Dictionary<Type, Func<Exception, HttpResponseMessage>>();
 
         /// <summary>
         /// initialises an instance of <see cref="FaultResponseProvider"/>
