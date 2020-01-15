@@ -3,16 +3,15 @@ using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
-using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.HTTP.Standard;
-using DFC.JSON.Standard;
+using Newtonsoft.Json;
 
 namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 {
-    internal sealed class GetAreaRoutingDetailByTouchpointIDFunctionAdapter :
-        IGetAreaRoutingDetailByTouchpointID
+    internal sealed class GetAreaRoutingDetailFunctionAdapter :
+        IGetAreaRoutingDetails
     {
         public IStoreAreaRoutingDetails StorageProvider { get; }
 
@@ -22,20 +21,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
         public IHttpResponseMessageHelper ResponseHelper { get; }
 
-        public IJsonHelper JsonHelper { get; }
-
-        public GetAreaRoutingDetailByTouchpointIDFunctionAdapter(
+        public GetAreaRoutingDetailFunctionAdapter(
             IStoreAreaRoutingDetails storageProvider,
             IHttpResponseMessageHelper httpResponseMessageHelper,
             IProvideFaultResponses faultResponses,
-            IProvideSafeOperations safeOperations,
-            IJsonHelper jsonHelper)
+            IProvideSafeOperations safeOperations)
         {
             StorageProvider = storageProvider;
             ResponseHelper = httpResponseMessageHelper;
             Faults = faultResponses;
             SafeOperations = safeOperations;
-            JsonHelper = jsonHelper;
         }
 
         /// <summary>
@@ -63,7 +58,40 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .AsGuard<MalformedRequestException>();
 
             var result = await StorageProvider.GetAreaRoutingDetailFor(theTouchpointID);
-            var contentResult = JsonHelper.SerializeObjectAndRenameIdProperty(result, "id", "TouchpointID");
+            var contentResult = JsonConvert.SerializeObject(result);
+            var response = ResponseHelper.Ok(contentResult);
+
+            await useLoggingScope.ExitMethod();
+
+            return await Task.FromResult(response);
+        }
+
+        public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext useLoggingScope) =>
+            await SafeOperations.Try(
+                () => ProcessGetAreaRoutingDetailBy(theLocation, useLoggingScope),
+                x => Faults.GetResponseFor(x, useLoggingScope));
+
+        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext useLoggingScope)
+        {
+            await useLoggingScope.EnterMethod();
+
+            It.IsEmpty(theLocation)
+                .AsGuard<MalformedRequestException>();
+
+            // TODO: things...
+            // integrate postcodes io
+            //      simplify code / interface ?
+            // determine what 'the location' is
+            //      postcode ?
+            //      town ?
+            //      something else ?
+            // define
+            //      the local authority model
+            //      the storage provider
+            //      extend the storage path provider
+
+            var result = await StorageProvider.GetAreaRoutingDetailFor(theLocation);
+            var contentResult = JsonConvert.SerializeObject(result);
             var response = ResponseHelper.Ok(contentResult);
 
             await useLoggingScope.ExitMethod();

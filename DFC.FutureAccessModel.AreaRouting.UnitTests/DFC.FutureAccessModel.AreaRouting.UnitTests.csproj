@@ -17,7 +17,6 @@
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
-            Include="Factories\Internal\" />
         <Folder Include="Storage\" />
         <Folder Include="Storage\Internal\" />
         <Folder Include="Functions\" />

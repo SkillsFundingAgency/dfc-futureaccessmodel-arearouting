@@ -56,9 +56,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             // arrange
             var sut = MakeSUT();
             var request = MakeRequest();
+            var log = MakeStrictMock<ILogger>();
 
             // act
-            var scope = await sut.BeginScopeFor(request);
+            var scope = await sut.BeginScopeFor(request, log);
 
             // assert
             Assert.NotNull(scope);
@@ -74,9 +75,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             // arrange
             var sut = MakeSUT();
             var request = MakeRequest();
+            var log = MakeStrictMock<ILogger>();
 
             // act
-            var scope = await sut.BeginScopeFor(request);
+            var scope = await sut.BeginScopeFor(request, log);
 
             // assert
             Assert.IsType<LoggingContextScope>(scope);
@@ -93,9 +95,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             // arrange
             var sut = MakeSUT();
             var request = MakeRequest();
+            var log = MakeStrictMock<ILogger>();
 
             // act
-            var scope = await sut.BeginScopeFor(request);
+            var scope = await sut.BeginScopeFor(request, log);
 
             // assert
             Assert.IsAssignableFrom<IScopeLoggingContext>(scope);
@@ -111,13 +114,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             // arrange
             var sut = MakeSUT();
             var request = MakeRequest();
+            var log = MakeStrictMock<ILogger>();
 
             // act
-            _= await sut.BeginScopeFor(request);
+            _ = await sut.BeginScopeFor(request, log);
 
             // assert
             GetMock(sut.LoggerHelper)
-                .Verify(x => x.LogInformationMessage(sut.Log, It.IsAny<Guid>(), It.IsAny<string>()), Times.Exactly(7));
+                .Verify(x => x.LogInformationMessage(log, It.IsAny<Guid>(), It.IsAny<string>()), Times.Exactly(7));
         }
 
         /// <summary>
@@ -173,20 +177,18 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <returns>the system under test</returns>
         internal LoggingContextScopeFactory MakeSUT()
         {
-            var log = MakeStrictMock<ILogger>();
-
             var helper = MakeStrictMock<ILoggerHelper>();
             GetMock(helper)
-                .Setup(x => x.LogInformationMessage(log, It.IsAny<Guid>(), It.IsAny<string>()));
+                .Setup(x => x.LogInformationMessage(It.IsAny<ILogger>(), It.IsAny<Guid>(), It.IsAny<string>()));
 
-            return MakeSUT(log, helper);
+            return MakeSUT(helper);
         }
 
         /// <summary>
         /// make a 'system under test'
         /// </summary>
         /// <returns>a document client factory</returns>
-        internal LoggingContextScopeFactory MakeSUT(ILogger log, ILoggerHelper logHelper) =>
-            new LoggingContextScopeFactory(log, logHelper);
+        internal LoggingContextScopeFactory MakeSUT(ILoggerHelper logHelper) =>
+            new LoggingContextScopeFactory(logHelper);
     }
 }

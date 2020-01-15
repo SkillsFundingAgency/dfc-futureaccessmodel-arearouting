@@ -46,6 +46,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>an area routing detail</returns>
         public async Task<IRoutingDetail> GetAreaRoutingDetailFor(string theTouchpointID)
         {
+            // TODO: enable this code once we are happy
             // var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpointID)
             // return await DocumentStore.GetDocument<RoutingDetail>(usingPath)
 

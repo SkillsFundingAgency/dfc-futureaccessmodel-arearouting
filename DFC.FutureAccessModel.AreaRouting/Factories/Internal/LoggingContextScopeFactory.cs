@@ -31,11 +31,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         public const string ValueNotFound = "(not found)";
 
         /// <summary>
-        /// the microsoft log
-        /// </summary>
-        public ILogger Log { get; }
-
-        /// <summary>
         /// the DFC logging helper
         /// </summary>
         public ILoggerHelper LoggerHelper { get; }
@@ -45,24 +40,27 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// </summary>
         /// <param name="log">the microsoft log</param>
         /// <param name="logHelper">the DFC logging helper</param>
-        public LoggingContextScopeFactory(ILogger log, ILoggerHelper logHelper)
+        public LoggingContextScopeFactory(ILoggerHelper logHelper)
         {
-            It.IsNull(log)
-                .AsGuard<ArgumentNullException>(nameof(log));
             It.IsNull(logHelper)
                 .AsGuard<ArgumentNullException>(nameof(logHelper));
 
-            Log = log;
             LoggerHelper = logHelper;
         }
 
         /// <summary>
         /// begin scope
         /// </summary>
-        /// <returns>a new logging context scope</returns>
-        public async Task<IScopeLoggingContext> BeginScopeFor(HttpRequest theRequest, [CallerMemberName] string initialisingRoutine = null)
+        /// <param name="theRequest">the request</param>
+        /// <param name="usingTraceWriter">using (the) trace writer</param>
+        /// <param name="initialisingRoutine">initalising routine</param>
+        /// <returns>a new logging scope</returns>
+        public async Task<IScopeLoggingContext> BeginScopeFor(
+            HttpRequest theRequest,
+            ILogger usingTraceWriter,
+            [CallerMemberName] string initialisingRoutine = null)
         {
-            var scope = new LoggingContextScope(Log, LoggerHelper, initialisingRoutine);
+            var scope = new LoggingContextScope(usingTraceWriter, LoggerHelper, initialisingRoutine);
 
             await scope.Information($"beginning scope for remote host, address: '{theRequest.HttpContext.Connection.RemoteIpAddress}' port: '{theRequest.HttpContext.Connection.RemotePort}'");
             await scope.Information($"request verb: '{theRequest.Method}");

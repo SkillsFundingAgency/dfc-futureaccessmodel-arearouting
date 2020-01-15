@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories
 {
@@ -12,7 +13,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
         /// <summary>
         /// begin scope
         /// </summary>
+        /// <param name="theRequest">the request</param>
+        /// <param name="usingTraceWriter">using (the) trace writer</param>
+        /// <param name="initialisingRoutine">initalising routine</param>
         /// <returns>a new logging scope</returns>
-        Task<IScopeLoggingContext> BeginScopeFor(HttpRequest theRequest, [CallerMemberName] string initialisingRoutine = null);
+        Task<IScopeLoggingContext> BeginScopeFor(
+            HttpRequest theRequest,
+            ILogger usingTraceWriter,
+            [CallerMemberName] string initialisingRoutine = null);
     }
 }

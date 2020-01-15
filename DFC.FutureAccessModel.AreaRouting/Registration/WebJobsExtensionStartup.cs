@@ -35,7 +35,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration
 
             // project level
             // adapters
-            builder.Services.AddSingleton<IGetAreaRoutingDetailByTouchpointID, GetAreaRoutingDetailByTouchpointIDFunctionAdapter>();
+            builder.Services.AddSingleton<IGetAreaRoutingDetails, GetAreaRoutingDetailFunctionAdapter>();
 
             // factories
             builder.Services.AddSingleton<ICreateDocumentClients, DocumentClientFactory>();

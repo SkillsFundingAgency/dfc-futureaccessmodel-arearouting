@@ -5,9 +5,9 @@ using DFC.FutureAccessModel.AreaRouting.Factories;
 namespace DFC.FutureAccessModel.AreaRouting.Adapters
 {
     /// <summary>
-    /// i get area routing detail by touchpoint id
+    /// i get area routing detail...
     /// </summary>
-    public interface IGetAreaRoutingDetailByTouchpointID
+    public interface IGetAreaRoutingDetails
     {
         /// <summary>
         /// get (the) area routing detail for...
@@ -16,5 +16,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters
         /// <param name="useLoggingScope">use (the) logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
         Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext useLoggingScope);
+
+        /// <summary>
+        /// get (the) area routing detail by...
+        /// </summary>
+        /// <param name="theLocation">the location</param>
+        /// <param name="useLoggingScope">use (the) logging scope</param>
+        /// <returns>the currently running task containing the response message (success or fail)</returns>
+        Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext useLoggingScope);
     }
 }
