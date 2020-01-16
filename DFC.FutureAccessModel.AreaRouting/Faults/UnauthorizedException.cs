@@ -12,33 +12,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         Exception
     {
         /// <summary>
-        /// initialises an instance of the <see cref="UnauthorizedAccessException"/>
+        /// initialises an instance of the <see cref="UnauthorizedException"/>
         /// </summary>
-        public UnauthorizedException()
+        public UnauthorizedException() :
+            base(string.Empty)
         {
         }
 
         /// <summary>
-        /// initialises an instance of the <see cref="UnauthorizedAccessException"/>
-        /// </summary>
-        /// <param name="message">message</param>
-        public UnauthorizedException(string message) :
-            base(message)
-        {
-        }
-
-        /// <summary>
-        /// initialises an instance of the <see cref="UnauthorizedAccessException"/>
-        /// </summary>
-        /// <param name="message">message</param>
-        /// <param name="innerException">inner exception</param>
-        public UnauthorizedException(string message, Exception innerException) :
-            base(message, innerException)
-        {
-        }
-
-        /// <summary>
-        /// initialises an instance of the <see cref="UnauthorizedAccessException"/>
+        /// initialises an instance of the <see cref="UnauthorizedException"/>
         /// </summary>
         /// <param name="info">info</param>
         /// <param name="context">context</param>

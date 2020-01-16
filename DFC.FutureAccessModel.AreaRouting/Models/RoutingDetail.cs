@@ -12,7 +12,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Models
         [Required]
         [Display(Description = "The region's unique identifier")]
         [StringLength(10, MinimumLength = 10)]
-        [Example(Description = TouchpointArea.EastMidlandsAndNorthamptonshire)]
+        [Example(Description = "0000000101")]
         public string TouchpointID { get; set; }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Models
         [StringLength(12)]
         [RegularExpression(ValidationExpressions.PhoneNumber)]
         [Display(Description = "The contractor's region specific contact 'text' number")]
-        [Example(Description = "01234 456789")]
+        [Example(Description = "07123 456789")]
         public string SMSNumber { get; set; }
 
         /// <summary>

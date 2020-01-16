@@ -13,22 +13,34 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
     internal sealed class GetAreaRoutingDetailFunctionAdapter :
         IGetAreaRoutingDetails
     {
+        /// <summary>
+        /// the (area routing) storage provider
+        /// </summary>
         public IStoreAreaRoutingDetails StorageProvider { get; }
 
+        /// <summary>
+        /// the fault (response provider)
+        /// </summary>
         public IProvideFaultResponses Faults { get; }
 
+        /// <summary>
+        /// the safe operations (provider)
+        /// </summary>
         public IProvideSafeOperations SafeOperations { get; }
 
-        public IHttpResponseMessageHelper ResponseHelper { get; }
+        /// <summary>
+        /// the response (helper)
+        /// </summary>
+        public IHttpResponseMessageHelper Respond { get; }
 
         public GetAreaRoutingDetailFunctionAdapter(
             IStoreAreaRoutingDetails storageProvider,
-            IHttpResponseMessageHelper httpResponseMessageHelper,
+            IHttpResponseMessageHelper responseHelper,
             IProvideFaultResponses faultResponses,
             IProvideSafeOperations safeOperations)
         {
             StorageProvider = storageProvider;
-            ResponseHelper = httpResponseMessageHelper;
+            Respond = responseHelper;
             Faults = faultResponses;
             SafeOperations = safeOperations;
         }
@@ -57,13 +69,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             It.IsEmpty(theTouchpointID)
                 .AsGuard<MalformedRequestException>();
 
-            var result = await StorageProvider.GetAreaRoutingDetailFor(theTouchpointID);
-            var contentResult = JsonConvert.SerializeObject(result);
-            var response = ResponseHelper.Ok(contentResult);
+            var theDetail = await StorageProvider.GetAreaRoutingDetailFor(theTouchpointID);
+            var withContent = JsonConvert.SerializeObject(theDetail);
+            var response = Respond.Ok(withContent);
 
             await useLoggingScope.ExitMethod();
 
-            return await Task.FromResult(response);
+            return response;
         }
 
         public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext useLoggingScope) =>
@@ -89,14 +101,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             //      the local authority model
             //      the storage provider
             //      extend the storage path provider
+            // fall back process
+            //      redirect to the national centre?
 
-            var result = await StorageProvider.GetAreaRoutingDetailFor(theLocation);
-            var contentResult = JsonConvert.SerializeObject(result);
-            var response = ResponseHelper.Ok(contentResult);
+            var theDetail = await StorageProvider.GetAreaRoutingDetailFor(theLocation);
+            var withContent = JsonConvert.SerializeObject(theDetail);
+            var response = Respond.Ok(withContent);
 
             await useLoggingScope.ExitMethod();
 
-            return await Task.FromResult(response);
+            return response;
         }
     }
 }

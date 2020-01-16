@@ -21,26 +21,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// initialises an instance of the <see cref="AccessForbiddenException"/>
         /// </summary>
         public AccessForbiddenException() :
-            this(ExceptionMessage)
-        {
-        }
-
-        /// <summary>
-        /// initialises an instance of the <see cref="AccessForbiddenException"/>
-        /// </summary>
-        /// <param name="message">message</param>
-        public AccessForbiddenException(string message) :
-            base(message)
-        {
-        }
-
-        /// <summary>
-        /// initialises an instance of the <see cref="AccessForbiddenException"/>
-        /// </summary>
-        /// <param name="message">message</param>
-        /// <param name="innerException">inner exception</param>
-        public AccessForbiddenException(string message, Exception innerException) :
-            base(message, innerException)
+            base(ExceptionMessage)
         {
         }
 

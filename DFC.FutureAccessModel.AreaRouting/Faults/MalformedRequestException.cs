@@ -14,26 +14,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// <summary>
         /// initialises an instance of the <see cref="MalformedRequestException"/>
         /// </summary>
-        public MalformedRequestException()
-        {
-        }
-
-        /// <summary>
-        /// initialises an instance of the <see cref="MalformedRequestException"/>
-        /// </summary>
-        /// <param name="message">message</param>
-        public MalformedRequestException(string message) :
-            base(message)
-        {
-        }
-
-        /// <summary>
-        /// initialises an instance of the <see cref="MalformedRequestException"/>
-        /// </summary>
-        /// <param name="message">message</param>
-        /// <param name="innerException">inner exception</param>
-        public MalformedRequestException(string message, Exception innerException) :
-            base(message, innerException)
+        public MalformedRequestException() :
+            base(string.Empty)
         {
         }
 

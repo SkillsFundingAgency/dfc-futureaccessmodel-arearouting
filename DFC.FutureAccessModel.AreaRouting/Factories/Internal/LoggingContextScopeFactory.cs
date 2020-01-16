@@ -63,11 +63,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             var scope = new LoggingContextScope(usingTraceWriter, LoggerHelper, initialisingRoutine);
 
             await scope.Information($"beginning scope for remote host, address: '{theRequest.HttpContext.Connection.RemoteIpAddress}' port: '{theRequest.HttpContext.Connection.RemotePort}'");
-            await scope.Information($"request verb: '{theRequest.Method}");
-            await scope.Information($"request content type: '{theRequest.ContentType}");
-            await scope.Information($"request query string: '{theRequest.QueryString}");
-            await scope.Information($"requested API Version: '{GetHeaderItemFrom(theRequest, HeaderVersion)}");
-            await scope.Information($"request API Key: '{GetHeaderItemFrom(theRequest, HeaderAPIKey)}");
+            await scope.Information($"request verb: '{theRequest.Method}'");
+            await scope.Information($"request content type: '{theRequest.ContentType}'");
+            await scope.Information($"request query string: '{theRequest.QueryString}'");
+            await scope.Information($"requested API Version: '{GetHeaderItemFrom(theRequest, HeaderVersion)}'");
+            await scope.Information($"request API Key: '{GetHeaderItemFrom(theRequest, HeaderAPIKey)}'");
 
             return scope;
         }

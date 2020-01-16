@@ -25,6 +25,7 @@
         <Folder Include="Factories\Internal\" />
         <Folder Include="Providers\" />
         <Folder Include="Providers\Internal\" />
+        <Folder Include="Faults\" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\DFC.FutureAccessModel.AreaRouting\DFC.FutureAccessModel.AreaRouting.csproj" />

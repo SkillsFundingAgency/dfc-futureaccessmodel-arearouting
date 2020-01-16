@@ -26,23 +26,23 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="logging"></param>
         /// <param name="adapter"></param>
         /// <returns></returns>
-        [FunctionName("GetAreaRoutingDetailByLocationFunction")]
+        [FunctionName("GetAreaRoutingDetailByLocation")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "The Routing Detail was found", ShowSchema = true)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "The Routing Detail does not exist for the given Touchpoint", ShowSchema = false)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Request was malformed", ShowSchema = false)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
-        [Display(Name = "Get", Description = "Ability to return a Routing Detail for the given Location.")]
+        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = FunctionDescription.RoutingDetailFound, ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.RoutingDetailDoesNotExist, ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = FunctionDescription.MalformedRequest, ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
+        [Display(Name = "Get", Description = "Ability to return a Routing Detail for the given Location in the form areas/?location=WV12%202PT.")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/{theLocation}")]HttpRequest theRequest,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas")]HttpRequest theRequest,
             ILogger usingTraceWriter,
-            string theLocation,
             [Inject] ICreateLoggingContextScopes logging,
             [Inject] IGetAreaRoutingDetails adapter)
         {
             using (var scope = await logging.BeginScopeFor(theRequest, usingTraceWriter))
             {
+                var theLocation = theRequest.Query["location"];
                 return await adapter.GetAreaRoutingDetailBy(theLocation, scope);
             }
         }

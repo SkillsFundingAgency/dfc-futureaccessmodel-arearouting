@@ -17,35 +17,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// initialise an instance of the <see cref="UnprocessableEntityException"/>
         /// </summary>
         public UnprocessableEntityException() :
-            this(GetMessage())
-        {
-        }
-
-        /// <summary>
-        /// initialise an instance of the <see cref="UnprocessableEntityException"/>
-        /// </summary>
-        /// <param name="errors"></param>
-        public UnprocessableEntityException(IReadOnlyDictionary<string, string> errors) :
-            this(GetMessage(errors))
-        {
-        }
-
-        /// <summary>
-        /// initialise an instance of the <see cref="UnprocessableEntityException"/>
-        /// </summary>
-        /// <param name="message">message</param>
-        public UnprocessableEntityException(string message) :
-            base(message)
-        {
-        }
-
-        /// <summary>
-        /// initialise an instance of the <see cref="UnprocessableEntityException"/>
-        /// </summary>
-        /// <param name="message">message</param>
-        /// <param name="innerException">inner exception</param>
-        public UnprocessableEntityException(string message, Exception innerException) :
-            base(message, innerException)
+            base(GetMessage())
         {
         }
 

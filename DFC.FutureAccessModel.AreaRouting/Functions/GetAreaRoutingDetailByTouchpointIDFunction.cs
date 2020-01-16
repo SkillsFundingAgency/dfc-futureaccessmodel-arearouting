@@ -19,6 +19,18 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
     {
         /// <summary>
         /// run...
+        /// touchpoint details (2020-01-16)
+        /// 0000000101, East of England and Buckinghamshire
+        /// 0000000102, East Midlands and Northamptonshire
+        /// 0000000103, London
+        /// 0000000104, West Midlands
+        /// 0000000105, North West
+        /// 0000000106, North East and Cumbria
+        /// 0000000107, South East
+        /// 0000000108, South West
+        /// 0000000109, Yorkshire and Humber
+        /// 0000000999, National Careers Helpline
+        /// 1000000000, Digital
         /// </summary>
         /// <param name="theRequest">the request</param>
         /// <param name="usingTraceWriter">using (the) trace writer</param>
@@ -28,11 +40,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <returns></returns>
         [FunctionName("GetAreaRoutingDetailByTouchpointID")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "The Routing Detail was found", ShowSchema = true)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "The Routing Detail does not exist for the given Touchpoint", ShowSchema = false)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Request was malformed", ShowSchema = false)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = FunctionDescription.RoutingDetailFound, ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.RoutingDetailDoesNotExist, ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = FunctionDescription.MalformedRequest, ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Get", Description = "Ability to return a Routing Detail for the given Touchpoint.")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/{touchpointID}")]HttpRequest theRequest,

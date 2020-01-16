@@ -19,8 +19,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         // load local settings and check your variables are loaded
         // if this is a production deployment (release), this code will be missing
 
-        IConfiguration _config;
-
         static string[] _keys = {
             "DocumentStoreID",
             "RoutingDetailCollectionID",
@@ -31,7 +29,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
         public ApplicationSettingsProvider()
         {
-            _config = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                 .AddJsonFile(Path.Combine(Environment.CurrentDirectory, "local.settings.json"), true, true)
                 .AddEnvironmentVariables()
                 .Build();
@@ -43,10 +41,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                     var candidate = GetVariable(x);
                     if (It.IsNull(candidate))
                     {
-                        candidate = _config.GetSection("Values")[x];
+                        candidate = config.GetSection("Values")[x];
                         Console.WriteLine($"candidate value for: {x} => '{candidate}'");
+
                         Environment.SetEnvironmentVariable(x, candidate);
                         Console.WriteLine($"value applied for: {x} => '{GetVariable(x)}'");
+
                         return;
                     }
 

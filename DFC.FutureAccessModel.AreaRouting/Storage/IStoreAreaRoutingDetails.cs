@@ -8,6 +8,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage
     /// </summary>
     public interface IStoreAreaRoutingDetails
     {
+        /// <summary>
+        /// get (the) area routing detail for...
+        /// </summary>
+        /// <param name="theTouchpointID">the touchpoint id</param>
+        /// <returns>an area routing detail</returns>
         Task<IRoutingDetail> GetAreaRoutingDetailFor(string theTouchpointID);
     }
 }
