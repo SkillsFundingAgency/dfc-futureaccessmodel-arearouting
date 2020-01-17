@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
+using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.HTTP.Standard;
@@ -124,6 +125,40 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await Assert.ThrowsAsync<MalformedRequestException>(()=> sut.ProcessGetAreaRoutingDetailFor(touchpointID, scope));
         }
 
+        [Fact]
+        public async Task GetAreaRoutingDetailForValidTouchpointMeetsVerification()
+        {
+            // arrange
+            const string touchpoint = "any old touchpoint";
+            const string resultText = "{\"TouchpointID\":null,\"Area\":null,\"TelephoneNumber\":null,\"SMSNumber\":null,\"EmailAddress\":null}";
+
+            var sut = MakeSUT();
+            GetMock(sut.StorageProvider)
+                .Setup(x => x.GetAreaRoutingDetailFor(touchpoint))
+                .Returns(Task.FromResult<IRoutingDetail>(new RoutingDetail()));
+            GetMock(sut.Respond)
+                .Setup(x => x.Ok(resultText))
+                .Returns(new HttpResponseMessage());
+
+            var scope = MakeStrictMock<IScopeLoggingContext>();
+            GetMock(scope)
+                .Setup(x => x.EnterMethod("ProcessGetAreaRoutingDetailFor"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.ExitMethod("ProcessGetAreaRoutingDetailFor"))
+                .Returns(Task.CompletedTask);
+
+            // act
+            var result = await sut.ProcessGetAreaRoutingDetailFor(touchpoint, scope);
+
+            // assert
+            Assert.IsAssignableFrom<HttpResponseMessage>(result);
+            GetMock(sut.StorageProvider).VerifyAll();
+            GetMock(sut.Respond).VerifyAll();
+            GetMock(sut.Faults).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
         /// <summary>
         /// get area routing detail by, meets verification
         /// </summary>
@@ -170,6 +205,46 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
             // act / assert
             await Assert.ThrowsAsync<MalformedRequestException>(() => sut.ProcessGetAreaRoutingDetailBy(location, scope));
+        }
+
+        [Fact]
+        public async Task GetAreaRoutingDetailByValidLocationMeetsVerification()
+        {
+            // arrange
+            const string location = "any old location";
+            const string resultText = "{\"TouchpointID\":null,\"Area\":null,\"TelephoneNumber\":null,\"SMSNumber\":null,\"EmailAddress\":null}";
+
+            var sut = MakeSUT();
+            GetMock(sut.StorageProvider)
+                .Setup(x => x.GetAreaRoutingDetailFor(location))
+                .Returns(Task.FromResult<IRoutingDetail>(new RoutingDetail()));
+            GetMock(sut.Respond)
+                .Setup(x => x.Ok(resultText))
+                .Returns(new HttpResponseMessage());
+
+            var scope = MakeStrictMock<IScopeLoggingContext>();
+            GetMock(scope)
+                .Setup(x => x.EnterMethod("ProcessGetAreaRoutingDetailBy"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.ExitMethod("ProcessGetAreaRoutingDetailBy"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.EnterMethod("ProcessGetAreaRoutingDetailFor"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.ExitMethod("ProcessGetAreaRoutingDetailFor"))
+                .Returns(Task.CompletedTask);
+
+            // act
+            var result = await sut.ProcessGetAreaRoutingDetailBy(location, scope);
+
+            // assert
+            Assert.IsAssignableFrom<HttpResponseMessage>(result);
+            GetMock(sut.StorageProvider).VerifyAll();
+            GetMock(sut.Respond).VerifyAll();
+            GetMock(sut.Faults).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
         }
 
         /// <summary>

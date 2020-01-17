@@ -73,6 +73,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             GetMock(sut.LoggerHelper).VerifyAll();
         }
 
+        /// <summary>
+        /// recording a message, log helper meets verification
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
         [Fact]
         public async Task RecordingAMessageLogHelperMeetsVerification()
         {
@@ -91,6 +95,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             GetMock(sut.LoggerHelper).VerifyAll();
         }
 
+        /// <summary>
+        /// recording an exception, log helper meets verification
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
         [Fact]
         public async Task RecordingAnExceptionLogHelperMeetsVerification()
         {
@@ -102,6 +110,27 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
 
             // act
             await sut.ExceptionDetail(exception);
+
+            // assert
+            GetMock(sut.Log).VerifyAll();
+            GetMock(sut.LoggerHelper).VerifyAll();
+        }
+
+        /// <summary>
+        /// recording a message during dispose,log helper meets verification
+        /// </summary>
+        [Fact]
+        public void RecordingAMessageDuringDisposeLogHelperMeetsVerification()
+        {
+            // arrange
+            const string message = "request completed";
+
+            var sut = MakeSUT();
+            GetMock(sut.LoggerHelper)
+                .Setup(x => x.LogInformationMessage(sut.Log, sut.CorrelationID, message));
+
+            // act
+            sut.Dispose();
 
             // assert
             GetMock(sut.Log).VerifyAll();

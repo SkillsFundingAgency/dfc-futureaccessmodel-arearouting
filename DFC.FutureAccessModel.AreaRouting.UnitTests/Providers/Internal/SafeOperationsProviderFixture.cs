@@ -21,6 +21,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             Assert.IsAssignableFrom<IProvideSafeOperations>(MakeSUT());
         }
 
+        /// <summary>
+        /// void try with exception meets expectation
+        /// </summary>
+        /// <param name="expectedException">the expected exception</param>
+        /// <returns>the currently running (test) task</returns>
         [Theory]
         [InlineData(typeof(MalformedRequestException))]
         [InlineData(typeof(UnauthorizedException))]
@@ -43,7 +48,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <summary>
         /// void try meets expectation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the currently running (test) task</returns>
         [Fact]
         public async Task VoidTryMeetsExpectation()
         {
@@ -62,11 +67,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             Assert.False(threwError);
         }
 
+        /// <summary>
+        /// try with result meets expectation
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
+        /// <param name="expectedResult"></param>
+        /// <param name="expectedState"></param>
+        /// <returns>the currently running (test) task</returns>
         [Theory]
-        [InlineData(0, 0, -1, true)]
+        [InlineData(0, 0, -1, true)] // this will throw divide by zero exception
         [InlineData(0, 1, 0, false)]
         [InlineData(1, 1, 1, false)]
-        [InlineData(1, 0, -1, true)]
+        [InlineData(1, 0, -1, true)] // this will throw divide by zero exception
         public async Task TryWithResultMeetsExpectation(int first, int second, int expectedResult, bool expectedState)
         {
             // arrange

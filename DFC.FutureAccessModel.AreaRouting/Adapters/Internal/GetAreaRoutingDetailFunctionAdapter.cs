@@ -122,6 +122,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             It.IsEmpty(theLocation)
                 .AsGuard<MalformedRequestException>();
 
+            var theTouchpoint = theLocation;
+
             // TODO: things...
             // integrate postcodes io
             //      simplify code / interface ?
@@ -136,13 +138,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             // fall back process
             //      redirect to the national centre?
 
-            var theDetail = await StorageProvider.GetAreaRoutingDetailFor(theLocation);
-            var withContent = JsonConvert.SerializeObject(theDetail);
-            var response = Respond.Ok(withContent);
-
             await inLoggingScope.ExitMethod();
 
-            return response;
+            return await ProcessGetAreaRoutingDetailFor(theTouchpoint, inLoggingScope);
         }
     }
 }
