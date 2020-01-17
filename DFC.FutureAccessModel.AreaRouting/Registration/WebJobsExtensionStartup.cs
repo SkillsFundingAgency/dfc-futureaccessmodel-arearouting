@@ -1,4 +1,5 @@
-﻿using DFC.Common.Standard.Logging;
+﻿using System.Diagnostics.CodeAnalysis;
+using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Adapters.Internal;
@@ -19,6 +20,12 @@ using Microsoft.Extensions.DependencyInjection;
 [assembly: WebJobsStartup(typeof(AreaRoutingWebJobsExtensionStartup), "Area Routing Web Jobs Extension Startup")]
 namespace DFC.FutureAccessModel.AreaRouting.Registration
 {
+    /// <summary>
+    /// area routing web jobs extension startup
+    /// this can't be tested because the service collection utilises routine
+    /// grafting that cannot be 'substituted' (static dpeendency)
+    /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class AreaRoutingWebJobsExtensionStartup :
         IWebJobsStartup
     {
@@ -28,10 +35,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration
 
             // inherited, package level
             builder.Services.AddSingleton<ILoggerHelper, LoggerHelper>();
-            builder.Services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
             builder.Services.AddSingleton<IHttpResponseMessageHelper, HttpResponseMessageHelper>();
-            builder.Services.AddSingleton<IJsonHelper, JsonHelper>();
             builder.Services.AddSingleton<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();
+
+            // might need to put these back at some point
+            // builder.Services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>()
+            // builder.Services.AddSingleton<IJsonHelper, JsonHelper>()
 
             // project level
             // adapters

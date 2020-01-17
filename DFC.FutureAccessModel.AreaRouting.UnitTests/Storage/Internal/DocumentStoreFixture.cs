@@ -398,9 +398,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         internal DocumentStore MakeSUT(
             IProvideApplicationSettings settings,
             ICreateDocumentClients factory,
-            IProvideSafeOperations safeOperator)
-        {
-            return new DocumentStore(settings, factory, safeOperator);
-        }
+            IProvideSafeOperations safeOperator) =>
+                new DocumentStore(settings, factory, safeOperator);
     }
 }
