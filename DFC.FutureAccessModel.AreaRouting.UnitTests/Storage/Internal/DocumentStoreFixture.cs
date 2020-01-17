@@ -43,7 +43,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// the document store endpoint address key meets expectation
         /// </summary>
         [Fact]
-        public void DocumentStoreEndpointAddressKeyMeetsExpectation()
+        public void EndpointAddressKeyMeetsExpectation()
         {
             // arrange / act / assert
             Assert.Equal(storeEndpointAddressKey, DocumentStore.DocumentStoreEndpointAddressKey);
@@ -53,17 +53,17 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// the document store account key meets expectation
         /// </summary>
         [Fact]
-        public void DocumentStoreAccountKeyMeetsExpectation()
+        public void AccountKeyMeetsExpectation()
         {
             // arrange / act / assert
             Assert.Equal(storeAccountKey, DocumentStore.DocumentStoreAccountKey);
         }
 
         /// <summary>
-        /// new document store build fails with null settings
+        /// build with null settings throws
         /// </summary>
         [Fact]
-        public void NewDocumentStoreBuildFailsWithNullSettings()
+        public void BuildWithNullSettingsThrows()
         {
             // arrange
             var factory = MakeStrictMock<ICreateDocumentClients>();
@@ -74,10 +74,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// new document store build fails with null settings
+        /// build with null factory throws
         /// </summary>
         [Fact]
-        public void NewDocumentStoreBuildFailsWithNullFactory()
+        public void BuildWithNullFactoryThrows()
         {
             // arrange
             var settings = MakeStrictMock<IProvideApplicationSettings>();
@@ -88,10 +88,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// new document store build fails with null safe operations
+        /// build with null safe operations throws
         /// </summary>
         [Fact]
-        public void NewDocumentStoreBuildFailsWithNullSafeOperations()
+        public void BuildWithNullSafeOperationsThrows()
         {
             // arrange
             var settings = MakeStrictMock<IProvideApplicationSettings>();
@@ -102,7 +102,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// new document store build failure meets expectation
+        /// build failure meets expectation
         /// </summary>
         /// <param name="endpointAddress">the test endpoint address</param>
         /// <param name="accountKey">the test account key</param>
@@ -112,7 +112,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         [InlineData(null, "anyOldAccountKey", typeof(ArgumentNullException))]
         [InlineData("anyOldEndpoint", null, typeof(ArgumentNullException))]
         [InlineData("anyOldEndpoint", "anyOldAccountKey", typeof(UriFormatException))]
-        public void NewDocumentStoreBuildFailureMeetsExpectation(string endpointAddress, string accountKey, Type expectedException)
+        public void BuildFailureMeetsExpectation(string endpointAddress, string accountKey, Type expectedException)
         {
             // arrange
             var settings = MakeStrictMock<IProvideApplicationSettings>();
@@ -131,10 +131,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// new document store meets verification
+        /// build meets verification
         /// </summary>
         [Fact]
-        public void NewDocumentStoreBuildMeetsVerification()
+        public void BuildMeetsVerification()
         {
             // arrange
             const string accountKeyValue = "anyOldAccountKey";
@@ -326,12 +326,31 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
+        /// process get document error handler with null http status code
+        /// this shouldn't happen and is the test in place only for code coverage
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task ProcessGetDocumentErrorHandlerWithNullHttpStatusCode()
+        {
+            // arrange
+            var sut = MakeSUT();
+            var exception = MakeDocumentClientException(null);
+
+            // act / assert
+            var result = await sut.ProcessGetDocumentErrorHandler<RoutingDetail>(exception);
+
+            // assert
+            Assert.Equal(null, result);
+        }
+
+        /// <summary>
         /// make (a) document client exception
         /// all constructors have been internalised for some reason so we can't mock or 'new' up
         /// </summary>
         /// <param name="httpStatusCode"></param>
         /// <returns>a document client exception</returns>
-        internal DocumentClientException MakeDocumentClientException(HttpStatusCode httpStatusCode)
+        internal DocumentClientException MakeDocumentClientException(HttpStatusCode? httpStatusCode)
         {
             var type = typeof(DocumentClientException);
             var name = type.FullName;

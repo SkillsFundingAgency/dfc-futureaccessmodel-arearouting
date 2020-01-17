@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 #if DEBUG
 using System.IO;
 using System.Linq;
@@ -10,9 +11,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
     /// <summary>
     /// the application settings provider
+    /// this is a shim for environment variables and as such, cannot be tested.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal sealed class ApplicationSettingsProvider :
-        IProvideApplicationSettings
+            IProvideApplicationSettings
     {
 #if DEBUG
         // on the basis we are running local and debugging...

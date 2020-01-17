@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
-using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.HTTP.Standard;
@@ -18,7 +17,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
     {
         /// <summary>
-        /// run with null (document) storage (provider) throws
+        /// build with null (document) storage (provider) throws
         /// </summary>
         [Fact]
         public void BuildWithNullTraceThrows()
@@ -33,7 +32,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         }
 
         /// <summary>
-        /// run with null response helper throws
+        /// build with null response helper throws
         /// </summary>
         [Fact]
         public void BuildWithNullResponseHelperThrows()
@@ -48,7 +47,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         }
 
         /// <summary>
-        /// run with null fault response provider throws
+        /// build with null fault response provider throws
         /// </summary>
         [Fact]
         public void BuildWithNullFaultsResponseProviderThrows()
@@ -63,7 +62,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         }
 
         /// <summary>
-        /// run with null safe operations provider throws
+        /// build with null safe opeations throws
         /// </summary>
         [Fact]
         public void BuildWithNullSafeOperationsThrows()
@@ -77,6 +76,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(store, helper, faults, null));
         }
 
+        /// <summary>
+        /// get area routing detail for, meets verification
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetAreaRoutingDetailForMeetsVerification()
         {
@@ -99,6 +102,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             GetMock(sut.SafeOperations).VerifyAll();
         }
 
+        /// <summary>
+        /// process get area routing detail for invalid touchpoint id meets expectation
+        /// </summary>
+        /// <param name="touchpointID"></param>
+        /// <returns></returns>
         [Theory]
         [InlineData("")]
         [InlineData(null)]
@@ -116,6 +124,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await Assert.ThrowsAsync<MalformedRequestException>(()=> sut.ProcessGetAreaRoutingDetailFor(touchpointID, scope));
         }
 
+        /// <summary>
+        /// get area routing detail by, meets verification
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetAreaRoutingDetailByMeetsVerification()
         {
@@ -138,10 +150,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             GetMock(sut.SafeOperations).VerifyAll();
         }
 
+        /// <summary>
+        /// process get area routing detail by invalid location meets expectation
+        /// </summary>
+        /// <param name="location">the location</param>
+        /// <returns></returns>
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public async Task ProcessGetAreaRoutingDetailForInvalidLocationMeetsExpectation(string location)
+        public async Task ProcessGetAreaRoutingDetailByInvalidLocationMeetsExpectation(string location)
         {
             // arrange
             var sut = MakeSUT();

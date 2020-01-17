@@ -22,10 +22,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// new area routing detail store build fails with null paths
+        /// build with null paths throws
         /// </summary>
         [Fact]
-        public void NewAreaRoutingDetailStoreBuildFailsWithNullPaths()
+        public void BuildWithNullPathsThrows()
         {
             // arrange
             var store = MakeStrictMock<IStoreDocuments>();
@@ -35,10 +35,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// new area routing detail store build fails with null store
+        /// build with null store throws
         /// </summary>
         [Fact]
-        public void NewAreaRoutingDetailStoreBuildFailsWithNullStore()
+        public void BuildWithNullStoreThrows()
         {
             // arrange
             var paths = MakeStrictMock<IProvideStoragePaths>();
@@ -48,10 +48,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// new area routing detail store build meets verification
+        /// build meets verification
         /// </summary>
         [Fact]
-        public void NewAreaRoutingDetailStoreBuildMeetsVerification()
+        public void BuildMeetsVerification()
         {
             // arrange
             var paths = MakeStrictMock<IProvideStoragePaths>();

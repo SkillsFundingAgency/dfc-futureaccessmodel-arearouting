@@ -19,7 +19,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// the api definition title meets expectation
         /// </summary>
         [Fact]
-        public void APIDefinitionFunctionTitleMeetsExpectation()
+        public void TitleMeetsExpectation()
         {
             // arrange / act / assert
             Assert.Equal("areas", ApiDefinitionFunction.ApiTitle);
@@ -29,7 +29,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// the api definition version meets expectation
         /// </summary>
         [Fact]
-        public void APIDefinitionFunctionVersionMeetsExpectation()
+        public void VersionMeetsExpectation()
         {
             // arrange / act / assert
             Assert.Equal("1.0.0", ApiDefinitionFunction.ApiVersion);
@@ -39,7 +39,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// the api definition name meets expectation
         /// </summary>
         [Fact]
-        public void APIDefinitionFunctionNameMeetsExpectation()
+        public void NameMeetsExpectation()
         {
             // arrange / act / assert
             Assert.Equal("api-definition", ApiDefinitionFunction.ApiDefinitionName);
@@ -49,7 +49,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// the api definition description is not empty
         /// </summary>
         [Fact]
-        public void APIDefinitionFunctionDescriptionIsNotEmpty()
+        public void DescriptionIsNotEmpty()
         {
             // arrange / act / assert
             Assert.NotSame(string.Empty, ApiDefinitionFunction.ApiDescription);
@@ -59,7 +59,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// the api definition run routine throws with a null http request
         /// </summary>
         [Fact]
-        public async Task APIDefinitionFunctionRunWithNullRequestThrows()
+        public async Task RunWithNullRequestThrows()
         {
             // arrange
             var generator = MakeStrictMock<ISwaggerDocumentGenerator>();

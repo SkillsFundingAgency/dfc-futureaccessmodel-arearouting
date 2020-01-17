@@ -50,48 +50,71 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             Assert.IsAssignableFrom<IProvideStoragePaths>(MakeSUT());
         }
 
+        /// <summary>
+        /// document store id key meets expectation
+        /// </summary>
         [Fact]
-        public void StoragePathProviderDocumentStoreIDKeyMeetsExpectation()
+        public void DocumentStoreIDKeyMeetsExpectation()
         {
             // arrange / act / assert
             Assert.Equal(storeIDKey, StoragePathProvider.DocumentStoreIDKey);
         }
 
+        /// <summary>
+        /// routing collection id key meets expectation
+        /// </summary>
         [Fact]
-        public void StoragePathProviderRoutingDetailCollectionIDKeyMeetsExpectation()
+        public void RoutingDetailCollectionIDKeyMeetsExpectation()
         {
             // arrange / act / assert
             Assert.Equal(storeRoutingCollectionIDKey, StoragePathProvider.RoutingDetailCollectionIDKey);
         }
 
+        /// <summary>
+        /// local authority collection id key meets expectation
+        /// </summary>
         [Fact]
-        public void StoragePathProviderLocalAuthorityCollectionIDKeyMeetsExpectation()
+        public void LocalAuthorityCollectionIDKeyMeetsExpectation()
         {
             // arrange / act / assert
             Assert.Equal(storeLACollectionIDKey, StoragePathProvider.LocalAuthorityCollectionIDKey);
         }
 
         /// <summary>
-        /// new storage path provider build fails with null settings
+        /// build with null settings throws
         /// </summary>
         [Fact]
-        public void NewStoragePathProviderBuildFailsWithNullSettings()
+        public void BuildWithNullSettingsThrows()
         {
             // arrange / act / assert
             Assert.Throws<ArgumentNullException>(() => MakeSUT(null));
         }
 
         /// <summary>
-        /// new storage path provider build meets verification
+        /// build meets verification
         /// </summary>
         [Fact]
-        public void NewStoragePathProviderBuildMeetsVerification()
+        public void BuildMeetsVerification()
         {
             // arrange / act
             var sut = MakeSUT();
 
             // assert
             GetMock(sut.Settings).VerifyAll();
+        }
+
+        /// <summary>
+        /// build storage collection paths meet expectation
+        /// </summary>
+        [Fact]
+        public void BuildStorageCollectionPathsMeetExpectation()
+        {
+            // arrange
+            var sut = MakeSUT();
+
+            // act / assert
+            Assert.Equal("dbs/Store/colls/Authorities", sut.LocalAuthorityCollection.OriginalString);
+            Assert.Equal("dbs/Store/colls/Details", sut.RoutingDetailCollection.OriginalString);
         }
 
         /// <summary>

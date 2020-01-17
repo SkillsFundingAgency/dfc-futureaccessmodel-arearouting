@@ -40,6 +40,28 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 x => { Assert.IsType(expectedException, x); return Task.CompletedTask; });
         }
 
+        /// <summary>
+        /// void try meets expectation
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task VoidTryMeetsExpectation()
+        {
+            // arrange
+            var sut = MakeSUT();
+            var threwError = false;
+            var testItem = 1;
+
+            // act / assert
+            await sut.Try(
+                () => Task.Run(() => testItem++),
+                x => { threwError = true; return Task.CompletedTask; });
+
+            // assert
+            Assert.Equal(2, testItem);
+            Assert.False(threwError);
+        }
+
         [Theory]
         [InlineData(0, 0, -1, true)]
         [InlineData(0, 1, 0, false)]
