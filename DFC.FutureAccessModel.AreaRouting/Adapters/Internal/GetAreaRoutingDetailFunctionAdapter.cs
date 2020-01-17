@@ -69,22 +69,22 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// get (the) area routing detail for...
         /// </summary>
         /// <param name="theTouchpointID">the touchpoint id</param>
-        /// <param name="useLoggingScope">use (the) logging scope</param>
+        /// <param name="inLoggingScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext useLoggingScope) =>
+        public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inLoggingScope) =>
             await SafeOperations.Try(
-                () => ProcessGetAreaRoutingDetailFor(theTouchpointID, useLoggingScope),
-                x => Faults.GetResponseFor(x, useLoggingScope));
+                () => ProcessGetAreaRoutingDetailFor(theTouchpointID, inLoggingScope),
+                x => Faults.GetResponseFor(x, inLoggingScope));
 
         /// <summary>
         /// process, get (the) area routing detail for...
         /// </summary>
         /// <param name="theTouchpointID">the touchpoint id</param>
-        /// <param name="useLoggingScope">use (the) logging scope</param>
+        /// <param name="inLoggingScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success only)</returns>
-        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext useLoggingScope)
+        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inLoggingScope)
         {
-            await useLoggingScope.EnterMethod();
+            await inLoggingScope.EnterMethod();
 
             It.IsEmpty(theTouchpointID)
                 .AsGuard<MalformedRequestException>();
@@ -93,7 +93,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             var withContent = JsonConvert.SerializeObject(theDetail);
             var response = Respond.Ok(withContent);
 
-            await useLoggingScope.ExitMethod();
+            await inLoggingScope.ExitMethod();
 
             return response;
         }
@@ -102,22 +102,22 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// get (the) area routing detail by...
         /// </summary>
         /// <param name="theLocation">the location</param>
-        /// <param name="useLoggingScope">use (the) logging scope</param>
+        /// <param name="inLoggingScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext useLoggingScope) =>
+        public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inLoggingScope) =>
             await SafeOperations.Try(
-                () => ProcessGetAreaRoutingDetailBy(theLocation, useLoggingScope),
-                x => Faults.GetResponseFor(x, useLoggingScope));
+                () => ProcessGetAreaRoutingDetailBy(theLocation, inLoggingScope),
+                x => Faults.GetResponseFor(x, inLoggingScope));
 
         /// <summary>
         /// process, get (the) area routing detail by...
         /// </summary>
         /// <param name="theLocation">the location</param>
-        /// <param name="useLoggingScope">use (the) logging scope</param>
+        /// <param name="inLoggingScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext useLoggingScope)
+        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inLoggingScope)
         {
-            await useLoggingScope.EnterMethod();
+            await inLoggingScope.EnterMethod();
 
             It.IsEmpty(theLocation)
                 .AsGuard<MalformedRequestException>();
@@ -140,7 +140,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             var withContent = JsonConvert.SerializeObject(theDetail);
             var response = Respond.Ok(withContent);
 
-            await useLoggingScope.ExitMethod();
+            await inLoggingScope.ExitMethod();
 
             return response;
         }

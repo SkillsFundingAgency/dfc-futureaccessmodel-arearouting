@@ -17,7 +17,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// <summary>
         /// the exception message
         /// </summary>
-        /// <returns>the exception message</returns>
         public const string ExceptionMessage = "Insufficient access to this resource";
 
         /// <summary>
@@ -25,6 +24,25 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// </summary>
         public AccessForbiddenException() :
             base(ExceptionMessage)
+        {
+        }
+
+        /// <summary>
+        /// initialises an instance of the <see cref="AccessForbiddenException"/>
+        /// </summary>
+        /// <param name="message"></param>
+        public AccessForbiddenException(string message) :
+            base(ExceptionMessage)
+        {
+        }
+
+        /// <summary>
+        /// initialises an instance of the <see cref="AccessForbiddenException"/>
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="innerException"></param>
+        public AccessForbiddenException(string message, Exception innerException) :
+            base(ExceptionMessage, innerException)
         {
         }
 

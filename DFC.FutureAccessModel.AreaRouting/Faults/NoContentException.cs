@@ -25,6 +25,25 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// <summary>
         /// initialises an instance of the <see cref="NoContentException"/>
         /// </summary>
+        /// <param name="message">message</param>
+        public NoContentException(string message) :
+            base(GetMessage())
+        {
+        }
+
+        /// <summary>
+        /// initialises an instance of the <see cref="NoContentException"/>
+        /// </summary>
+        /// <param name="message">message</param>
+        /// <param name="innerException">inner exception</param>
+        public NoContentException(string message, Exception innerException) :
+            base(GetMessage(), innerException)
+        {
+        }
+
+        /// <summary>
+        /// initialises an instance of the <see cref="NoContentException"/>
+        /// </summary>
         /// <param name="info">info</param>
         /// <param name="context">context</param>
         protected NoContentException(SerializationInfo info, StreamingContext context) :

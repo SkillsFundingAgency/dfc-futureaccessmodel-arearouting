@@ -27,6 +27,25 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// <summary>
         /// initialise an instance of the <see cref="UnprocessableEntityException"/>
         /// </summary>
+        /// <param name="message">message</param>
+        public UnprocessableEntityException(string message) :
+            base(GetMessage())
+        {
+        }
+
+        /// <summary>
+        /// initialise an instance of the <see cref="UnprocessableEntityException"/>
+        /// </summary>
+        /// <param name="message">message</param>
+        /// <param name="innerException">inner exception</param>
+        public UnprocessableEntityException(string message, Exception innerException) :
+            base(GetMessage(), innerException)
+        {
+        }
+
+        /// <summary>
+        /// initialise an instance of the <see cref="UnprocessableEntityException"/>
+        /// </summary>
         /// <param name="info">info</param>
         /// <param name="context">context</param>
         protected UnprocessableEntityException(SerializationInfo info, StreamingContext context) :

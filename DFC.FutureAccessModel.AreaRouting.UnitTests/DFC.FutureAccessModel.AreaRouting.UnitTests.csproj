@@ -5,7 +5,6 @@
         <IsPackable>false</IsPackable>
         <RootNamespace>DFC.FutureAccessModel.AreaRouting</RootNamespace>
         <!--for future reference <ProjectGuid>{A06867DA-D978-466F-83C8-6205FBE88D40}</ProjectGuid>-->
-        <ProjectGuid>{A06867DA-D978-466F-83C8-6205FBE88D40}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
@@ -26,6 +25,8 @@
         <Folder Include="Providers\" />
         <Folder Include="Providers\Internal\" />
         <Folder Include="Faults\" />
+        <Folder Include="Adapters\" />
+        <Folder Include="Adapters\Internal\" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\DFC.FutureAccessModel.AreaRouting\DFC.FutureAccessModel.AreaRouting.csproj" />

@@ -156,20 +156,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <param name="theException">the exception</param>
         internal void ProcessError(DocumentClientException theException)
         {
-            if (It.IsNull(theException))
-            {
-                throw new MalformedRequestException();
-            }
+            It.IsNull(theException)
+                .AsGuard<MalformedRequestException>();
 
-            if (HttpStatusCode.NotFound == theException.StatusCode)
-            {
-                throw new NoContentException();
-            }
+            (HttpStatusCode.NotFound == theException.StatusCode)
+                .AsGuard<NoContentException>();
 
-            if (LocalHttpStatusCode.TooManyRequests.ComparesTo(theException.StatusCode))
-            {
-                throw new MalformedRequestException();
-            }
+            LocalHttpStatusCode.TooManyRequests.ComparesTo(theException.StatusCode)
+                .AsGuard<MalformedRequestException>();
         }
     }
 }
