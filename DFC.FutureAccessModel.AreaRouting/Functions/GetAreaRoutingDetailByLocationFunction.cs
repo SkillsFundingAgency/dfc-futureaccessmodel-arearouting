@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
@@ -5,6 +6,7 @@ using System.Threading.Tasks;
 using DFC.Functions.DI.Standard.Attributes;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
+using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +25,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="theRequest">the request</param>
         /// <param name="usingTraceWriter">using (the) trace writer)</param>
         /// <param name="theLocation"></param>
-        /// <param name="logging"></param>
+        /// <param name="factory"></param>
         /// <param name="adapter"></param>
         /// <returns></returns>
         [FunctionName("GetAreaRoutingDetailByLocation")]
@@ -37,10 +39,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas")]HttpRequest theRequest,
             ILogger usingTraceWriter,
-            [Inject] ICreateLoggingContextScopes logging,
+            [Inject] ICreateLoggingContextScopes factory,
             [Inject] IGetAreaRoutingDetails adapter)
         {
-            using (var scope = await logging.BeginScopeFor(theRequest, usingTraceWriter))
+            It.IsNull(theRequest)
+                .AsGuard<ArgumentNullException>(nameof(theRequest));
+            It.IsNull(usingTraceWriter)
+                .AsGuard<ArgumentNullException>(nameof(usingTraceWriter));
+            It.IsNull(factory)
+                .AsGuard<ArgumentNullException>(nameof(factory));
+            It.IsNull(adapter)
+                .AsGuard<ArgumentNullException>(nameof(adapter));
+
+            using (var scope = await factory.BeginScopeFor(theRequest, usingTraceWriter))
             {
                 var theLocation = theRequest.Query["location"];
                 return await adapter.GetAreaRoutingDetailBy(theLocation, scope);

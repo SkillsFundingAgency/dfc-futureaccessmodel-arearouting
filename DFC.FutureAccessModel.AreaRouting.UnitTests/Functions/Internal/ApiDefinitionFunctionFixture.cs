@@ -12,80 +12,80 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
     /// <summary>
     /// the api (document generating) definition test fixture
     /// </summary>
-    public sealed class ApiDefinitionFixture :
+    public sealed class ApiDefinitionFunctionFixture :
         MoqTestingFixture
     {
         /// <summary>
         /// the api definition title meets expectation
         /// </summary>
         [Fact]
-        public void APIDefinitionTitleMeetsExpectation()
+        public void APIDefinitionFunctionTitleMeetsExpectation()
         {
             // arrange / act / assert
-            Assert.Equal("areas", ApiDefinition.ApiTitle);
+            Assert.Equal("areas", ApiDefinitionFunction.ApiTitle);
         }
 
         /// <summary>
         /// the api definition version meets expectation
         /// </summary>
         [Fact]
-        public void APIDefinitionVersionMeetsExpectation()
+        public void APIDefinitionFunctionVersionMeetsExpectation()
         {
             // arrange / act / assert
-            Assert.Equal("1.0.0", ApiDefinition.ApiVersion);
+            Assert.Equal("1.0.0", ApiDefinitionFunction.ApiVersion);
         }
 
         /// <summary>
         /// the api definition name meets expectation
         /// </summary>
         [Fact]
-        public void APIDefinitionNameMeetsExpectation()
+        public void APIDefinitionFunctionNameMeetsExpectation()
         {
             // arrange / act / assert
-            Assert.Equal("api-definition", ApiDefinition.ApiDefinitionName);
+            Assert.Equal("api-definition", ApiDefinitionFunction.ApiDefinitionName);
         }
 
         /// <summary>
         /// the api definition description is not empty
         /// </summary>
         [Fact]
-        public void APIDefinitionDescriptionIsNotEmpty()
+        public void APIDefinitionFunctionDescriptionIsNotEmpty()
         {
             // arrange / act / assert
-            Assert.NotSame(string.Empty, ApiDefinition.ApiDescription);
+            Assert.NotSame(string.Empty, ApiDefinitionFunction.ApiDescription);
         }
 
         /// <summary>
         /// the api definition run routine throws with a null http request
         /// </summary>
         [Fact]
-        public void APIDefinitionRunWithNullRequestThrows()
+        public async Task APIDefinitionFunctionRunWithNullRequestThrows()
         {
             // arrange
             var generator = MakeStrictMock<ISwaggerDocumentGenerator>();
 
             // act / assert
-            Assert.Throws<ArgumentNullException>(() => ApiDefinition.Run(null, generator));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => ApiDefinitionFunction.Run(null, generator));
         }
 
         /// <summary>
         /// the api definition run routine throws with a null document generator
         /// </summary>
         [Fact]
-        public void APIDefinitionRunWithNullDocumentGeneratorThrows()
+        public async Task RunWithNullDocumentGeneratorThrows()
         {
             // arrange
             var request = MakeStrictMock<HttpRequest>();
 
             // act / assert
-            Assert.Throws<ArgumentNullException>(() => ApiDefinition.Run(request, null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => ApiDefinitionFunction.Run(request, null));
         }
 
         /// <summary>
-        /// the api definition run routine throws with a null document generator
+        /// run meets expectation
         /// </summary>
         [Fact]
-        public async Task APIDefinitionRunMeetsExpectation()
+        public async Task RunMeetsExpectation()
         {
             const string documentContent = "document returned from generator";
 
@@ -97,10 +97,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
             GetMock(generator)
                 .Setup(x => x.GenerateSwaggerDocument(
                     request,
-                    ApiDefinition.ApiTitle,
-                    ApiDefinition.ApiDescription,
-                    ApiDefinition.ApiDefinitionName,
-                    ApiDefinition.ApiVersion,
+                    ApiDefinitionFunction.ApiTitle,
+                    ApiDefinitionFunction.ApiDescription,
+                    ApiDefinitionFunction.ApiDefinitionName,
+                    ApiDefinitionFunction.ApiVersion,
                     Moq.It.IsAny<Assembly>(),
                     true, // include subcontractor id, optional parameter
                     true, // include touchpoint id, optional parameter
@@ -108,7 +108,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
                 .Returns(documentContent);
 
             // act
-            var result = ApiDefinition.Run(request, generator);
+            var result = await ApiDefinitionFunction.Run(request, generator);
 
             // assert
             Assert.IsAssignableFrom<HttpResponseMessage>(result);

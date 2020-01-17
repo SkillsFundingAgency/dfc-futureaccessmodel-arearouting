@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
@@ -5,6 +6,7 @@ using System.Threading.Tasks;
 using DFC.Functions.DI.Standard.Attributes;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
+using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
@@ -53,6 +55,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
             [Inject] ICreateLoggingContextScopes factory,
             [Inject] IGetAreaRoutingDetails adapter)
         {
+            It.IsNull(theRequest)
+                .AsGuard<ArgumentNullException>(nameof(theRequest));
+            It.IsNull(usingTraceWriter)
+                .AsGuard<ArgumentNullException>(nameof(usingTraceWriter));
+            It.IsNull(factory)
+                .AsGuard<ArgumentNullException>(nameof(factory));
+            It.IsNull(adapter)
+                .AsGuard<ArgumentNullException>(nameof(adapter));
+
             using (var scope = await factory.BeginScopeFor(theRequest, usingTraceWriter))
             {
                 return await adapter.GetAreaRoutingDetailFor(touchpointID, scope);

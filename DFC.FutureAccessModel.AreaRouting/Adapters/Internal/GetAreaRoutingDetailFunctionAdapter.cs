@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
@@ -10,6 +11,9 @@ using Newtonsoft.Json;
 
 namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 {
+    /// <summary>
+    /// get (the) area routing detail function adapter
+    /// </summary>
     internal sealed class GetAreaRoutingDetailFunctionAdapter :
         IGetAreaRoutingDetails
     {
@@ -33,12 +37,28 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// </summary>
         public IHttpResponseMessageHelper Respond { get; }
 
+        /// <summary>
+        /// create an instance of <see cref="GetAreaRoutingDetailFunctionAdapter"/>
+        /// </summary>
+        /// <param name="storageProvider">the storage provider</param>
+        /// <param name="responseHelper">the response helper</param>
+        /// <param name="faultResponses">the fault responses (provider)</param>
+        /// <param name="safeOperations">the safe operations (provider)</param>
         public GetAreaRoutingDetailFunctionAdapter(
             IStoreAreaRoutingDetails storageProvider,
             IHttpResponseMessageHelper responseHelper,
             IProvideFaultResponses faultResponses,
             IProvideSafeOperations safeOperations)
         {
+            It.IsNull(storageProvider)
+                .AsGuard<ArgumentNullException>(nameof(storageProvider));
+            It.IsNull(responseHelper)
+                .AsGuard<ArgumentNullException>(nameof(responseHelper));
+            It.IsNull(faultResponses)
+                .AsGuard<ArgumentNullException>(nameof(faultResponses));
+            It.IsNull(safeOperations)
+                .AsGuard<ArgumentNullException>(nameof(safeOperations));
+
             StorageProvider = storageProvider;
             Respond = responseHelper;
             Faults = faultResponses;
@@ -57,7 +77,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 x => Faults.GetResponseFor(x, useLoggingScope));
 
         /// <summary>
-        /// get (the) area routing detail for...
+        /// process, get (the) area routing detail for...
         /// </summary>
         /// <param name="theTouchpointID">the touchpoint id</param>
         /// <param name="useLoggingScope">use (the) logging scope</param>
@@ -78,11 +98,23 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             return response;
         }
 
+        /// <summary>
+        /// get (the) area routing detail by...
+        /// </summary>
+        /// <param name="theLocation">the location</param>
+        /// <param name="useLoggingScope">use (the) logging scope</param>
+        /// <returns>the currently running task containing the response message (success or fail)</returns>
         public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext useLoggingScope) =>
             await SafeOperations.Try(
                 () => ProcessGetAreaRoutingDetailBy(theLocation, useLoggingScope),
                 x => Faults.GetResponseFor(x, useLoggingScope));
 
+        /// <summary>
+        /// process, get (the) area routing detail by...
+        /// </summary>
+        /// <param name="theLocation">the location</param>
+        /// <param name="useLoggingScope">use (the) logging scope</param>
+        /// <returns>the currently running task containing the response message (success or fail)</returns>
         internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext useLoggingScope)
         {
             await useLoggingScope.EnterMethod();

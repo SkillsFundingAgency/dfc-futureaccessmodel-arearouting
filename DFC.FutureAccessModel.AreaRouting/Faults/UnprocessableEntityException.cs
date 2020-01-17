@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -7,9 +8,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
 {
     /// <summary>
     /// unprocessable entity exception
-    /// contructors and decorators are here to satisfy the static analysis tool
+    /// constructors and decorators are here to satisfy the static analysis tool
+    /// as a consequence, excluded from coverage as they can't be tested properly
     /// </summary>
     [Serializable]
+    [ExcludeFromCodeCoverage]
     public class UnprocessableEntityException :
             Exception
     {

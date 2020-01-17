@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
 using DFC.Functions.DI.Standard.Attributes;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.Swagger.Standard;
@@ -14,7 +15,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
     /// <summary>
     /// the api definition for 'swagger' document generation 
     /// </summary>
-    public static class ApiDefinition
+    public static class ApiDefinitionFunction
     {
         public const string ApiTitle = "areas";
         public const string ApiVersion = "1.0.0";
@@ -31,27 +32,28 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="theDocumentGenerator">the document generator</param>
         /// <returns>a http response containing the generated document</returns>
         [FunctionName("ApiDefinition")]
-        public static HttpResponseMessage Run(
+        public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = ApiDefinitionRoute)]HttpRequest theRequest,
-            [Inject]ISwaggerDocumentGenerator theDocumentGenerator)
-        {
-            It.IsNull(theRequest)
-                .AsGuard<ArgumentNullException>(nameof(theRequest));
-            It.IsNull(theDocumentGenerator)
-                .AsGuard<ArgumentNullException>(nameof(theDocumentGenerator));
+            [Inject]ISwaggerDocumentGenerator theDocumentGenerator) =>
+                await Task.Run(() =>
+                {
+                    It.IsNull(theRequest)
+                        .AsGuard<ArgumentNullException>(nameof(theRequest));
+                    It.IsNull(theDocumentGenerator)
+                        .AsGuard<ArgumentNullException>(nameof(theDocumentGenerator));
 
-            var theDocument = theDocumentGenerator.GenerateSwaggerDocument(
-                theRequest,
-                ApiTitle,
-                ApiDescription,
-                ApiDefinitionName,
-                ApiVersion,
-                Assembly.GetExecutingAssembly());
+                    var theDocument = theDocumentGenerator.GenerateSwaggerDocument(
+                        theRequest,
+                        ApiTitle,
+                        ApiDescription,
+                        ApiDefinitionName,
+                        ApiVersion,
+                        Assembly.GetExecutingAssembly());
 
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(theDocument)
-            };
-        }
+                    return new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(theDocument)
+                    };
+                });
     }
 }

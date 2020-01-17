@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace DFC.FutureAccessModel.AreaRouting.Faults
 {
     /// <summary>
     /// the malformed request exception
-    /// contructors and decorators are here to satisfy the static analysis tool
+    /// constructors and decorators are here to satisfy the static analysis tool
+    /// as a consequence, excluded from coverage as they can't be tested properly
     /// </summary>
     [Serializable]
+    [ExcludeFromCodeCoverage]
     public class MalformedRequestException :
         Exception
     {

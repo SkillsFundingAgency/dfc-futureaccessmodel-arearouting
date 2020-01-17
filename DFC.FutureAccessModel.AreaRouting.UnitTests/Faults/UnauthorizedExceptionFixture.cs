@@ -22,7 +22,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
             var message = sut.Message;
 
             // assert
-            Assert.Equal("", message);
+            Assert.Equal(string.Empty, message);
         }
 
         /// <summary>
