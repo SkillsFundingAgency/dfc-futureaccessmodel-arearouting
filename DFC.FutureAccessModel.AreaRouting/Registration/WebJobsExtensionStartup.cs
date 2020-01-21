@@ -1,22 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard;
-using DFC.FutureAccessModel.AreaRouting.Adapters;
-using DFC.FutureAccessModel.AreaRouting.Adapters.Internal;
-using DFC.FutureAccessModel.AreaRouting.Factories;
-using DFC.FutureAccessModel.AreaRouting.Factories.Internal;
-using DFC.FutureAccessModel.AreaRouting.Providers;
-using DFC.FutureAccessModel.AreaRouting.Providers.Internal;
-using DFC.FutureAccessModel.AreaRouting.Registration;
-using DFC.FutureAccessModel.AreaRouting.Storage;
-using DFC.FutureAccessModel.AreaRouting.Storage.Internal;
-using DFC.HTTP.Standard;
-using DFC.Swagger.Standard;
+using DFC.FutureAccessModel.AreaRouting.Registration.Internal;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 
-[assembly: WebJobsStartup(typeof(AreaRoutingWebJobsExtensionStartup), "Area Routing Web Jobs Extension Startup")]
 namespace DFC.FutureAccessModel.AreaRouting.Registration
 {
     /// <summary>
@@ -32,32 +19,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration
         {
             builder.AddDependencyInjection();
 
-            // inherited, package level
-            builder.Services.AddSingleton<ILoggerHelper, LoggerHelper>();
-            builder.Services.AddSingleton<IHttpResponseMessageHelper, HttpResponseMessageHelper>();
-            builder.Services.AddSingleton<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();
+            var provider = ServiceRegistrationProvider.CreateService();
 
-            // might need to put these back at some point
-            // builder.Services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>()
-            // builder.Services.AddSingleton<IJsonHelper, JsonHelper>()
-
-            // project level
-            // adapters
-            builder.Services.AddSingleton<IGetAreaRoutingDetails, GetAreaRoutingDetailFunctionAdapter>();
-
-            // factories
-            builder.Services.AddSingleton<ICreateDocumentClients, DocumentClientFactory>();
-            builder.Services.AddSingleton<ICreateLoggingContextScopes, LoggingContextScopeFactory>();
-
-            // providers
-            builder.Services.AddSingleton<IProvideApplicationSettings, ApplicationSettingsProvider>();
-            builder.Services.AddSingleton<IProvideFaultResponses, FaultResponseProvider>();
-            builder.Services.AddSingleton<IProvideSafeOperations, SafeOperationsProvider>();
-
-            // storage
-            builder.Services.AddSingleton<IStoreAreaRoutingDetails, AreaRoutingDetailStore>();
-            builder.Services.AddSingleton<IStoreDocuments, DocumentStore>();
-            builder.Services.AddSingleton<IProvideStoragePaths, StoragePathProvider>();
+            provider.Compose(builder.Services);
         }
     }
 }

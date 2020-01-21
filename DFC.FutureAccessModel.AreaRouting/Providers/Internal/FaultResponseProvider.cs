@@ -7,6 +7,8 @@ using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
+using MarkEmbling.PostcodesIO.Exceptions;
+using Newtonsoft.Json;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
@@ -26,11 +28,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         public FaultResponseProvider()
         {
-            _faultActionMap.Add(typeof(MalformedRequestException), Malformed);
-            _faultActionMap.Add(typeof(NoContentException), NoContent);
+            _faultActionMap.Add(typeof(MalformedRequestException), Fallback);
+            _faultActionMap.Add(typeof(NoContentException), Fallback);
             _faultActionMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
             _faultActionMap.Add(typeof(AccessForbiddenException), Forbidden);
             _faultActionMap.Add(typeof(UnauthorizedException), Unauthorized);
+
+            _faultActionMap.Add(typeof(PostcodesIOApiException), Fallback);
+            _faultActionMap.Add(typeof(PostcodesIOEmptyResponseException), Fallback);
+            _faultActionMap.Add(typeof(InvalidPostcodeException), Fallback);
         }
 
         /// <summary>
@@ -43,19 +49,45 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             if (_faultActionMap.ContainsKey(theException.GetType()))
             {
-                await useLoggingScope.Information(theException.Message);
+                await InformOn(theException, useLoggingScope);
                 return _faultActionMap[theException.GetType()].Invoke(theException);
             }
 
             await useLoggingScope.ExceptionDetail(theException);
-            return UnknownError();
+
+            return Fallback(theException);
         }
+
+        /// <summary>
+        /// infomr on...
+        /// </summary>
+        /// <param name="theException">the exception</param>
+        /// <param name="useLoggingScope">using (the) logging scope</param>
+        /// <returns></returns>
+        internal async Task InformOn(Exception theException, IScopeLoggingContext useLoggingScope)
+        {
+            await useLoggingScope.Information(theException.Message);
+
+            if (It.Has(theException.InnerException))
+            {
+                await InformOn(theException.InnerException, useLoggingScope);
+            }
+        }
+
+        /// <summary>
+        /// the fallback message
+        /// </summary>
+        /// <param name="theException">the exception (is ignored in here)</param>
+        /// <returns>a 'fallback' message</returns>
+        internal HttpResponseMessage Fallback(Exception theException) =>
+            new HttpResponseMessage(HttpStatusCode.OK)
+                .SetContent(JsonConvert.SerializeObject(RoutingDetail.Default));
 
         /// <summary>
         /// the malformed request action
         /// </summary>
         /// <returns>a 'bad request' message</returns>
-        public HttpResponseMessage Malformed(Exception theException) =>
+        internal HttpResponseMessage Malformed(Exception theException) =>
             new HttpResponseMessage(HttpStatusCode.BadRequest)
                 .SetContent(string.Empty);
 
@@ -63,7 +95,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// the forbidden action
         /// </summary>
         /// <returns>a 'forbidden' message</returns>
-        public HttpResponseMessage Forbidden(Exception theException) =>
+        internal HttpResponseMessage Forbidden(Exception theException) =>
             new HttpResponseMessage(HttpStatusCode.Forbidden)
                 .SetContent(theException.Message);
 
@@ -71,7 +103,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// the no content action
         /// </summary>
         /// <returns>a 'no content' message</returns>
-        public HttpResponseMessage NoContent(Exception theException) =>
+        internal HttpResponseMessage NoContent(Exception theException) =>
             new HttpResponseMessage(HttpStatusCode.NoContent)
                 .SetContent(theException.Message);
 
@@ -79,7 +111,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// the unprocessable entity action
         /// </summary>
         /// <returns>a 'unprocessable entity' message</returns>
-        public HttpResponseMessage UnprocessableEntity(Exception theException) =>
+        internal HttpResponseMessage UnprocessableEntity(Exception theException) =>
             new HttpResponseMessage(LocalHttpStatusCode.UnprocessableEntity.AsHttpStatusCode())
                 .SetContent(theException.Message);
 
@@ -87,7 +119,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// the unauthorised action
         /// </summary>
         /// <returns>an 'unauthorised' message</returns>
-        public HttpResponseMessage Unauthorized(Exception theException) =>
+        internal HttpResponseMessage Unauthorized(Exception theException) =>
             new HttpResponseMessage(HttpStatusCode.Unauthorized)
                 .SetContent(string.Empty);
 
@@ -95,7 +127,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// the unknown error action
         /// </summary>
         /// <returns>an 'internal server error' message</returns>
-        public HttpResponseMessage UnknownError() =>
+        internal HttpResponseMessage UnknownError() =>
             new HttpResponseMessage(HttpStatusCode.InternalServerError)
                 .SetContent(string.Empty);
     }

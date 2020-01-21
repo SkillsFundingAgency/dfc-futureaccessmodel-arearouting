@@ -2,14 +2,15 @@
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
+using DFC.FutureAccessModel.AreaRouting.Providers;
 
 namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 {
     /// <summary>
     /// the area routing detail store
     /// </summary>
-    internal sealed class AreaRoutingDetailStore :
-        IStoreAreaRoutingDetails
+    internal sealed class LocalAuthorityStore :
+        IStoreLocalAuthorities
     {
         /// <summary>
         /// storage paths
@@ -22,11 +23,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public IStoreDocuments DocumentStore { get; }
 
         /// <summary>
-        /// create an instance of hte <see cref="AreaRoutingDetailStore"/>
+        /// create an instance of hte <see cref="LocalAuthorityStore"/>
         /// </summary>
         /// <param name="paths">the storage paths (provider)</param>
         /// <param name="store">the document store</param>
-        public AreaRoutingDetailStore(
+        public LocalAuthorityStore(
             IProvideStoragePaths paths,
             IStoreDocuments store)
         {
@@ -40,23 +41,21 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// get (the) area routing detail for...
+        /// get (the) local authority for...
         /// </summary>
-        /// <param name="theTouchpointID">the touchpoint id</param>
-        /// <returns>an area routing detail</returns>
-        public async Task<IRoutingDetail> GetAreaRoutingDetailFor(string theTouchpointID)
+        /// <param name="theAdminDistrict">the admin distict (code)</param>
+        /// <returns>a local authority</returns>
+        public async Task<ILocalAuthority> GetLocalAuthorityFor(string theAdminDistrict)
         {
             // TODO: enable this code once we are happy
-            // var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpointID)
-            // return await DocumentStore.GetDocument<RoutingDetail>(usingPath)
+            //var usingPath = StoragePaths.GetLocalAuthorityResourcePathFor(theAdminDistrict)
+            //return await DocumentStore.GetDocument<LocalAuthority>(usingPath)
 
-            return await Task.FromResult(new RoutingDetail
+            return await Task.FromResult(new LocalAuthority
             {
-                TouchpointID = theTouchpointID,
-                Area = "Dummy Detail Region Name",
-                EmailAddress = "test.address@education.gov.uk",
-                SMSNumber = "07123456789",
-                TelephoneNumber = "01234567890"
+                TouchpointID = "0000000999",
+                Name = "NationalCareers Service",
+                LADCode = theAdminDistrict
             });
         }
     }

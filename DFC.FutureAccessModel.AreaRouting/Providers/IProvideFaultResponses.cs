@@ -2,13 +2,15 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
+using DFC.FutureAccessModel.AreaRouting.Registration;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers
 {
     /// <summary>
     /// i provide fault responses
     /// </summary>
-    public interface IProvideFaultResponses
+    public interface IProvideFaultResponses :
+        ISupportServiceRegistration
     {
         /// <summary>
         /// get (the) response for...

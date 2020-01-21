@@ -27,9 +27,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             var helper = MakeStrictMock<IHttpResponseMessageHelper>();
             var faults = MakeStrictMock<IProvideFaultResponses>();
             var safe = MakeStrictMock<IProvideSafeOperations>();
+            var analyser = MakeStrictMock<IAnalyseExpresssions>();
+            var actions = MakeStrictMock<IProvideExpressionActions>();
 
             // act / assert
-            Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(null, helper, faults, safe));
+            Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(null, helper, faults, safe, analyser, actions));
         }
 
         /// <summary>
@@ -42,9 +44,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             var store = MakeStrictMock<IStoreAreaRoutingDetails>();
             var faults = MakeStrictMock<IProvideFaultResponses>();
             var safe = MakeStrictMock<IProvideSafeOperations>();
+            var analyser = MakeStrictMock<IAnalyseExpresssions>();
+            var actions = MakeStrictMock<IProvideExpressionActions>();
 
             // act / assert
-            Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(store, null, faults, safe));
+            Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(store, null, faults, safe, analyser, actions));
         }
 
         /// <summary>
@@ -57,9 +61,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             var store = MakeStrictMock<IStoreAreaRoutingDetails>();
             var helper = MakeStrictMock<IHttpResponseMessageHelper>();
             var safe = MakeStrictMock<IProvideSafeOperations>();
+            var analyser = MakeStrictMock<IAnalyseExpresssions>();
+            var actions = MakeStrictMock<IProvideExpressionActions>();
 
             // act / assert
-            Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(store, helper, null, safe));
+            Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(store, helper, null, safe, analyser, actions));
         }
 
         /// <summary>
@@ -72,9 +78,39 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             var store = MakeStrictMock<IStoreAreaRoutingDetails>();
             var helper = MakeStrictMock<IHttpResponseMessageHelper>();
             var faults = MakeStrictMock<IProvideFaultResponses>();
+            var analyser = MakeStrictMock<IAnalyseExpresssions>();
+            var actions = MakeStrictMock<IProvideExpressionActions>();
 
             // act / assert
-            Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(store, helper, faults, null));
+            Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(store, helper, faults, null, analyser, actions));
+        }
+
+        [Fact]
+        public void BuildWithNullExpressionAnalyserThrows()
+        {
+            // arrange
+            var store = MakeStrictMock<IStoreAreaRoutingDetails>();
+            var helper = MakeStrictMock<IHttpResponseMessageHelper>();
+            var faults = MakeStrictMock<IProvideFaultResponses>();
+            var safe = MakeStrictMock<IProvideSafeOperations>();
+            var actions = MakeStrictMock<IProvideExpressionActions>();
+
+            // act / assert
+            Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(store, helper, faults, safe, null, actions));
+        }
+
+        [Fact]
+        public void BuildWithNullActionProviderThrows()
+        {
+            // arrange
+            var store = MakeStrictMock<IStoreAreaRoutingDetails>();
+            var helper = MakeStrictMock<IHttpResponseMessageHelper>();
+            var faults = MakeStrictMock<IProvideFaultResponses>();
+            var safe = MakeStrictMock<IProvideSafeOperations>();
+            var analyser = MakeStrictMock<IAnalyseExpresssions>();
+
+            // act / assert
+            Assert.Throws<ArgumentNullException>(() => new GetAreaRoutingDetailFunctionAdapter(store, helper, faults, safe, analyser, null));
         }
 
         /// <summary>
@@ -122,7 +158,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .Returns(Task.CompletedTask);
 
             // act / assert
-            await Assert.ThrowsAsync<MalformedRequestException>(()=> sut.ProcessGetAreaRoutingDetailFor(touchpointID, scope));
+            await Assert.ThrowsAsync<MalformedRequestException>(() => sut.ProcessGetAreaRoutingDetailFor(touchpointID, scope));
         }
 
         [Fact]
@@ -211,12 +247,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         public async Task GetAreaRoutingDetailByValidLocationMeetsVerification()
         {
             // arrange
-            const string location = "any old location";
+            const string locationIn = "any old location";
+            const string touchpointOut = "any old touchpoint";
             const string resultText = "{\"TouchpointID\":null,\"Area\":null,\"TelephoneNumber\":null,\"SMSNumber\":null,\"EmailAddress\":null}";
 
             var sut = MakeSUT();
+            GetMock(sut.Analyser)
+                .Setup(x => x.GetTypeOfExpressionFor(locationIn))
+                .Returns(TypeOfExpression.Postcode);
+            GetMock(sut.Actions)
+                .Setup(x => x.GetActionFor(It.IsAny<TypeOfExpression>()))
+                .Returns((x, y) => Task.FromResult(touchpointOut));
             GetMock(sut.StorageProvider)
-                .Setup(x => x.GetAreaRoutingDetailFor(location))
+                .Setup(x => x.GetAreaRoutingDetailFor(touchpointOut))
                 .Returns(Task.FromResult<IRoutingDetail>(new RoutingDetail()));
             GetMock(sut.Respond)
                 .Setup(x => x.Ok(resultText))
@@ -237,7 +280,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .Returns(Task.CompletedTask);
 
             // act
-            var result = await sut.ProcessGetAreaRoutingDetailBy(location, scope);
+            var result = await sut.ProcessGetAreaRoutingDetailBy(locationIn, scope);
 
             // assert
             Assert.IsAssignableFrom<HttpResponseMessage>(result);
@@ -257,8 +300,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             var helper = MakeStrictMock<IHttpResponseMessageHelper>();
             var faults = MakeStrictMock<IProvideFaultResponses>();
             var safe = MakeStrictMock<IProvideSafeOperations>();
+            var analyser = MakeStrictMock<IAnalyseExpresssions>();
+            var actions = MakeStrictMock<IProvideExpressionActions>();
 
-            return MakeSUT(store, helper, faults, safe);
+            return MakeSUT(store, helper, faults, safe, analyser, actions);
         }
 
         /// <summary>
@@ -273,7 +318,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             IStoreAreaRoutingDetails store,
             IHttpResponseMessageHelper helper,
             IProvideFaultResponses faults,
-            IProvideSafeOperations safe) =>
-                new GetAreaRoutingDetailFunctionAdapter(store, helper, faults, safe);
+            IProvideSafeOperations safe,
+            IAnalyseExpresssions analyser,
+            IProvideExpressionActions actions) =>
+                new GetAreaRoutingDetailFunctionAdapter(store, helper, faults, safe, analyser, actions);
     }
 }

@@ -28,6 +28,7 @@
         <Folder Include="Faults\" />
         <Folder Include="Adapters\" />
         <Folder Include="Adapters\Internal\" />
+        <Folder Include="Registration\" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\DFC.FutureAccessModel.AreaRouting\DFC.FutureAccessModel.AreaRouting.csproj" />

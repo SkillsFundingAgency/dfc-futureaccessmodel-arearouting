@@ -1,8 +1,7 @@
 ﻿using System;
-using DFC.FutureAccessModel.AreaRouting.Providers;
 using Xunit;
 
-namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
     /// <summary>
     /// the storage path provider fixture

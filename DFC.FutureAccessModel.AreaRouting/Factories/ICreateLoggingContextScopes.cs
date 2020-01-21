@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using DFC.FutureAccessModel.AreaRouting.Registration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +9,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
     /// <summary>
     /// i create logging context scopes
     /// </summary>
-    public interface ICreateLoggingContextScopes
+    public interface ICreateLoggingContextScopes :
+        ISupportServiceRegistration
     {
         /// <summary>
         /// begin scope

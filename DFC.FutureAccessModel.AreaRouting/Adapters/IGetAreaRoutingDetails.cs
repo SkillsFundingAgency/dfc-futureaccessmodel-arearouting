@@ -1,13 +1,15 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
+using DFC.FutureAccessModel.AreaRouting.Registration;
 
 namespace DFC.FutureAccessModel.AreaRouting.Adapters
 {
     /// <summary>
     /// i get area routing detail...
     /// </summary>
-    public interface IGetAreaRoutingDetails
+    public interface IGetAreaRoutingDetails :
+        ISupportServiceRegistration
     {
         /// <summary>
         /// get (the) area routing detail for...

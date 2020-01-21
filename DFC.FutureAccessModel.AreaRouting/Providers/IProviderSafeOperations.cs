@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DFC.FutureAccessModel.AreaRouting.Registration;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers
 {
     /// <summary>
     /// i provide safe operations
     /// </summary>
-    public interface IProvideSafeOperations
+    public interface IProvideSafeOperations :
+        ISupportServiceRegistration
     {
         /// <summary>
         /// try...

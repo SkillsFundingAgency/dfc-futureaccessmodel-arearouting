@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DFC.FutureAccessModel.AreaRouting.Registration;
 
 namespace DFC.FutureAccessModel.AreaRouting.Storage
 {
     /// <summary>
     /// i store documents
     /// </summary>
-    public interface IStoreDocuments
+    public interface IStoreDocuments :
+        ISupportServiceRegistration
     {
         /// <summary>
         /// add document

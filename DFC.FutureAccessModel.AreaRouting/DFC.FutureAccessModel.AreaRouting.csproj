@@ -22,6 +22,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.2" />
         <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
+        <PackageReference Include="MarkEmbling.PostcodesIO" Version="0.0.7" />
     </ItemGroup>
     <ItemGroup>
         <Reference Include="Microsoft.CSharp" />
@@ -44,5 +45,6 @@
         <Folder Include="Faults\" />
         <Folder Include="Factories\" />
         <Folder Include="Factories\Internal\" />
+        <Folder Include="Registration\Internal\" />
     </ItemGroup>
 </Project>

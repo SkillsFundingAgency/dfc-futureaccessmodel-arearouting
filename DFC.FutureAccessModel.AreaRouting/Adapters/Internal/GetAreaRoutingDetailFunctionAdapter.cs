@@ -38,6 +38,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         public IHttpResponseMessageHelper Respond { get; }
 
         /// <summary>
+        /// i analyse expressions
+        /// </summary>
+        public IAnalyseExpresssions Analyser { get; }
+
+        /// <summary>
+        /// i provide expression actions
+        /// </summary>
+        public IProvideExpressionActions Actions { get; }
+
+        /// <summary>
         /// create an instance of <see cref="GetAreaRoutingDetailFunctionAdapter"/>
         /// </summary>
         /// <param name="storageProvider">the storage provider</param>
@@ -48,7 +58,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             IStoreAreaRoutingDetails storageProvider,
             IHttpResponseMessageHelper responseHelper,
             IProvideFaultResponses faultResponses,
-            IProvideSafeOperations safeOperations)
+            IProvideSafeOperations safeOperations,
+            IAnalyseExpresssions analyser,
+            IProvideExpressionActions actions)
         {
             It.IsNull(storageProvider)
                 .AsGuard<ArgumentNullException>(nameof(storageProvider));
@@ -58,11 +70,17 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .AsGuard<ArgumentNullException>(nameof(faultResponses));
             It.IsNull(safeOperations)
                 .AsGuard<ArgumentNullException>(nameof(safeOperations));
+            It.IsNull(analyser)
+                .AsGuard<ArgumentNullException>(nameof(analyser));
+            It.IsNull(actions)
+                .AsGuard<ArgumentNullException>(nameof(actions));
 
             StorageProvider = storageProvider;
             Respond = responseHelper;
             Faults = faultResponses;
             SafeOperations = safeOperations;
+            Analyser = analyser;
+            Actions = actions;
         }
 
         /// <summary>
@@ -122,21 +140,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             It.IsEmpty(theLocation)
                 .AsGuard<MalformedRequestException>();
 
-            var theTouchpoint = theLocation;
-
-            // TODO: things...
-            // integrate postcodes io
-            //      simplify code / interface ?
-            // determine what 'the location' is
-            //      postcode ?
-            //      town ?
-            //      something else ?
-            // define
-            //      the local authority model
-            //      the storage provider
-            //      extend the storage path provider
-            // fall back process
-            //      redirect to the national centre?
+            var theExpressionType = Analyser.GetTypeOfExpressionFor(theLocation);
+            var actionDo = Actions.GetActionFor(theExpressionType);
+            var theTouchpoint = await actionDo(theLocation, inLoggingScope);
 
             await inLoggingScope.ExitMethod();
 

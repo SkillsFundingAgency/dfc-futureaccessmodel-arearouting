@@ -1,4 +1,7 @@
-﻿namespace DFC.FutureAccessModel.AreaRouting.Helpers
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace DFC.FutureAccessModel.AreaRouting.Helpers
 {
     /// <summary>
     /// a static helper class to increase code readability
@@ -21,6 +24,25 @@
         /// <returns>true if null or whitespace</returns>
         public static bool IsEmpty(string theItem) =>
             string.IsNullOrWhiteSpace(theItem);
+
+        /// <summary>
+        /// is empty
+        /// </summary>
+        /// <typeparam name="TEntity">the entity type</typeparam>
+        /// <param name="theItems">the items (instance)</param>
+        /// <returns></returns>
+        public static bool IsEmpty<TItem>(IEnumerable<TItem> theItems) =>
+            !theItems.Any();
+
+        /// <summary>
+        /// has...
+        /// </summary>
+        /// <typeparam name="TEntity">the entity type</typeparam>
+        /// <param name="theItem">the item (instance)</param>
+        /// <returns>true if not null</returns>
+        public static bool Has<TEntity>(TEntity theItem)
+            where TEntity : class =>
+            !IsNull(theItem);
 
         /// <summary>
         /// has...

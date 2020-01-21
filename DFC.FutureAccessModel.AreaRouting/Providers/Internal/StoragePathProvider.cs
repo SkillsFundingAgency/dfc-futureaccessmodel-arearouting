@@ -1,9 +1,8 @@
 ﻿using System;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
-using DFC.FutureAccessModel.AreaRouting.Providers;
 using Microsoft.Azure.Documents.Client;
 
-namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
     /// <summary>
     /// the storage path provider
@@ -75,11 +74,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// get the routine detail path for
+        /// get (the) routine detail path for
         /// </summary>
         /// <param name="theTouchpointID">the touchpoint id</param>
-        /// <returns>the uri for ther requested storage path</returns>
+        /// <returns>the uri for the requested storage path</returns>
         public Uri GetRoutingDetailResourcePathFor(string theTouchpointID) =>
             UriFactory.CreateDocumentUri(DocumentStoreID, RoutingDetailCollectionID, $"{theTouchpointID}");
+
+        /// <summary>
+        /// get (the) local authority resource path for...
+        /// </summary>
+        /// <param name="theAdminDistrict">the admin district</param>
+        /// <returns>the uri for the requested storage path</returns>
+        public Uri GetLocalAuthorityResourcePathFor(string theAdminDistrict) =>
+            UriFactory.CreateDocumentUri(DocumentStoreID, LocalAuthorityCollectionID, $"{theAdminDistrict}");
     }
 }

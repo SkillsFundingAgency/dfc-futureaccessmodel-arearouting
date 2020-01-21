@@ -54,5 +54,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Models
         [Display(Description = "The contractor's region specific contact email address")]
         [Example(Description = "abc@regionprovider.co.uk")]
         public string EmailAddress { get; set; }
+
+        /// <summary>
+        /// the fallback value
+        /// not intended to be a permanent addition
+        /// </summary>
+        public static IRoutingDetail Default =>
+            new RoutingDetail
+            {
+                Area = "National Call Centre",
+                EmailAddress = "nationalcareersservice@education.gov.uk",
+                SMSNumber = "",
+                TelephoneNumber = "0800 123456",
+                TouchpointID = "0000000999"
+            };
     }
 }
