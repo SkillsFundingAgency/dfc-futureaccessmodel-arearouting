@@ -26,7 +26,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
             // arrange
             var trace = MakeStrictMock<ILogger>();
             var factory = MakeStrictMock<ICreateLoggingContextScopes>();
-            var adapter = MakeStrictMock<IGetAreaRoutingDetails>();
+            var adapter = MakeStrictMock<IManageAreaRoutingDetails>();
 
             // act / assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => GetAreaRoutingDetailByLocationFunction.Run(null, trace, factory, adapter));
@@ -42,7 +42,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
             // arrange
             var request = MakeStrictMock<HttpRequest>();
             var factory = MakeStrictMock<ICreateLoggingContextScopes>();
-            var adapter = MakeStrictMock<IGetAreaRoutingDetails>();
+            var adapter = MakeStrictMock<IManageAreaRoutingDetails>();
 
             // act / assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => GetAreaRoutingDetailByLocationFunction.Run(request, null, factory, adapter));
@@ -58,7 +58,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
             // arrange
             var request = MakeStrictMock<HttpRequest>();
             var trace = MakeStrictMock<ILogger>();
-            var adapter = MakeStrictMock<IGetAreaRoutingDetails>();
+            var adapter = MakeStrictMock<IManageAreaRoutingDetails>();
 
             // act / assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => GetAreaRoutingDetailByLocationFunction.Run(request, trace, null, adapter));
@@ -105,7 +105,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
                 .Setup(x => x.BeginScopeFor(request, trace, "Run"))
                 .Returns(Task.FromResult(scope));
 
-            var adapter = MakeStrictMock<IGetAreaRoutingDetails>();
+            var adapter = MakeStrictMock<IManageAreaRoutingDetails>();
             GetMock(adapter)
                 .Setup(x => x.GetAreaRoutingDetailBy(location, scope))
                 .Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)));

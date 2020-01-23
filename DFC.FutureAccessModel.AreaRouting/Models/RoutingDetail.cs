@@ -9,6 +9,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Models
         /// <summary>
         /// the region's unique identifier
         /// </summary>
+        [Key]
         [Required]
         [Display(Description = "The region's unique identifier")]
         [StringLength(10, MinimumLength = 10)]

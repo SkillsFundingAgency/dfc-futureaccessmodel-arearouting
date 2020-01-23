@@ -102,8 +102,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
                     ApiDefinitionFunction.ApiDefinitionName,
                     ApiDefinitionFunction.ApiVersion,
                     Moq.It.IsAny<Assembly>(),
-                    true, // include subcontractor id, optional parameter
-                    true, // include touchpoint id, optional parameter
+                    false, // include subcontractor id, optional parameter
+                    false, // include touchpoint id, optional parameter
                     "/api/")) // api route prefix => /api, optional parameter
                 .Returns(documentContent);
 

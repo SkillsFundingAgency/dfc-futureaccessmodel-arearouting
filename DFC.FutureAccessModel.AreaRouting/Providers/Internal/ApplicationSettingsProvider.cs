@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 #if DEBUG
 using System.IO;
-using System.Linq;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using Microsoft.Extensions.Configuration;
 #endif
@@ -37,24 +36,22 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .AddEnvironmentVariables()
                 .Build();
 
-            _keys
-                .ToList()
-                .ForEach(x =>
+            _keys.ForEach(x =>
+            {
+                var candidate = GetVariable(x);
+                if (It.IsNull(candidate))
                 {
-                    var candidate = GetVariable(x);
-                    if (It.IsNull(candidate))
-                    {
-                        candidate = config.GetSection("Values")[x];
-                        Console.WriteLine($"candidate value for: {x} => '{candidate}'");
+                    candidate = config.GetSection("Values")[x];
+                    Console.WriteLine($"candidate value for: {x} => '{candidate}'");
 
-                        Environment.SetEnvironmentVariable(x, candidate);
-                        Console.WriteLine($"value applied for: {x} => '{GetVariable(x)}'");
+                    Environment.SetEnvironmentVariable(x, candidate);
+                    Console.WriteLine($"value applied for: {x} => '{GetVariable(x)}'");
 
-                        return;
-                    }
+                    return;
+                }
 
-                    Console.WriteLine($"found value for: {x} => '{candidate}'");
-                });
+                Console.WriteLine($"found value for: {x} => '{candidate}'");
+            });
         }
 #endif
 

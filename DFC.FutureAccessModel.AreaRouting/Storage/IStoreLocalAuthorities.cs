@@ -11,10 +11,17 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage
         ISupportServiceRegistration
     {
         /// <summary>
-        /// get (the) local authority for...
+        /// get...
         /// </summary>
         /// <param name="theAdminDistrict">the admin distict (code)</param>
         /// <returns>a local authority</returns>
-        Task<ILocalAuthority> GetLocalAuthorityFor(string theAdminDistrict);
+        Task<ILocalAuthority> Get(string theAdminDistrict);
+
+        /// <summary>
+        /// add...
+        /// </summary>
+        /// <param name="theCandidate">the candidate</param>
+        /// <returns>the newly added local authority</returns>
+        Task<ILocalAuthority> Add(ILocalAuthority theCandidate);
     }
 }

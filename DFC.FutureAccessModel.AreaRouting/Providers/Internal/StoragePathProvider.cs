@@ -41,12 +41,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         public string LocalAuthorityCollectionID { get; }
 
         /// <summary>
-        /// the routing detail coolection (path)
+        /// the routing detail collection (path), used for new documents
         /// </summary>
         public Uri RoutingDetailCollection { get; }
 
         /// <summary>
-        /// the local authority collection (path)
+        /// the local authority collection (path), used for new documents
         /// </summary>
         public Uri LocalAuthorityCollection { get; }
 

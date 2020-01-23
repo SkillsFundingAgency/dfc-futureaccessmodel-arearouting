@@ -265,3 +265,8 @@ __pycache__/
 *.pyc
 DFC.FutureAccessModel.AreaRouting/Storage/.DS_Store
 .DS_Store
+__azurite_db_blob__.json
+__azurite_db_blob_extent__.json
+__azurite_db_queue__.json
+__azurite_db_queue_extent__.json
+__blobstorage__/e779ad36-299e-4a2a-8590-9963fd4e7ae7

@@ -42,8 +42,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <returns></returns>
         [FunctionName("GetAreaRoutingDetailByTouchpointID")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = FunctionDescription.RoutingDetailFound, ShowSchema = true)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.RoutingDetailDoesNotExist, ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = FunctionDescription.ResourceFound, ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.NoContent, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = FunctionDescription.MalformedRequest, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
@@ -53,7 +53,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
             ILogger usingTraceWriter,
             string touchpointID,
             [Inject] ICreateLoggingContextScopes factory,
-            [Inject] IGetAreaRoutingDetails adapter)
+            [Inject] IManageAreaRoutingDetails adapter)
         {
             It.IsNull(theRequest)
                 .AsGuard<ArgumentNullException>(nameof(theRequest));
@@ -64,9 +64,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
             It.IsNull(adapter)
                 .AsGuard<ArgumentNullException>(nameof(adapter));
 
-            using (var scope = await factory.BeginScopeFor(theRequest, usingTraceWriter))
+            using (var inScope = await factory.BeginScopeFor(theRequest, usingTraceWriter))
             {
-                return await adapter.GetAreaRoutingDetailFor(touchpointID, scope);
+                return await adapter.GetAreaRoutingDetailFor(touchpointID, inScope);
             }
         }
     }

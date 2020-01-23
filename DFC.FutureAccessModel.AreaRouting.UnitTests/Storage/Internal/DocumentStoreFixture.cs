@@ -7,7 +7,6 @@ using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
 using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
 using Moq;
 using Xunit;
 
@@ -176,8 +175,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
 
             GetMock(sut.SafeOperations)
-                .Setup(x => x.Try(It.IsAny<Func<Task>>(), It.IsAny<Func<Exception, Task>>()))
-                .Returns(Task.CompletedTask);
+                .Setup(x => x.Try(It.IsAny<Func<Task<RoutingDetail>>>(), It.IsAny<Func<Exception, Task<RoutingDetail>>>()))
+                .Returns(Task.FromResult(modelItem));
 
             // act
             await sut.AddDocument(modelItem, testPath);
@@ -200,8 +199,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
 
             GetMock(sut.Client)
-                .Setup(x => x.CreateDocumentAsync(testPath, modelItem, null, false, default))
-                .Returns(Task.FromResult(new ResourceResponse<Document>()));
+                .Setup(x => x.CreateDocumentAsync(testPath, modelItem))
+                .Returns(Task.FromResult(modelItem));
 
             // act
             await sut.ProcessAddDocument(testPath, modelItem);
@@ -209,39 +208,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             // assert
             GetMock(sut.Client).VerifyAll();
             GetMock(sut.SafeOperations).VerifyAll();
-        }
-
-        /// <summary>
-        /// process add document error handler throws malformed request exception for null incoming exception
-        /// </summary>
-        /// <returns>the currently running (test) task</returns>
-        [Fact]
-        public async Task ProcessAddDocumentErrorHandlerThrowsMalformedRequestForIncomingNull()
-        {
-            // arrange
-            var sut = MakeSUT();
-
-            // act / assert
-            await Assert.ThrowsAsync<MalformedRequestException>(() => sut.ProcessAddDocumentErrorHandler(null));
-        }
-
-        /// <summary>
-        /// process add document error handler meets expectation
-        /// </summary>
-        /// <param name="httpCode">the http code</param>
-        /// <param name="expectedException">the expected exception</param>
-        /// <returns>the currently running (test) task</returns>
-        [Theory]
-        [InlineData(HttpStatusCode.NotFound, typeof(NoContentException))]
-        [InlineData(HttpStatusCode.TooManyRequests, typeof(MalformedRequestException))]
-        public async Task ProcessAddDocumentErrorHandlerMeetsExpectation(HttpStatusCode httpCode, Type expectedException)
-        {
-            // arrange
-            var sut = MakeSUT();
-            var exception = MakeDocumentClientException(httpCode);
-
-            // act / assert
-            await Assert.ThrowsAsync(expectedException, () => sut.ProcessAddDocumentErrorHandler(exception));
         }
 
         /// <summary>
@@ -280,8 +246,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
 
             GetMock(sut.Client)
-                .Setup(x => x.ReadDocumentAsync(testPath, null, default))
-                .Returns(Task.FromResult(new ResourceResponse<Document>(new Document())));
+                .Setup(x => x.ReadDocumentAsync<RoutingDetail>(testPath))
+                .Returns(Task.FromResult(new RoutingDetail()));
 
             // act
             var result = await sut.ProcessGetDocument<RoutingDetail>(testPath);
@@ -303,7 +269,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var sut = MakeSUT();
 
             // act / assert
-            await Assert.ThrowsAsync<MalformedRequestException>(() => sut.ProcessGetDocumentErrorHandler<RoutingDetail>(null));
+            await Assert.ThrowsAsync<MalformedRequestException>(() => sut.ProcessDocumentErrorHandler<RoutingDetail>(null));
         }
 
         /// <summary>
@@ -322,7 +288,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var exception = MakeDocumentClientException(httpCode);
 
             // act / assert
-            await Assert.ThrowsAsync(expectedException, () => sut.ProcessGetDocumentErrorHandler<RoutingDetail>(exception));
+            await Assert.ThrowsAsync(expectedException, () => sut.ProcessDocumentErrorHandler<RoutingDetail>(exception));
         }
 
         /// <summary>
@@ -338,7 +304,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var exception = MakeDocumentClientException(null);
 
             // act / assert
-            var result = await sut.ProcessGetDocumentErrorHandler<RoutingDetail>(exception);
+            var result = await sut.ProcessDocumentErrorHandler<RoutingDetail>(exception);
 
             // assert
             Assert.Null(result);
@@ -381,7 +347,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var factory = MakeStrictMock<ICreateDocumentClients>();
             GetMock(factory)
                 .Setup(x => x.CreateClient(It.IsAny<Uri>(), accountKeyValue))
-                .Returns(MakeStrictMock<IDocumentClient>());
+                .Returns(MakeStrictMock<IDocumentClientShim>());
 
             var safeOperator = MakeStrictMock<IProvideSafeOperations>();
 

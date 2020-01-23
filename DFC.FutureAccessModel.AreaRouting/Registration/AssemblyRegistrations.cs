@@ -28,7 +28,8 @@ using Microsoft.Azure.WebJobs.Hosting;
 
 // project level
 // adapters
-[assembly: InternalRegistration(typeof(IGetAreaRoutingDetails), typeof(GetAreaRoutingDetailFunctionAdapter), TypeOfRegistrationScope.Singleton)]
+[assembly: InternalRegistration(typeof(IManageAreaRoutingDetails), typeof(AreaRoutingDetailManagementFunctionAdapter), TypeOfRegistrationScope.Singleton)]
+[assembly: InternalRegistration(typeof(IManageLocalAuthorities), typeof(LocalAuthorityManagmentFunctionAdapter), TypeOfRegistrationScope.Singleton)]
 
 // factories
 [assembly: InternalRegistration(typeof(ICreateDocumentClients), typeof(DocumentClientFactory), TypeOfRegistrationScope.Singleton)]

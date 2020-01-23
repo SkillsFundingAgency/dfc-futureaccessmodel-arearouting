@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
+using Newtonsoft.Json;
 
-namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Helpers
 {
     /// <summary>
     /// the response message helper
@@ -11,11 +12,20 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// set the content of the response
         /// </summary>
         /// <param name="source">the source (response message)</param>
-        /// <param name="newContent">the new content</param>
+        /// <param name="theContent">the (new) content</param>
         /// <returns>the message with new content</returns>
-        public static HttpResponseMessage SetContent(this HttpResponseMessage source, string newContent)
+        public static HttpResponseMessage SetContent(this HttpResponseMessage source, object theContent) =>
+            SetContent(source, JsonConvert.SerializeObject(theContent));
+
+        /// <summary>
+        /// set the content of the response
+        /// </summary>
+        /// <param name="source">the source (response message)</param>
+        /// <param name="theContent">the (new) content</param>
+        /// <returns>the message with new content</returns>
+        public static HttpResponseMessage SetContent(this HttpResponseMessage source, string theContent)
         {
-            source.Content = new StringContent(newContent);
+            source.Content = new StringContent(theContent);
             return source;
         }
     }

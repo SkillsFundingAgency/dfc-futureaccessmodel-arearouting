@@ -6,9 +6,9 @@ using DFC.FutureAccessModel.AreaRouting.Registration;
 namespace DFC.FutureAccessModel.AreaRouting.Adapters
 {
     /// <summary>
-    /// i get area routing detail...
+    /// i manage area routing details
     /// </summary>
-    public interface IGetAreaRoutingDetails :
+    public interface IManageAreaRoutingDetails :
         ISupportServiceRegistration
     {
         /// <summary>
@@ -26,5 +26,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters
         /// <param name="inLoggingScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
         Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inLoggingScope);
+
+        /// <summary>
+        /// add area routing detail using
+        /// </summary>
+        /// <param name="theContent">the content</param>
+        /// <param name="inScope">in scope</param>
+        /// <returns>the currently running task containing the response message (success or fail)</returns>
+        Task<HttpResponseMessage> AddAreaRoutingDetailUsing(string theContent, IScopeLoggingContext inScope);
     }
 }

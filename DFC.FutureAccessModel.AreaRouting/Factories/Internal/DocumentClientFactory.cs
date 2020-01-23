@@ -1,6 +1,4 @@
 ﻿using System;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
 {
@@ -16,7 +14,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <param name="forEndpoint">for endpoint</param>
         /// <param name="usingAccountKey">using account key</param>
         /// <returns>a newly constructed document client</returns>
-        public IDocumentClient CreateClient(Uri forEndpoint, string usingAccountKey) =>
-            new DocumentClient(forEndpoint, usingAccountKey);
+        public IDocumentClientShim CreateClient(Uri forEndpoint, string usingAccountKey) =>
+            new StorageClient(forEndpoint, usingAccountKey);
     }
 }

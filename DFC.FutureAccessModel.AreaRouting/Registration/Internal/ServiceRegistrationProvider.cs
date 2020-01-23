@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
+using DFC.FutureAccessModel.AreaRouting.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DFC.FutureAccessModel.AreaRouting.Registration.Internal
@@ -36,8 +36,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration.Internal
 
             var assembly = Assembly.GetExecutingAssembly();
 
-            var inherited = assembly.GetCustomAttributes<ExternalRegistrationAttribute>().ToList();
-            var local = assembly.GetCustomAttributes<InternalRegistrationAttribute>().ToList();
+            var inherited = assembly.GetCustomAttributes<ExternalRegistrationAttribute>().AsSafeReadOnlyList();
+            var local = assembly.GetCustomAttributes<InternalRegistrationAttribute>().AsSafeReadOnlyList();
 
             Registrations.AddRange(local);
             Registrations.AddRange(inherited);

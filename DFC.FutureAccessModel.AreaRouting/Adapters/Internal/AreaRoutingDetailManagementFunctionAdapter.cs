@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
+using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.HTTP.Standard;
@@ -14,28 +15,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
     /// <summary>
     /// get (the) area routing detail function adapter
     /// </summary>
-    internal sealed class GetAreaRoutingDetailFunctionAdapter :
-        IGetAreaRoutingDetails
+    internal sealed class AreaRoutingDetailManagementFunctionAdapter :
+        GeneralFunctionAdapter,
+        IManageAreaRoutingDetails
     {
         /// <summary>
-        /// the (area routing) storage provider
+        /// the (area) routing details (storage provider)
         /// </summary>
-        public IStoreAreaRoutingDetails StorageProvider { get; }
-
-        /// <summary>
-        /// the fault (response provider)
-        /// </summary>
-        public IProvideFaultResponses Faults { get; }
-
-        /// <summary>
-        /// the safe operations (provider)
-        /// </summary>
-        public IProvideSafeOperations SafeOperations { get; }
-
-        /// <summary>
-        /// the response (helper)
-        /// </summary>
-        public IHttpResponseMessageHelper Respond { get; }
+        public IStoreAreaRoutingDetails RoutingDetails { get; }
 
         /// <summary>
         /// i analyse expressions
@@ -48,37 +35,31 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         public IProvideExpressionActions Actions { get; }
 
         /// <summary>
-        /// create an instance of <see cref="GetAreaRoutingDetailFunctionAdapter"/>
+        /// create an instance of <see cref="AreaRoutingDetailManagementFunctionAdapter"/>
         /// </summary>
-        /// <param name="storageProvider">the storage provider</param>
+        /// <param name="routingDetails">the storage provider</param>
         /// <param name="responseHelper">the response helper</param>
         /// <param name="faultResponses">the fault responses (provider)</param>
         /// <param name="safeOperations">the safe operations (provider)</param>
-        public GetAreaRoutingDetailFunctionAdapter(
-            IStoreAreaRoutingDetails storageProvider,
+        /// <param name="analyser">the expression analyser</param>
+        /// <param name="actions">the expression action provider</param>
+        public AreaRoutingDetailManagementFunctionAdapter(
             IHttpResponseMessageHelper responseHelper,
             IProvideFaultResponses faultResponses,
             IProvideSafeOperations safeOperations,
+            IStoreAreaRoutingDetails routingDetails,
             IAnalyseExpresssions analyser,
-            IProvideExpressionActions actions)
+            IProvideExpressionActions actions) :
+                base(responseHelper, faultResponses, safeOperations)
         {
-            It.IsNull(storageProvider)
-                .AsGuard<ArgumentNullException>(nameof(storageProvider));
-            It.IsNull(responseHelper)
-                .AsGuard<ArgumentNullException>(nameof(responseHelper));
-            It.IsNull(faultResponses)
-                .AsGuard<ArgumentNullException>(nameof(faultResponses));
-            It.IsNull(safeOperations)
-                .AsGuard<ArgumentNullException>(nameof(safeOperations));
+            It.IsNull(routingDetails)
+                .AsGuard<ArgumentNullException>(nameof(routingDetails));
             It.IsNull(analyser)
                 .AsGuard<ArgumentNullException>(nameof(analyser));
             It.IsNull(actions)
                 .AsGuard<ArgumentNullException>(nameof(actions));
 
-            StorageProvider = storageProvider;
-            Respond = responseHelper;
-            Faults = faultResponses;
-            SafeOperations = safeOperations;
+            RoutingDetails = routingDetails;
             Analyser = analyser;
             Actions = actions;
         }
@@ -92,7 +73,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inLoggingScope) =>
             await SafeOperations.Try(
                 () => ProcessGetAreaRoutingDetailFor(theTouchpointID, inLoggingScope),
-                x => Faults.GetResponseFor(x, inLoggingScope));
+                x => Faults.GetResponseFor(x, TypeofMethod.Get, inLoggingScope));
 
         /// <summary>
         /// process, get (the) area routing detail for...
@@ -107,7 +88,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             It.IsEmpty(theTouchpointID)
                 .AsGuard<MalformedRequestException>();
 
-            var theDetail = await StorageProvider.GetAreaRoutingDetailFor(theTouchpointID);
+            var theDetail = await RoutingDetails.Get(theTouchpointID);
             var withContent = JsonConvert.SerializeObject(theDetail);
             var response = Respond.Ok(withContent);
 
@@ -125,7 +106,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inLoggingScope) =>
             await SafeOperations.Try(
                 () => ProcessGetAreaRoutingDetailBy(theLocation, inLoggingScope),
-                x => Faults.GetResponseFor(x, inLoggingScope));
+                x => Faults.GetResponseFor(x, TypeofMethod.Get, inLoggingScope));
 
         /// <summary>
         /// process, get (the) area routing detail by...
@@ -147,6 +128,42 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await inLoggingScope.ExitMethod();
 
             return await ProcessGetAreaRoutingDetailFor(theTouchpoint, inLoggingScope);
+        }
+
+        /// <summary>
+        /// add new area routing detail
+        /// </summary>
+        /// <param name="theTouchpoint">the touchpoint</param>
+        /// <param name="usingContent">using content</param>
+        /// <param name="inScope">in scope</param>
+        /// <returns>the result of the operation</returns>
+        public async Task<HttpResponseMessage> AddAreaRoutingDetailUsing(
+            string theContent,
+            IScopeLoggingContext inScope) =>
+            await SafeOperations.Try(
+                () => ProcessAddAreaRoutingDetailUsing(theContent, inScope),
+                x => Faults.GetResponseFor(x, TypeofMethod.Post, inScope));
+
+        /// <summary>
+        /// process, add new area routing detail
+        /// </summary>
+        /// <param name="theTouchpoint">the touchpoint</param>
+        /// <param name="usingContent">using content</param>
+        /// <param name="inScope">in scope</param>
+        /// <returns>the result of the operation</returns>
+        public async Task<HttpResponseMessage> ProcessAddAreaRoutingDetailUsing(
+            string theContent,
+            IScopeLoggingContext inScope)
+        {
+            await inScope.EnterMethod();
+
+            var theCandidate = JsonConvert.DeserializeObject<RoutingDetail>(theContent);
+
+            var result = await RoutingDetails.Add(theCandidate);
+
+            await inScope.ExitMethod();
+
+            return Respond.Created().SetContent(result);
         }
     }
 }

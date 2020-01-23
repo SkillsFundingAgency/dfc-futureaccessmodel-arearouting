@@ -11,10 +11,17 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage
         ISupportServiceRegistration
     {
         /// <summary>
-        /// get (the) area routing detail for...
+        /// get...
         /// </summary>
-        /// <param name="theTouchpointID">the touchpoint id</param>
-        /// <returns>an area routing detail</returns>
-        Task<IRoutingDetail> GetAreaRoutingDetailFor(string theTouchpointID);
+        /// <param name="theTouchpoint">the touchpoint (id)</param>
+        /// <returns>an area routing detail (the touchpoint)</returns>
+        Task<IRoutingDetail> Get(string theTouchpoint);
+
+        /// <summary>
+        /// add...
+        /// </summary>
+        /// <param name="theCandidate">the candidate (touchpoint)</param>
+        /// <returns>the newly stored routing details (touchpoint)</returns>
+        Task<IRoutingDetail> Add(IRoutingDetail theCandidate);
     }
 }

@@ -22,8 +22,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         public const string ApiDefinitionName = "api-definition";
         public const string ApiDefinitionRoute = ApiTitle + "/" + ApiDefinitionName;
         public const string ApiDescription =
-            @"To support email routing requirements between DSS and the ABC's. Plus lot's of
-            other stuff I don't know yet as I don't have access to the specification";
+            @"To support email routing requirements between DSS and the ABC's";
 
         /// <summary>
         /// run... (the api document generator function)
@@ -48,7 +47,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
                         ApiDescription,
                         ApiDefinitionName,
                         ApiVersion,
-                        Assembly.GetExecutingAssembly());
+                        Assembly.GetExecutingAssembly(),
+                        false, false); // don't include some irrelevant default parameters
 
                     return new HttpResponseMessage(HttpStatusCode.OK)
                     {

@@ -21,6 +21,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Models
         /// <summary>
         /// the local admin district code
         /// </summary>
+        [Key]
         [Required]
         [Display(Description = "The authority's unique identifier")]
         [StringLength(10, MinimumLength = 10)]

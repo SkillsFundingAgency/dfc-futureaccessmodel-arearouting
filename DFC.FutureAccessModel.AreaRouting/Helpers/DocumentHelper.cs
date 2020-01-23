@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Newtonsoft.Json;
 
-namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Helpers
 {
     /// <summary>
     /// a document extension helper

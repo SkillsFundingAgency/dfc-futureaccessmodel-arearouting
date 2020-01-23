@@ -8,7 +8,6 @@ using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using MarkEmbling.PostcodesIO.Exceptions;
-using Newtonsoft.Json;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
@@ -19,43 +18,96 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         IProvideFaultResponses
     {
         /// <summary>
-        /// the fault action map
+        /// the method action map
         /// </summary>
-        private readonly Dictionary<Type, Func<Exception, HttpResponseMessage>> _faultActionMap = new Dictionary<Type, Func<Exception, HttpResponseMessage>>();
+        private readonly Dictionary<TypeofMethod, Dictionary<Type, Func<Exception, HttpResponseMessage>>> _methodMap = new Dictionary<TypeofMethod, Dictionary<Type, Func<Exception, HttpResponseMessage>>>();
 
         /// <summary>
         /// initialises an instance of <see cref="FaultResponseProvider"/>
         /// </summary>
         public FaultResponseProvider()
         {
-            _faultActionMap.Add(typeof(MalformedRequestException), Fallback);
-            _faultActionMap.Add(typeof(NoContentException), Fallback);
-            _faultActionMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
-            _faultActionMap.Add(typeof(AccessForbiddenException), Forbidden);
-            _faultActionMap.Add(typeof(UnauthorizedException), Unauthorized);
+            _methodMap.Add(TypeofMethod.Delete, AddDefaultFaultMap());
+            _methodMap.Add(TypeofMethod.Get, AddGetFaultMap());
+            _methodMap.Add(TypeofMethod.Patch, AddDefaultFaultMap());
+            _methodMap.Add(TypeofMethod.Post, AddPostFaultMap());
+        }
 
-            _faultActionMap.Add(typeof(PostcodesIOApiException), Fallback);
-            _faultActionMap.Add(typeof(PostcodesIOEmptyResponseException), Fallback);
-            _faultActionMap.Add(typeof(InvalidPostcodeException), Fallback);
+        public Dictionary<Type, Func<Exception, HttpResponseMessage>> AddDefaultFaultMap()
+        {
+            var _faultMap = new Dictionary<Type, Func<Exception, HttpResponseMessage>>();
+
+            _faultMap.Add(typeof(ConflictingResourceException), Conflicted);
+            _faultMap.Add(typeof(MalformedRequestException), Malformed);
+            _faultMap.Add(typeof(NoContentException), NoContent);
+            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
+            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
+            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
+
+            _faultMap.Add(typeof(PostcodesIOApiException), Malformed);
+            _faultMap.Add(typeof(PostcodesIOEmptyResponseException), Malformed);
+            _faultMap.Add(typeof(InvalidPostcodeException), Malformed);
+            _faultMap.Add(typeof(FallbackActionException), UnknownError);
+
+            return _faultMap;
+        }
+
+        public Dictionary<Type, Func<Exception, HttpResponseMessage>> AddGetFaultMap()
+        {
+            var _faultMap = new Dictionary<Type, Func<Exception, HttpResponseMessage>>();
+
+            _faultMap.Add(typeof(ConflictingResourceException), Conflicted);
+            _faultMap.Add(typeof(MalformedRequestException), Fallback);
+            _faultMap.Add(typeof(NoContentException), Fallback);
+            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
+            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
+            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
+
+            _faultMap.Add(typeof(PostcodesIOApiException), Fallback);
+            _faultMap.Add(typeof(PostcodesIOEmptyResponseException), Fallback);
+            _faultMap.Add(typeof(InvalidPostcodeException), Fallback);
+            _faultMap.Add(typeof(FallbackActionException), Fallback);
+
+            return _faultMap;
+        }
+
+        public Dictionary<Type, Func<Exception, HttpResponseMessage>> AddPostFaultMap()
+        {
+            var _faultMap = new Dictionary<Type, Func<Exception, HttpResponseMessage>>();
+
+            _faultMap.Add(typeof(ConflictingResourceException), Conflicted);
+            _faultMap.Add(typeof(MalformedRequestException), Malformed);
+            _faultMap.Add(typeof(NoContentException), NoContent);
+            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
+            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
+            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
+
+            _faultMap.Add(typeof(PostcodesIOApiException), NoContent);
+            _faultMap.Add(typeof(PostcodesIOEmptyResponseException), NoContent);
+            _faultMap.Add(typeof(InvalidPostcodeException), NoContent);
+            _faultMap.Add(typeof(FallbackActionException), UnknownError);
+
+            return _faultMap;
         }
 
         /// <summary>
         /// get (the) response for...
         /// </summary>
         /// <param name="theException">the exception</param>
+        /// <param name="theMethod">the type of method</param>
         /// <param name="useLoggingScope">use (the) logging scope</param>
         /// <returns>the currently running task containing the http response message</returns>
-        public async Task<HttpResponseMessage> GetResponseFor(Exception theException, IScopeLoggingContext useLoggingScope)
+        public async Task<HttpResponseMessage> GetResponseFor(Exception theException, TypeofMethod theMethod, IScopeLoggingContext useLoggingScope)
         {
-            if (_faultActionMap.ContainsKey(theException.GetType()))
+            if (_methodMap[theMethod].ContainsKey(theException.GetType()))
             {
                 await InformOn(theException, useLoggingScope);
-                return _faultActionMap[theException.GetType()].Invoke(theException);
+                return _methodMap[theMethod][theException.GetType()].Invoke(theException);
             }
 
             await useLoggingScope.ExceptionDetail(theException);
 
-            return Fallback(theException);
+            return _methodMap[theMethod][typeof(FallbackActionException)].Invoke(theException);
         }
 
         /// <summary>
@@ -81,7 +133,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <returns>a 'fallback' message</returns>
         internal HttpResponseMessage Fallback(Exception theException) =>
             new HttpResponseMessage(HttpStatusCode.OK)
-                .SetContent(JsonConvert.SerializeObject(RoutingDetail.Default));
+                .SetContent(RoutingDetail.Default);
 
         /// <summary>
         /// the malformed request action
@@ -89,6 +141,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <returns>a 'bad request' message</returns>
         internal HttpResponseMessage Malformed(Exception theException) =>
             new HttpResponseMessage(HttpStatusCode.BadRequest)
+                .SetContent(string.Empty);
+
+        /// <summary>
+        /// the conflicted request action
+        /// </summary>
+        /// <param name="theException">the exception</param>
+        /// <returns>a conflicted message</returns>
+        internal HttpResponseMessage Conflicted(Exception theException) =>
+            new HttpResponseMessage(HttpStatusCode.Conflict)
                 .SetContent(string.Empty);
 
         /// <summary>
@@ -127,8 +188,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// the unknown error action
         /// </summary>
         /// <returns>an 'internal server error' message</returns>
-        internal HttpResponseMessage UnknownError() =>
+        internal HttpResponseMessage UnknownError(Exception theException) =>
             new HttpResponseMessage(HttpStatusCode.InternalServerError)
-                .SetContent(string.Empty);
+                .SetContent(theException?.Message ?? string.Empty);
     }
 }

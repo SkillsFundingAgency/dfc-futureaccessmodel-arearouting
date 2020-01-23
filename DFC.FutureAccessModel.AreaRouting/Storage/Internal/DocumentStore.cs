@@ -39,8 +39,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <summary>
         /// the document store client
         /// </summary>
-        public IDocumentClient Client { get; }
+        public IDocumentClientShim Client { get; }
 
+        /// <summary>
+        /// the safe operations (provider)
+        /// </summary>
         public IProvideSafeOperations SafeOperations { get; }
 
         /// <summary>
@@ -72,64 +75,71 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
+        /// document exists
+        /// </summary>
+        /// <typeparam name="TDocument">the document type</typeparam>
+        /// <param name="usingStoragePath">using (the) storage path</param>
+        /// <returns>true if the document exists</returns>
+        public async Task<bool> DocumentExists<TDocument>(Uri usingStoragePath)
+            where TDocument: class =>
+            await SafeOperations.Try(
+                () => ProcessDocumentExists<TDocument>(usingStoragePath),
+                x => Task.FromResult(false));
+
+        /// <summary>
+        /// document exists
+        /// </summary>
+        /// <param name="usingStoragePath">using (the) storage path</param>
+        /// <returns>true if the document exists</returns>
+        internal async Task<bool> ProcessDocumentExists<TDocument>(Uri usingStoragePath)
+            where TDocument : class =>
+            It.Has(await Client.ReadDocumentAsync<TDocument>(usingStoragePath));
+
+        /// <summary>
         /// add (a) document (to the document store)
         /// </summary>
-        /// <typeparam name="TDocument">the docuement type</typeparam>
+        /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="theDocument">the document</param>
-        /// <param name="usingStoragePath">using the storage path</param>
+        /// <param name="usingCollectionPath">using (the) collection path</param>
         /// <returns>the currently running task</returns>
-        public async Task AddDocument<TDocument>(TDocument theDocument, Uri usingStoragePath)
+        public async Task<TDocument> AddDocument<TDocument>(TDocument theDocument, Uri usingCollectionPath)
             where TDocument : class =>
             await SafeOperations.Try(
-                () => ProcessAddDocument(usingStoragePath, theDocument),
-                x => ProcessAddDocumentErrorHandler(x));
+                () => ProcessAddDocument(usingCollectionPath, theDocument),
+                x => ProcessDocumentErrorHandler<TDocument>(x));
 
         /// <summary>
         /// process add document
         /// </summary>
         /// <typeparam name="TDocument">the document type</typeparam>
-        /// <param name="usingStoragePath">using (the) storage path</param>
+        /// <param name="usingCollectionPath">using (the) collection path</param>
         /// <param name="theDocument">the document</param>
         /// <returns>the currently running task</returns>
-        internal async Task ProcessAddDocument<TDocument>(Uri usingStoragePath, TDocument theDocument)
+        internal async Task<TDocument> ProcessAddDocument<TDocument>(Uri usingCollectionPath, TDocument theDocument)
             where TDocument : class =>
-            await Client.CreateDocumentAsync(usingStoragePath, theDocument);
-
-        /// <summary>
-        /// process add document error handler. 
-        /// safe handling and exception transformation into something the API can deal with. 
-        /// an incoming null is likely to be the result of an argument null 
-        /// exception for an 'invalid' uri in the read document call. 
-        /// </summary>
-        /// <param name="theException">the exception</param>
-        /// <returns>the currently running task</returns>
-        internal async Task ProcessAddDocumentErrorHandler(Exception theException) =>
-            await Task.Run(() => ProcessError(theException as DocumentClientException));
+            await Client.CreateDocumentAsync(usingCollectionPath, theDocument);
 
         /// <summary>
         /// get (a) document (from the document store)
         /// </summary>
-        /// <typeparam name="TDocument">the docuement type</typeparam>
-        /// <param name="usingStoragePath">using the storage path</param>
+        /// <typeparam name="TDocument">the document type</typeparam>
+        /// <param name="usingStoragePath">using (the) storage path</param>
         /// <returns>the currently running task</returns>
         public async Task<TDocument> GetDocument<TDocument>(Uri usingStoragePath)
             where TDocument : class =>
             await SafeOperations.Try(
                 () => ProcessGetDocument<TDocument>(usingStoragePath),
-                x => ProcessGetDocumentErrorHandler<TDocument>(x));
+                x => ProcessDocumentErrorHandler<TDocument>(x));
 
         /// <summary>
         /// process get document
         /// </summary>
-        /// <typeparam name="TDocument"></typeparam>
-        /// <param name="usingStoragePath"></param>
+        /// <typeparam name="TDocument">the document type</typeparam>
+        /// <param name="usingStoragePath">using (the) storage path</param>
         /// <returns></returns>
         internal async Task<TDocument> ProcessGetDocument<TDocument>(Uri usingStoragePath)
-            where TDocument : class
-        {
-            var doc = await Client.ReadDocumentAsync(usingStoragePath);
-            return await doc.Resource.ConvertTo<TDocument>() ?? default;
-        }
+            where TDocument : class =>
+            await Client.ReadDocumentAsync<TDocument>(usingStoragePath);
 
         /// <summary>
         /// process get document error handler. 
@@ -137,10 +147,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// an incoming null is likely to be the result of an argument null 
         /// exception for an 'invalid' uri in the read document call. 
         /// </summary>
-        /// <typeparam name="TDocument"></typeparam>
-        /// <param name="theException"></param>
+        /// <typeparam name="TDocument">the document type</typeparam>
+        /// <param name="theException">the exception</param>
         /// <returns>nothing, the expectation is to throw an 'application' exception</returns>
-        internal async Task<TDocument> ProcessGetDocumentErrorHandler<TDocument>(Exception theException)
+        internal async Task<TDocument> ProcessDocumentErrorHandler<TDocument>(Exception theException)
             where TDocument : class =>
             await Task.Run(() =>
             {

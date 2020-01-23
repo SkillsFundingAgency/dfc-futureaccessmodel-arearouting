@@ -1,6 +1,4 @@
 ﻿using System;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
@@ -57,7 +55,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             var client = sut.CreateClient(_testPath, _testAccountKey);
 
             // assert
-            Assert.IsType<DocumentClient>(client);
+            Assert.IsType<StorageClient>(client);
         }
 
         /// <summary>
@@ -73,7 +71,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             var client = sut.CreateClient(_testPath, _testAccountKey);
 
             // assert
-            Assert.IsAssignableFrom<IDocumentClient>(client);
+            Assert.IsAssignableFrom<IDocumentClientShim>(client);
         }
 
         /// <summary>

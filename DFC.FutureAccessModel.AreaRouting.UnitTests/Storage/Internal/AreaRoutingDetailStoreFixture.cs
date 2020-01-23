@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
+using Moq;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
@@ -75,9 +76,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         {
             // arrange
             var sut = MakeSUT();
+            const string touchpoint = "0000000001";
+            GetMock(sut.DocumentStore)
+                .Setup(x => x.GetDocument<RoutingDetail>(It.IsAny<Uri>()))
+                .Returns(Task.FromResult(new RoutingDetail()));
+            GetMock(sut.StoragePaths)
+                .Setup(x => x.GetRoutingDetailResourcePathFor(touchpoint))
+                .Returns(new Uri("/"));
 
             // act
-            var result = await sut.GetAreaRoutingDetailFor("0000000001");
+            var result = await sut.Get(touchpoint);
 
             // assert
             GetMock(sut.DocumentStore).VerifyAll();

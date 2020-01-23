@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
+using DFC.FutureAccessModel.AreaRouting.Models;
 using MarkEmbling.PostcodesIO.Exceptions;
 using Xunit;
 
@@ -48,7 +49,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var exception = (Exception)testException.Assembly.CreateInstance(testException.FullName);
 
             // act
-            var result = await sut.GetResponseFor(exception, logger);
+            var result = await sut.GetResponseFor(exception, TypeofMethod.Get, logger);
 
             // assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -73,7 +74,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Returns(Task.CompletedTask);
 
             // act
-            var result = await sut.GetResponseFor(new PostcodesIOApiException(new Exception()), logger);
+            var result = await sut.GetResponseFor(new PostcodesIOApiException(new Exception()), TypeofMethod.Get, logger);
 
             // assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -95,7 +96,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Returns(Task.CompletedTask);
 
             // act
-            var result = await sut.GetResponseFor(new PostcodesIOEmptyResponseException(HttpStatusCode.NotImplemented), logger);
+            var result = await sut.GetResponseFor(new PostcodesIOEmptyResponseException(HttpStatusCode.NotImplemented), TypeofMethod.Get, logger);
 
             // assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -125,7 +126,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var exception = (Exception)testException.Assembly.CreateInstance(testException.FullName);
 
             // act
-            var result = await sut.GetResponseFor(exception, logger);
+            var result = await sut.GetResponseFor(exception, TypeofMethod.Get, logger);
 
             // assert
             Assert.Equal(expectedState, result.StatusCode);
@@ -154,7 +155,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Returns(Task.CompletedTask);
 
             // act
-            var result = await sut.GetResponseFor(exception, logger);
+            var result = await sut.GetResponseFor(exception, TypeofMethod.Get, logger);
 
             // assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);

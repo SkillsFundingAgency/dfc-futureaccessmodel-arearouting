@@ -45,7 +45,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             It.IsNull(authorityProvider)
                 .AsGuard<ArgumentNullException>(nameof(authorityProvider));
 
+            // yuk, i need to be in a factory, direct injection doesn't work
             Postcode = new PostcodesIOClient();
+
             Authority = authorityProvider;
 
             _actionMap.Add(TypeOfExpression.Town, GetTouchpointIDFromTown);
@@ -112,13 +114,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         public async Task<string> GetTouchpointIDFromPostcode(string theCandidate, IScopeLoggingContext usingScope)
         {
             await usingScope.EnterMethod();
+            await usingScope.Information($"seeking postcode '{theCandidate}'");
 
             var result = await Postcode.LookupAsync(theCandidate);
+
             It.IsNull(result)
                 .AsGuard<InvalidPostcodeException>();
 
-            var authority = await Authority.GetLocalAuthorityFor(result.Codes.AdminDistrict);
+            await usingScope.Information($"found postcode for '{result.OutCode} {result.InCode}'");
+            await usingScope.Information($"seeking local authority '{result.Codes.AdminDistrict}'");
 
+            var authority = await Authority.Get(result.Codes.AdminDistrict);
+
+            await usingScope.Information($"found local authority '{authority.LADCode}'");
             await usingScope.ExitMethod();
 
             return authority.TouchpointID;

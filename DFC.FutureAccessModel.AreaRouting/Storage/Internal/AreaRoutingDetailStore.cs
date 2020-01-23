@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
@@ -41,17 +42,36 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// get (the) area routing detail for...
+        /// get...
         /// </summary>
-        /// <param name="theTouchpointID">the touchpoint id</param>
-        /// <returns>an area routing detail</returns>
-        public async Task<IRoutingDetail> GetAreaRoutingDetailFor(string theTouchpointID)
+        /// <param name="theTouchpoint">the touchpoint (id)</param>
+        /// <returns>an area routing detail (the touchpoint)</returns>
+        public async Task<IRoutingDetail> Get(string theTouchpoint)
         {
-            // TODO: enable this code once we are happy
-            // var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpointID)
-            // return await DocumentStore.GetDocument<RoutingDetail>(usingPath)
+            var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
+            return await DocumentStore.GetDocument<RoutingDetail>(usingPath);
+        }
 
-            return await Task.FromResult(RoutingDetail.Default);
+        /// <summary>
+        /// add...
+        /// </summary>
+        /// <param name="theCandidate">the candidate (touchpoint)</param>
+        /// <returns>the newly stored routing details (touchpoint)</returns>
+        public async Task<IRoutingDetail> Add(IRoutingDetail theCandidate)
+        {
+            It.IsNull(theCandidate)
+                .AsGuard<ArgumentNullException>(nameof(theCandidate));
+
+            var theTouchpoint = theCandidate.TouchpointID;
+            It.IsNull(theTouchpoint)
+                .AsGuard<ArgumentNullException>(nameof(theTouchpoint));
+
+            var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
+
+            (await DocumentStore.DocumentExists<RoutingDetail>(usingPath))
+                .AsGuard<ConflictingResourceException>();
+
+            return await DocumentStore.AddDocument(theCandidate, StoragePaths.RoutingDetailCollection);
         }
     }
 }

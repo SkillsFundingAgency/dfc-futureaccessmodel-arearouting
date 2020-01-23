@@ -17,37 +17,32 @@ using Microsoft.Extensions.Logging;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
-    public static class GetAreaRoutingDetailByLocationFunction
+    public static class PostLocalAuthorityFunction
     {
         /// <summary>
         /// run...
         /// </summary>
         /// <param name="theRequest">the request</param>
-        /// <param name="usingTraceWriter">using (the) trace writer)</param>
-        /// <param name="theLocation"></param>
+        /// <param name="usingTraceWriter">using (the) trace writer</param>
+        /// <param name="touchpointID"></param>
         /// <param name="factory"></param>
         /// <param name="adapter"></param>
         /// <returns></returns>
-        [FunctionName("GetAreaRoutingDetailByLocation")]
+        [FunctionName("PostLocalAuthority")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = FunctionDescription.ResourceFound, ShowSchema = true)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.NoContent, ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Created, Description = FunctionDescription.ResourceCreated, ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.NoParentContent, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = FunctionDescription.MalformedRequest, ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Conflict, Description = FunctionDescription.Conflict, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
-        [Display(Name = "Get", Description =
-            @"Ability to return:
-                a list of Touchpoint ID's</p>
-                or a singluar full area routing detail when coupled with the use of the location parameter
-                Examples:
-                    ?location=TS14 6AH
-                    ?location=Stafford (search by town proposed, not yet implemented)
-                    ?locaiton=WS11 (search by outward code proposed, not yet implemented)")]
+        [Display(Name = "Post", Description = "Ability to add the Local Authority details for the given Touchpoint.")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas")]HttpRequest theRequest,
+            [HttpTrigger(AuthorizationLevel.Admin, "post", Route = "areas/{touchpointID}/localauthorities")]HttpRequest theRequest,
             ILogger usingTraceWriter,
+            string touchpointID,
             [Inject] ICreateLoggingContextScopes factory,
-            [Inject] IManageAreaRoutingDetails adapter)
+            [Inject] IManageLocalAuthorities adapter)
         {
             It.IsNull(theRequest)
                 .AsGuard<ArgumentNullException>(nameof(theRequest));
@@ -58,10 +53,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
             It.IsNull(adapter)
                 .AsGuard<ArgumentNullException>(nameof(adapter));
 
-            using (var scope = await factory.BeginScopeFor(theRequest, usingTraceWriter))
+            using (var inScope = await factory.BeginScopeFor(theRequest, usingTraceWriter))
             {
-                var theLocation = theRequest.Query["location"];
-                return await adapter.GetAreaRoutingDetailBy(theLocation, scope);
+                var theContent = await theRequest.ReadAsStringAsync();
+                return await adapter.AddNewAuthorityFor(touchpointID, theContent, inScope);
             }
         }
     }
