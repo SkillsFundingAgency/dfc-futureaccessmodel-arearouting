@@ -77,12 +77,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             // arrange
             var sut = MakeSUT();
             const string touchpoint = "0000000001";
+            var documentPath = new Uri("/", UriKind.Relative);
+
             GetMock(sut.DocumentStore)
-                .Setup(x => x.GetDocument<RoutingDetail>(It.IsAny<Uri>()))
+                .Setup(x => x.GetDocument<RoutingDetail>(documentPath))
                 .Returns(Task.FromResult(new RoutingDetail()));
             GetMock(sut.StoragePaths)
                 .Setup(x => x.GetRoutingDetailResourcePathFor(touchpoint))
-                .Returns(new Uri("/"));
+                .Returns(documentPath);
 
             // act
             var result = await sut.Get(touchpoint);
