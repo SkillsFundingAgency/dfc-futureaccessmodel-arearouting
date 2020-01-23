@@ -83,10 +83,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <returns>the LAD code</returns>
         public async Task<string> GetTouchpointIDFromTown(string theCandidate, IScopeLoggingContext usingScope)
         {
-            // TODO: things...
-            // from the town get a candidate outward code (district)
-            // return await GetTouchpointIDFromOutwardCode(result.District)
-            return await Task.FromResult(theCandidate);
+            await Task.CompletedTask;
+            throw new NotSupportedException("GetTouchpointIDFromTown: this operation has not yet been coded");
         }
 
         /// <summary>
