@@ -16,9 +16,23 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
     /// get (the) area routing detail function adapter
     /// </summary>
     internal sealed class AreaRoutingDetailManagementFunctionAdapter :
-        GeneralFunctionAdapter,
         IManageAreaRoutingDetails
     {
+        /// <summary>
+        /// the fault (response provider)
+        /// </summary>
+        public IProvideFaultResponses Faults { get; }
+
+        /// <summary>
+        /// the safe operations (provider)
+        /// </summary>
+        public IProvideSafeOperations SafeOperations { get; }
+
+        /// <summary>
+        /// the response (helper)
+        /// </summary>
+        public IHttpResponseMessageHelper Respond { get; }
+
         /// <summary>
         /// the (area) routing details (storage provider)
         /// </summary>
@@ -49,9 +63,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             IProvideSafeOperations safeOperations,
             IStoreAreaRoutingDetails routingDetails,
             IAnalyseExpresssions analyser,
-            IProvideExpressionActions actions) :
-                base(responseHelper, faultResponses, safeOperations)
+            IProvideExpressionActions actions)
         {
+            It.IsNull(responseHelper)
+                .AsGuard<ArgumentNullException>(nameof(responseHelper));
+            It.IsNull(faultResponses)
+                .AsGuard<ArgumentNullException>(nameof(faultResponses));
+            It.IsNull(safeOperations)
+                .AsGuard<ArgumentNullException>(nameof(safeOperations));
             It.IsNull(routingDetails)
                 .AsGuard<ArgumentNullException>(nameof(routingDetails));
             It.IsNull(analyser)
@@ -59,6 +78,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             It.IsNull(actions)
                 .AsGuard<ArgumentNullException>(nameof(actions));
 
+            Respond = responseHelper;
+            Faults = faultResponses;
+            SafeOperations = safeOperations;
             RoutingDetails = routingDetails;
             Analyser = analyser;
             Actions = actions;

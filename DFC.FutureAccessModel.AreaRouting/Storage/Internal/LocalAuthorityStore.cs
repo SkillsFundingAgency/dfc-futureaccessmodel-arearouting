@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
@@ -50,28 +49,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         {
             var usingPath = StoragePaths.GetLocalAuthorityResourcePathFor(theAdminDistrict);
             return await DocumentStore.GetDocument<LocalAuthority>(usingPath);
-        }
-
-        /// <summary>
-        /// add
-        /// </summary>
-        /// <param name="theCandidate">the candidate (authority)</param>
-        /// <returns>the newly added local authority</returns>
-        public async Task<ILocalAuthority> Add(ILocalAuthority theCandidate)
-        {
-            It.IsNull(theCandidate)
-                .AsGuard<ArgumentNullException>(nameof(theCandidate));
-
-            var theAdminDistrict = theCandidate.LADCode;
-            It.IsNull(theAdminDistrict)
-                .AsGuard<ArgumentNullException>(nameof(theAdminDistrict));
-
-            var usingPath = StoragePaths.GetLocalAuthorityResourcePathFor(theAdminDistrict);
-
-            (await DocumentStore.DocumentExists<LocalAuthority>(usingPath))
-                .AsGuard<ConflictingResourceException>();
-
-            return await DocumentStore.AddDocument(theCandidate, StoragePaths.LocalAuthorityCollection);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <param name="forEndpoint">for endpoint</param>
         /// <param name="usingAccountKey">using account key</param>
         /// <returns>a newly constructed document client</returns>
-        public IDocumentClientShim CreateClient(Uri forEndpoint, string usingAccountKey) =>
-            new StorageClient(forEndpoint, usingAccountKey);
+        public IWrapDocumentClient CreateClient(Uri forEndpoint, string usingAccountKey) =>
+            new DocumentClientWrapper(forEndpoint, usingAccountKey);
     }
 }

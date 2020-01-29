@@ -10,28 +10,22 @@ using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.FutureAccessModel.AreaRouting.Storage.Internal;
 using DFC.HTTP.Standard;
 using DFC.Swagger.Standard;
-using MarkEmbling.PostcodesIO;
 using Microsoft.Azure.WebJobs.Hosting;
 
 // the web job extension startup registration
 [assembly: WebJobsStartup(typeof(AreaRoutingWebJobsExtensionStartup), "Area Routing Web Jobs Extension Startup")]
 
 // inherited, package level
-[assembly: ExternalRegistration(typeof(IPostcodesIOClient), typeof(PostcodesIOClient), TypeOfRegistrationScope.Singleton)]
 [assembly: ExternalRegistration(typeof(ILoggerHelper), typeof(LoggerHelper), TypeOfRegistrationScope.Singleton)]
 [assembly: ExternalRegistration(typeof(IHttpResponseMessageHelper), typeof(HttpResponseMessageHelper), TypeOfRegistrationScope.Singleton)]
 [assembly: ExternalRegistration(typeof(ISwaggerDocumentGenerator), typeof(SwaggerDocumentGenerator), TypeOfRegistrationScope.Singleton)]
 
-// might need to put these back at some point
-// builder.Services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>()
-// builder.Services.AddSingleton<IJsonHelper, JsonHelper>()
-
 // project level
 // adapters
 [assembly: InternalRegistration(typeof(IManageAreaRoutingDetails), typeof(AreaRoutingDetailManagementFunctionAdapter), TypeOfRegistrationScope.Singleton)]
-[assembly: InternalRegistration(typeof(IManageLocalAuthorities), typeof(LocalAuthorityManagmentFunctionAdapter), TypeOfRegistrationScope.Singleton)]
 
 // factories
+[assembly: InternalRegistration(typeof(ICreatePostcodeClients), typeof(PostcodeClientFactory), TypeOfRegistrationScope.Singleton)]
 [assembly: InternalRegistration(typeof(ICreateDocumentClients), typeof(DocumentClientFactory), TypeOfRegistrationScope.Singleton)]
 [assembly: InternalRegistration(typeof(ICreateLoggingContextScopes), typeof(LoggingContextScopeFactory), TypeOfRegistrationScope.Singleton)]
 

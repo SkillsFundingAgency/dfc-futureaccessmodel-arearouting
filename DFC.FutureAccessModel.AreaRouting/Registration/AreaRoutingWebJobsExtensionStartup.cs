@@ -15,13 +15,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration
     public sealed class AreaRoutingWebJobsExtensionStartup :
         IWebJobsStartup
     {
+        /// <summary>
+        /// configure uses the service registrar to ensure complete service registration. 
+        /// i'd like this to be injectable but i don't have control at this level. 
+        /// so i have to use a static factory
+        /// </summary>
+        /// <param name="builder"></param>
         public void Configure(IWebJobsBuilder builder)
         {
             builder.AddDependencyInjection();
 
-            var provider = ServiceRegistrationProvider.CreateService();
+            var registrar = ServiceRegistrationProvider.CreateService();
 
-            provider.Compose(builder.Services);
+            registrar.Compose(builder.Services);
         }
     }
 }

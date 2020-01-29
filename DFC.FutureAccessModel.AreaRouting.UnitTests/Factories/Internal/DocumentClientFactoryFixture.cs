@@ -55,7 +55,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             var client = sut.CreateClient(_testPath, _testAccountKey);
 
             // assert
-            Assert.IsType<StorageClient>(client);
+            Assert.IsType<DocumentClientWrapper>(client);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             var client = sut.CreateClient(_testPath, _testAccountKey);
 
             // assert
-            Assert.IsAssignableFrom<IDocumentClientShim>(client);
+            Assert.IsAssignableFrom<IWrapDocumentClient>(client);
         }
 
         /// <summary>

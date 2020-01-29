@@ -347,7 +347,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var factory = MakeStrictMock<ICreateDocumentClients>();
             GetMock(factory)
                 .Setup(x => x.CreateClient(It.IsAny<Uri>(), accountKeyValue))
-                .Returns(MakeStrictMock<IDocumentClientShim>());
+                .Returns(MakeStrictMock<IWrapDocumentClient>());
 
             var safeOperator = MakeStrictMock<IProvideSafeOperations>();
 

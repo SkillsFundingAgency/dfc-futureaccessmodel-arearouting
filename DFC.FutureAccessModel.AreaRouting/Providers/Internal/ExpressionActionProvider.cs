@@ -7,7 +7,6 @@ using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Storage;
-using MarkEmbling.PostcodesIO;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
@@ -25,7 +24,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <summary>
         /// the postcode (client)
         /// </summary>
-        public IPostcodesIOClient Postcode { get; }
+        public IWrapPostcodesClient Postcode { get; }
 
         /// <summary>
         /// the local authority storage client
@@ -37,17 +36,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <param name="postcode">the postcode client</param>
         public ExpressionActionProvider(
-            IPostcodesIOClient postcode,
+            ICreatePostcodeClients factory,
             IStoreLocalAuthorities authorityProvider)
         {
-            It.IsNull(postcode)
-                .AsGuard<ArgumentNullException>(nameof(postcode));
+            It.IsNull(factory)
+                .AsGuard<ArgumentNullException>(nameof(factory));
             It.IsNull(authorityProvider)
                 .AsGuard<ArgumentNullException>(nameof(authorityProvider));
 
-            // yuk, i need to be in a factory, direct injection doesn't work
-            Postcode = new PostcodesIOClient();
-
+            Postcode = factory.Create();
             Authority = authorityProvider;
 
             _actionMap.Add(TypeOfExpression.Town, GetTouchpointIDFromTown);
@@ -95,10 +92,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <returns>the LAD code</returns>
         public async Task<string> GetTouchpointIDFromOutwardCode(string theCandidate, IScopeLoggingContext usingScope)
         {
-            var result = await Postcode.AutocompleteAsync(theCandidate);
+            await usingScope.EnterMethod();
+
+            It.IsNull(theCandidate)
+                .AsGuard<ArgumentNullException>(nameof(theCandidate));
+
+            await usingScope.Information($"seeking postcode via outward code: '{theCandidate}'");
+
+            var result = await Postcode.LookupOutwardCodeAsync(theCandidate);
 
             It.IsEmpty(result)
                 .AsGuard<MalformedRequestException>();
+
+            await usingScope.ExitMethod();
 
             return await GetTouchpointIDFromPostcode(result.FirstOrDefault(), usingScope);
         }

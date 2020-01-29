@@ -39,7 +39,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <summary>
         /// the document store client
         /// </summary>
-        public IDocumentClientShim Client { get; }
+        public IWrapDocumentClient Client { get; }
 
         /// <summary>
         /// the safe operations (provider)
