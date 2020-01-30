@@ -1,4 +1,7 @@
-﻿namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
+﻿using DFC.FutureAccessModel.AreaRouting.Wrappers;
+using DFC.FutureAccessModel.AreaRouting.Wrappers.Internal;
+
+namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
 {
     /// <summary>
     /// postcode client factory
@@ -7,10 +10,10 @@
         ICreatePostcodeClients
     {
         /// <summary>
-        /// create...
+        /// create client...
         /// </summary>
         /// <returns>a postcodes client wrapper</returns>
-        public IWrapPostcodesClient Create() =>
+        public IWrapPostcodesClient CreateClient() =>
             new PostcodesClientWrapper();
     }
 }

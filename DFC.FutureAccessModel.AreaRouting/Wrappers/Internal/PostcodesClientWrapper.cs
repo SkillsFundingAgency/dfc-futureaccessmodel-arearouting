@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using MarkEmbling.PostcodesIO;
 using MarkEmbling.PostcodesIO.Results;
 
-namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
 {
     /// <summary>
     /// the postcodes client wrapper
@@ -18,10 +19,20 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         private readonly IPostcodesIOClient _client;
 
         /// <summary>
-        /// initalises an instance of the <see cref="PostcodesClientWrapper"/>
+        /// initialises an instance of the <see cref="PostcodesClientWrapper"/>
         /// </summary>
-        public PostcodesClientWrapper() =>
-            _client = new PostcodesIOClient();
+        [ExcludeFromCodeCoverage]
+        public PostcodesClientWrapper() :
+                    this(new PostcodesIOClient())
+        { }
+
+        /// <summary>
+        /// initialises an instance of the <see cref="PostcodesClientWrapper"/>
+        /// using the principle of poor man's DI
+        /// </summary>
+        /// <param name="theClient">the client</param>
+        public PostcodesClientWrapper(IPostcodesIOClient theClient) =>
+            _client = theClient;
 
         /// <summary>
         /// look up (async)

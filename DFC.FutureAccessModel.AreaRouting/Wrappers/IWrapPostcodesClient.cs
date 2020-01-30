@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MarkEmbling.PostcodesIO.Results;
 
-namespace DFC.FutureAccessModel.AreaRouting.Factories
+namespace DFC.FutureAccessModel.AreaRouting.Wrappers
 {
     /// <summary>
     /// i wrap (the) postcodes client

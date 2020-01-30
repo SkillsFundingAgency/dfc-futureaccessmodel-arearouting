@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace DFC.FutureAccessModel.AreaRouting.Factories
+namespace DFC.FutureAccessModel.AreaRouting.Wrappers
 {
     /// <summary>
     /// i document client (shim)

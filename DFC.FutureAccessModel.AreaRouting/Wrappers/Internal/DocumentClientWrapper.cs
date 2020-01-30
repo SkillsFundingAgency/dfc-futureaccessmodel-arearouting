@@ -4,31 +4,40 @@ using Microsoft.Azure.Documents;
 using System.Diagnostics.CodeAnalysis;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using Microsoft.Azure.Documents.Client;
+using System.Linq;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
-namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
 {
     /// <summary>
     /// the document client wrapper
-    /// enables limited cosmos 'emulation' in DEBUG mode
     /// </summary>
-    [ExcludeFromCodeCoverage]
     internal sealed class DocumentClientWrapper :
             IWrapDocumentClient
     {
         /// <summary>
-        /// the (production build) document client
+        /// the document client
         /// </summary>
-        private readonly IDocumentClient _client;
+        public IDocumentClient Client { get; }
 
         /// <summary>
-        /// initialises an instance of <see cref="StoreClient"/>
+        /// initialises an instance of <see cref="DocumentClientWrapper"/>
         /// </summary>
         /// <param name="forEndpoint">for end point</param>
         /// <param name="usingAccountKey">using account key</param>
-        public DocumentClientWrapper(Uri forEndpoint, string usingAccountKey)
-        {
-            _client = new DocumentClient(forEndpoint, usingAccountKey);
-        }
+        [ExcludeFromCodeCoverage]
+        public DocumentClientWrapper(Uri forEndpoint, string usingAccountKey) :
+            this(new DocumentClient(forEndpoint, usingAccountKey))
+        { }
+
+        /// <summary>
+        /// initialises an instance of <see cref="DocumentClientWrapper"/>
+        /// using the principle of poor man's DI
+        /// </summary>
+        /// <param name="client"></param>
+        public DocumentClientWrapper(IDocumentClient client) =>
+            Client = client;
 
         /// <summary>
         /// create document (async)
@@ -40,8 +49,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         public async Task<TDocument> CreateDocumentAsync<TDocument>(Uri documentCollectionUri, TDocument document)
             where TDocument : class
         {
-            var response = await _client.CreateDocumentAsync(documentCollectionUri, document);
-            return await response.Resource.ConvertTo<TDocument>() ?? default;
+            await Client.CreateDocumentAsync(documentCollectionUri, document);
+
+            var documentUri = MakeDocumentPathFor(document, documentCollectionUri);
+            return await ReadDocumentAsync<TDocument>(documentUri) ?? default;
         }
 
         /// <summary>
@@ -52,7 +63,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <returns>true if it does</returns>
         public async Task<bool> DocumentExistsAsync(Uri documentUri)
         {
-            var response = await _client.ReadDocumentAsync(documentUri);
+            var response = await Client.ReadDocumentAsync(documentUri);
             return It.Has(response?.Resource);
         }
 
@@ -66,8 +77,27 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         public async Task<TDocument> ReadDocumentAsync<TDocument>(Uri documentUri)
             where TDocument : class
         {
-            var response = await _client.ReadDocumentAsync<TDocument>(documentUri);
+            var response = await Client.ReadDocumentAsync<TDocument>(documentUri);
             return response.Document;
+        }
+
+        /// <summary>
+        /// make resource path
+        /// </summary>
+        /// <typeparam name="TResource">the type of resource</typeparam>
+        /// <param name="theResource">the resource</param>
+        /// <param name="usingCollectionPath"></param>
+        /// <returns></returns>
+        internal Uri MakeDocumentPathFor<TResource>(TResource theResource, Uri usingCollectionPath)
+        {
+            var keyValueName = theResource.GetType()
+                .GetProperties()
+                .FirstOrDefault(x => x.GetCustomAttribute<KeyAttribute>() != null);
+
+            It.IsNull(keyValueName)
+                .AsGuard<ArgumentNullException>(nameof(keyValueName));
+
+            return new Uri($"{usingCollectionPath.OriginalString}/docs/{keyValueName.GetValue(theResource)}", UriKind.Relative);
         }
     }
 }

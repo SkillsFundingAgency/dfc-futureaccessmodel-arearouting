@@ -48,5 +48,7 @@
         <Folder Include="Factories\" />
         <Folder Include="Factories\Internal\" />
         <Folder Include="Registration\Internal\" />
+        <Folder Include="Wrappers\" />
+        <Folder Include="Wrappers\Internal\" />
     </ItemGroup>
 </Project>

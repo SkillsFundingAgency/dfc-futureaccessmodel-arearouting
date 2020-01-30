@@ -107,7 +107,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <summary>
         /// begin scope for the request records 7 items
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the currently running (test) task</returns>
         [Fact]
         public async Task BeginScopeForTheRequestRecordsSevenItems()
         {
@@ -187,7 +187,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <summary>
         /// make a 'system under test'
         /// </summary>
-        /// <returns>a document client factory</returns>
+        /// <returns>the system under test</returns>
         internal LoggingContextScopeFactory MakeSUT(ILoggerHelper logHelper) =>
             new LoggingContextScopeFactory(logHelper);
     }

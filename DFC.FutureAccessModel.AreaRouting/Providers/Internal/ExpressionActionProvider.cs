@@ -7,6 +7,7 @@ using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Storage;
+using DFC.FutureAccessModel.AreaRouting.Wrappers;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
@@ -44,7 +45,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             It.IsNull(authorityProvider)
                 .AsGuard<ArgumentNullException>(nameof(authorityProvider));
 
-            Postcode = factory.Create();
+            Postcode = factory.CreateClient();
             Authority = authorityProvider;
 
             _actionMap.Add(TypeOfExpression.Town, GetTouchpointIDFromTown);

@@ -31,6 +31,8 @@
         <Folder Include="Adapters\" />
         <Folder Include="Adapters\Internal\" />
         <Folder Include="Registration\" />
+        <Folder Include="Wrappers\" />
+        <Folder Include="Wrappers\Internal\" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\DFC.FutureAccessModel.AreaRouting\DFC.FutureAccessModel.AreaRouting.csproj" />

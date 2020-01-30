@@ -1,4 +1,5 @@
 ﻿using DFC.FutureAccessModel.AreaRouting.Registration;
+using DFC.FutureAccessModel.AreaRouting.Wrappers;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories
 {
@@ -9,9 +10,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
         ISupportServiceRegistration
     {
         /// <summary>
-        /// create...
+        /// create client...
         /// </summary>
         /// <returns>a postcodes client wrapper</returns>
-        IWrapPostcodesClient Create();
+        IWrapPostcodesClient CreateClient();
     }
 }

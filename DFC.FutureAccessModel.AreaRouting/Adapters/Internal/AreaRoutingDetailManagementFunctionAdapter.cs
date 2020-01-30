@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
@@ -88,10 +89,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
         /// <summary>
         /// get (the) area routing detail for...
+        /// excluded from coverage as moq doesn't support the lambda complexity for this routine
         /// </summary>
         /// <param name="theTouchpointID">the touchpoint id</param>
         /// <param name="inLoggingScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
+        [ExcludeFromCodeCoverage]
         public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inLoggingScope) =>
             await SafeOperations.Try(
                 () => ProcessGetAreaRoutingDetailFor(theTouchpointID, inLoggingScope),
@@ -121,10 +124,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
         /// <summary>
         /// get (the) area routing detail by...
+        /// excluded from coverage as moq doesn't support the lambda complexity for this routine
         /// </summary>
         /// <param name="theLocation">the location</param>
         /// <param name="inLoggingScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
+        [ExcludeFromCodeCoverage]
         public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inLoggingScope) =>
             await SafeOperations.Try(
                 () => ProcessGetAreaRoutingDetailBy(theLocation, inLoggingScope),
@@ -154,11 +159,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
         /// <summary>
         /// add new area routing detail
+        /// excluded from coverage as moq doesn't support the lambda complexity for this routine
         /// </summary>
         /// <param name="theTouchpoint">the touchpoint</param>
         /// <param name="usingContent">using content</param>
         /// <param name="inScope">in scope</param>
         /// <returns>the result of the operation</returns>
+        [ExcludeFromCodeCoverage]
         public async Task<HttpResponseMessage> AddAreaRoutingDetailUsing(
             string theContent,
             IScopeLoggingContext inScope) =>
@@ -179,9 +186,23 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         {
             await inScope.EnterMethod();
 
+            It.IsEmpty(theContent)
+                .AsGuard<MalformedRequestException>();
+
+            await inScope.Information($"deserialising the submitted content: {theContent}");
+
             var theCandidate = JsonConvert.DeserializeObject<RoutingDetail>(theContent);
 
+            await inScope.Information("deserialisation complete...");
+
+            It.IsEmpty(theCandidate?.TouchpointID)
+                .AsGuard<MalformedRequestException>();
+
+            await inScope.Information($"adding the area routing candidate: {theCandidate.TouchpointID}");
+
             var result = await RoutingDetails.Add(theCandidate);
+
+            await inScope.Information($"candidate addition complete...");
 
             await inScope.ExitMethod();
 

@@ -1,23 +1,15 @@
-﻿using System;
-using DFC.FutureAccessModel.AreaRouting.Wrappers;
+﻿using DFC.FutureAccessModel.AreaRouting.Wrappers;
 using DFC.FutureAccessModel.AreaRouting.Wrappers.Internal;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
 {
-    public sealed class DocumentClientFactoryFixture :
+    /// <summary>
+    ///  the postcodes client factory fixture
+    /// </summary>
+    public sealed class PostcodeClientFactoryFixture :
         MoqTestingFixture
     {
-        /// <summary>
-        /// test account key has to be base 64
-        /// </summary>
-        const string _testAccountKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
-
-        /// <summary>
-        /// test document storage path
-        /// </summary>
-        Uri _testPath = new Uri("http://testDomain/testStore");
-
         /// <summary>
         /// the system under test supports it's service contract
         /// </summary>
@@ -25,7 +17,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         public void TheSystemUnderTestSupportsItsServiceContract()
         {
             // arrange / act / assert
-            Assert.IsAssignableFrom<ICreateDocumentClients>(MakeSUT());
+            Assert.IsAssignableFrom<ICreatePostcodeClients>(MakeSUT());
         }
 
         /// <summary>
@@ -38,14 +30,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             var sut = MakeSUT();
 
             // act
-            var client = sut.CreateClient(_testPath, _testAccountKey);
+            var client = sut.CreateClient();
 
             // assert
             Assert.NotNull(client);
         }
 
         /// <summary>
-        /// create client returns a document client wrapper
+        /// create client returns a postcodes client
         /// </summary>
         [Fact]
         public void CreatClientReturnsADocumentClient()
@@ -54,14 +46,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             var sut = MakeSUT();
 
             // act
-            var client = sut.CreateClient(_testPath, _testAccountKey);
+            var client = sut.CreateClient();
 
             // assert
-            Assert.IsType<DocumentClientWrapper>(client);
+            Assert.IsType<PostcodesClientWrapper>(client);
         }
 
         /// <summary>
-        /// create client returns an instance using the 'i wrap document client' contract
+        /// create client returns an instance using the 'i wrap postcodes client' contract
         /// </summary>
         [Fact]
         public void CreatClientReturnValueIsAssignableContract()
@@ -70,17 +62,17 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
             var sut = MakeSUT();
 
             // act
-            var client = sut.CreateClient(_testPath, _testAccountKey);
+            var client = sut.CreateClient();
 
             // assert
-            Assert.IsAssignableFrom<IWrapDocumentClient>(client);
+            Assert.IsAssignableFrom<IWrapPostcodesClient>(client);
         }
 
         /// <summary>
         /// make a 'system under test'
         /// </summary>
-        /// <returns>a system under test</returns>
-        internal DocumentClientFactory MakeSUT() =>
-            new DocumentClientFactory();
+        /// <returns>a document client factory</returns>
+        internal PostcodeClientFactory MakeSUT() =>
+            new PostcodeClientFactory();
     }
 }

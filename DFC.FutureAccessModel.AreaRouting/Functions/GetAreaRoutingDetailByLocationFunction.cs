@@ -37,7 +37,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Get", Description =
             @"Ability to return:
-                a list of Touchpoint ID's</p>
+                a list of Touchpoint ID's
                 or a singluar full area routing detail when coupled with the use of the location parameter
                 Examples:
                     ?location=TS14 6AH

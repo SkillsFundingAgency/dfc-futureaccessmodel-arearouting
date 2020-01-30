@@ -1,5 +1,6 @@
 ﻿using System;
 using DFC.FutureAccessModel.AreaRouting.Registration;
+using DFC.FutureAccessModel.AreaRouting.Wrappers;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories
 {

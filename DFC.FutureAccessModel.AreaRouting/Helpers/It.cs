@@ -15,7 +15,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Helpers
         /// <param name="theItem">the item</param>
         /// <returns>true if null</returns>
         public static bool IsNull<TEntity>(TEntity theItem)
-            where TEntity : class => theItem is null;
+            where TEntity : class =>
+                theItem == null;
 
         /// <summary>
         /// is empty
@@ -42,7 +43,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Helpers
         /// <returns>true if not null</returns>
         public static bool Has<TEntity>(TEntity theItem)
             where TEntity : class =>
-            !IsNull(theItem);
+                !IsNull(theItem);
 
         /// <summary>
         /// has...
@@ -52,6 +53,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Helpers
         /// <returns>true if not null</returns>
         public static bool Has<TEntity>(TEntity? theItem)
             where TEntity : struct =>
-            theItem != null;
+                theItem != null;
     }
 }
