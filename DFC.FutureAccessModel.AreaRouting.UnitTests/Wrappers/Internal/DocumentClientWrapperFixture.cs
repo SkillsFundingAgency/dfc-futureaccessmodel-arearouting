@@ -24,24 +24,24 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         public async Task CreateDocumentAsyncMeetsVerification()
         {
             // arrange
-            const string touchPoint = "0000123";
+            const string keyValue = "0000123";
             var sut = MakeSUT();
-            var document = new RoutingDetail { TouchpointID = touchPoint };
+            var document = new LocalAuthority { LADCode = keyValue };
             var collectionUri = new Uri("dbs/areas/colls/routing", UriKind.Relative);
-            var documentUri = new Uri($"dbs/areas/colls/routing/docs/{touchPoint}", UriKind.Relative);
+            var documentUri = new Uri($"dbs/areas/colls/routing/docs/{keyValue}", UriKind.Relative);
 
             GetMock(sut.Client)
                 .Setup(x => x.CreateDocumentAsync(collectionUri, document, null, false, default))
                 .Returns(Task.FromResult(new ResourceResponse<Document>(new Document())));
             GetMock(sut.Client)
-                .Setup(x => x.ReadDocumentAsync<RoutingDetail>(documentUri, null, default))
-                .Returns(Task.FromResult(new DocumentResponse<RoutingDetail>(document)));
+                .Setup(x => x.ReadDocumentAsync<LocalAuthority>(documentUri, null, default))
+                .Returns(Task.FromResult(new DocumentResponse<LocalAuthority>(document)));
 
             // act
             var result = await sut.CreateDocumentAsync(collectionUri, document);
 
             // assert
-            Assert.IsAssignableFrom<IRoutingDetail>(result);
+            Assert.IsAssignableFrom<ILocalAuthority>(result);
         }
 
         [Fact]
@@ -86,28 +86,28 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             // arrange
             var sut = MakeSUT();
             var documentUri = new Uri("dbs/areas/colls/routing/docs/0000123", UriKind.Relative);
-            var document = new RoutingDetail();
+            var document = new LocalAuthority();
 
             GetMock(sut.Client)
-                .Setup(x => x.ReadDocumentAsync<RoutingDetail>(documentUri, null, default))
-                .Returns(Task.FromResult(new DocumentResponse<RoutingDetail>(document)));
+                .Setup(x => x.ReadDocumentAsync<LocalAuthority>(documentUri, null, default))
+                .Returns(Task.FromResult(new DocumentResponse<LocalAuthority>(document)));
 
             // act
-            var result = await sut.ReadDocumentAsync<RoutingDetail>(documentUri);
+            var result = await sut.ReadDocumentAsync<LocalAuthority>(documentUri);
 
             // assert
-            Assert.IsAssignableFrom<IRoutingDetail>(result);
+            Assert.IsAssignableFrom<ILocalAuthority>(result);
         }
 
         [Theory]
         [InlineData("0000123", "dbs/areas/colls/routing")]
         [InlineData("E0600032", "dbs/regions/colls/authorities")]
-        public void MakeDocumentPathForMeetsExpectation(string touchPoint, string collectionPath)
+        public void MakeDocumentPathForMeetsExpectation(string keyValue, string collectionPath)
         {
             // arrange
-            var document = new RoutingDetail { TouchpointID = touchPoint };
+            var document = new LocalAuthority { LADCode = keyValue };
             var collectionUri = new Uri(collectionPath, UriKind.Relative);
-            var documentPath = $"{collectionPath}/docs/{touchPoint}";
+            var documentPath = $"{collectionPath}/docs/{keyValue}";
 
             var sut = MakeSUT();
 

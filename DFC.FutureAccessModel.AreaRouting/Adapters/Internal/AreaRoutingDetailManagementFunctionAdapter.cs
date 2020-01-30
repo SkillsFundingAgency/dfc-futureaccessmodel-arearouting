@@ -198,7 +198,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             It.IsEmpty(theCandidate?.TouchpointID)
                 .AsGuard<MalformedRequestException>();
 
-            await inScope.Information($"adding the area routing candidate: {theCandidate.TouchpointID}");
+            await inScope.Information($"adding the area routing candidate: {theCandidate?.TouchpointID}");
 
             var result = await RoutingDetails.Add(theCandidate);
 
