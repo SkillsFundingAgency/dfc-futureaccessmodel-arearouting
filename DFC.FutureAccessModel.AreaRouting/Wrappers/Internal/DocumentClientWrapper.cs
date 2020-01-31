@@ -14,7 +14,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
     /// the document client wrapper
     /// </summary>
     internal sealed class DocumentClientWrapper :
-            IWrapDocumentClient
+        IWrapDocumentClient
     {
         /// <summary>
         /// the document client
