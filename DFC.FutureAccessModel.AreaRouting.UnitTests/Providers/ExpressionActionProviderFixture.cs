@@ -307,6 +307,37 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         }
 
         /// <summary>
+        /// unknown candidate type action records and throws
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task UnknownCandidateTypeActionRecordsAndThrows()
+        {
+            // arrange
+            const string thePostCode = "SA38 9RD";
+
+            var sut = MakeSUT();
+
+            GetMock(sut.Postcode)
+                .Setup(x => x.LookupAsync(thePostCode))
+                .Returns(Task.FromResult((PostcodeResult)null));
+
+            var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
+            GetMock(theLoggingScope)
+                .Setup(x => x.EnterMethod("UnknownCandidateTypeAction"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"malformed request candidate: '{thePostCode}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.ExitMethod("UnknownCandidateTypeAction"))
+                .Returns(Task.CompletedTask);
+
+            // act / assert
+            await Assert.ThrowsAsync<MalformedRequestException>(() => sut.UnknownCandidateTypeAction(thePostCode, theLoggingScope));
+        }
+
+        /// <summary>
         /// make (a) 'system under test'
         /// </summary>
         /// <returns>the system under test</returns>
