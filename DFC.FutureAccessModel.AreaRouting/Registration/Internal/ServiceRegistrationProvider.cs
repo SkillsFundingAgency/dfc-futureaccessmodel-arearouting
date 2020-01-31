@@ -25,7 +25,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration.Internal
         /// <summary>
         /// instantiates an instance of <see cref="ServiceRegistrationProvider"/>
         /// </summary>
-        public ServiceRegistrationProvider()
+        /// <param name="theRegistrant">for the registrant</param>
+        public ServiceRegistrationProvider(Assembly theRegistrant)
         {
             ActionMap = new Dictionary<TypeOfRegistrationScope, Action<IServiceCollection, ContainerRegistrationAttribute>>()
             {
@@ -34,10 +35,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration.Internal
                 [TypeOfRegistrationScope.Singleton] = AddSingleton,
             };
 
-            var assembly = Assembly.GetExecutingAssembly();
-
-            var inherited = assembly.GetCustomAttributes<ExternalRegistrationAttribute>().AsSafeReadOnlyList();
-            var local = assembly.GetCustomAttributes<InternalRegistrationAttribute>().AsSafeReadOnlyList();
+            var inherited = theRegistrant
+                .GetCustomAttributes<ExternalRegistrationAttribute>()
+                .AsSafeReadOnlyList();
+            var local = theRegistrant
+                .GetCustomAttributes<InternalRegistrationAttribute>()
+                .AsSafeReadOnlyList();
 
             Registrations.AddRange(local);
             Registrations.AddRange(inherited);
@@ -75,10 +78,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration.Internal
             usingCollection.AddSingleton(andRegistration.ContractType, andRegistration.ImplementationType);
 
         /// <summary>
-        /// create service
-        /// a chicken and egg situation...
         /// </summary>
         /// <returns>i register services</returns>
-        public static IRegisterServices CreateService() => new ServiceRegistrationProvider();
+
+        /// <summary>
+        /// create (a registrar) service
+        /// a chicken and egg situation...
+        /// </summary>
+        /// <param name="forTheRegistrant">for the registrant</param>
+        /// <returns>i register services</returns>
+        public static IRegisterServices CreateService(Assembly forTheRegistrant) =>
+            new ServiceRegistrationProvider(forTheRegistrant);
     }
 }

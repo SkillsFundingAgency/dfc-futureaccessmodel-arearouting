@@ -62,13 +62,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             It.IsNull(theCandidate)
                 .AsGuard<ArgumentNullException>(nameof(theCandidate));
 
-            var theTouchpoint = theCandidate.TouchpointID;
-            It.IsNull(theTouchpoint)
+            var theTouchpoint = theCandidate?.TouchpointID;
+            It.IsEmpty(theTouchpoint)
                 .AsGuard<ArgumentNullException>(nameof(theTouchpoint));
 
             var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
 
-            (await DocumentStore.DocumentExists<RoutingDetail>(usingPath))
+            (await DocumentStore.DocumentExists(usingPath))
                 .AsGuard<ConflictingResourceException>();
 
             return await DocumentStore.AddDocument(theCandidate, StoragePaths.RoutingDetailCollection);
