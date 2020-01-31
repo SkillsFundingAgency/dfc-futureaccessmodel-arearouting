@@ -28,6 +28,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration.Internal
         /// <param name="theRegistrant">for the registrant</param>
         public ServiceRegistrationProvider(Assembly theRegistrant)
         {
+            It.IsNull(theRegistrant)
+                .AsGuard<ArgumentNullException>(nameof(theRegistrant));
+
             ActionMap = new Dictionary<TypeOfRegistrationScope, Action<IServiceCollection, ContainerRegistrationAttribute>>()
             {
                 [TypeOfRegistrationScope.Scoped] = AddScoped,

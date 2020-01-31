@@ -35,6 +35,22 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         }
 
         /// <summary>
+        /// build with client meets expectation
+        /// </summary>
+        [Fact]
+        public void BuildWithClientMeetsExpectation()
+        {
+            // arrange
+            var client = MakeStrictMock<IPostcodesIOClient>();
+
+            // act
+            var sut = new PostcodesClientWrapper(client);
+
+            // assert
+            Assert.Equal(client, sut.Client);
+        }
+
+        /// <summary>
         /// lookup async meets expectation
         /// </summary>
         /// <returns></returns>

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Adapters.Internal;
 using DFC.FutureAccessModel.AreaRouting.Registration.Internal;
@@ -22,6 +23,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration
 
             // act / assert
             Assert.IsAssignableFrom<IRegisterServices>(sut);
+        }
+
+        /// <summary>
+        /// build with null assembly throws
+        /// </summary>
+        [Fact]
+        public void BuildWithNullAssemblyThrows()
+        {
+            // arrange / act / assert
+            Assert.Throws<ArgumentNullException>(() => new ServiceRegistrationProvider(null));
         }
 
         /// <summary>

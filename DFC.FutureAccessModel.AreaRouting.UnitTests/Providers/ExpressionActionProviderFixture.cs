@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using DFC.FutureAccessModel.AreaRouting.Factories;
+using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.FutureAccessModel.AreaRouting.Wrappers;
+using MarkEmbling.PostcodesIO.Results;
 using Xunit;
+using Task = System.Threading.Tasks.Task;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
@@ -48,7 +53,34 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             // act / assert
             Assert.Throws<ArgumentNullException>(() => new ExpressionActionProvider(postcodes, null));
         }
+        /// <summary>
+        /// build with factory and authorities meets verfication
+        /// </summary>
+        [Fact]
+        public void BuildWithFactoryAndAuthoritiesMeetsVerification()
+        {
+            // arrange
+            var client = MakeStrictMock<IWrapPostcodesClient>();
+            var postcodes = MakeStrictMock<ICreatePostcodeClients>();
+            GetMock(postcodes)
+                .Setup(x => x.CreateClient())
+                .Returns(client);
 
+            var authorities = MakeStrictMock<IStoreLocalAuthorities>();
+
+            // act
+            var sut = new ExpressionActionProvider(postcodes, authorities);
+
+            // assert
+            Assert.Equal(client, sut.Postcode);
+            Assert.Equal(authorities, sut.Authority);
+        }
+
+        /// <summary>
+        /// action map contents meets expectation
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="expectation"></param>
         [Theory]
         [InlineData(TypeOfExpression.Outward, true)]
         [InlineData(TypeOfExpression.Postcode, true)]
@@ -64,6 +96,214 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             // assert
             Assert.Equal(expectation, result);
+        }
+
+        /// <summary>
+        /// get action for expression type meets expectation
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="expectation"></param>
+        [Theory]
+        [InlineData(TypeOfExpression.Outward, "GetTouchpointIDFromOutwardCode")]
+        [InlineData(TypeOfExpression.Postcode, "GetTouchpointIDFromPostcode")]
+        [InlineData(TypeOfExpression.Town, "GetTouchpointIDFromTown")]
+        [InlineData(TypeOfExpression.Unknown, "UnknownCandidateTypeAction")]
+        public void GetActionForExpressionTypeMeetsExpectation(TypeOfExpression expression, string expectation)
+        {
+            // arrange
+            var sut = MakeSUT();
+
+            // act
+            var result = sut.GetActionFor(expression);
+
+            // assert
+            Assert.Equal(expectation, result.Method.Name);
+        }
+
+        /// <summary>
+        /// get touchpoint id from outward code with invalid candidate throws
+        /// </summary>
+        /// <param name="theCandidate"></param>
+        /// <returns></returns>
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public async Task GetTouchpointIDFromOutwardCodeWithEmptyCandidateThrows(string theCandidate)
+        {
+            // arrange
+            var sut = MakeSUT();
+
+            var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
+            GetMock(theLoggingScope)
+                .Setup(x => x.EnterMethod("GetTouchpointIDFromOutwardCode"))
+                .Returns(Task.CompletedTask);
+
+            // act / assert
+            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.GetTouchpointIDFromOutwardCode(theCandidate, theLoggingScope));
+        }
+
+        /// <summary>
+        /// get touchpoint id from outward code meets expectation
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetTouchpointIDFromOutwardCodeMeetsExpectation()
+        {
+            // arrange
+            const string theOutwardCode = "SA38";
+            const string thePostCode = "SA38 9RD";
+            const string theAdminDistrict = "E06000060";
+            const string theExpectation = "0000000456";
+
+            var sut = MakeSUT();
+
+            GetMock(sut.Postcode)
+                .Setup(x => x.LookupOutwardCodeAsync(theOutwardCode, 10))
+                .Returns(Task.FromResult<IReadOnlyCollection<string>>(new List<string> { thePostCode }));
+            GetMock(sut.Postcode)
+                .Setup(x => x.LookupAsync(thePostCode))
+                .Returns(Task.FromResult(new PostcodeResult
+                {
+                    Postcode = thePostCode,
+                    Codes = new Codes { AdminDistrict = theAdminDistrict }
+                }));
+
+            GetMock(sut.Authority)
+                .Setup(x => x.Get(theAdminDistrict))
+                .Returns(Task.FromResult<ILocalAuthority>(new LocalAuthority { LADCode = theAdminDistrict, TouchpointID = theExpectation }));
+
+            var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
+            GetMock(theLoggingScope)
+                .Setup(x => x.EnterMethod("GetTouchpointIDFromOutwardCode"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"seeking postcode via outward code: '{theOutwardCode}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.ExitMethod("GetTouchpointIDFromOutwardCode"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.EnterMethod("GetTouchpointIDFromPostcode"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"seeking postcode '{thePostCode}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"found postcode for '{thePostCode}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"seeking local authority '{theAdminDistrict}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"found local authority '{theAdminDistrict}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.ExitMethod("GetTouchpointIDFromPostcode"))
+                .Returns(Task.CompletedTask);
+
+            // act
+            var result = await sut.GetTouchpointIDFromOutwardCode(theOutwardCode, theLoggingScope);
+
+            // assert
+            Assert.Equal(theExpectation, result);
+        }
+
+        /// <summary>
+        /// get touchpoint id from postcode with invalid postcode throws
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetTouchpointIDFromPostcodeWithInvalidPostcodeThrows()
+        {
+            // arrange
+            const string thePostCode = "SA38 9RD";
+
+            var sut = MakeSUT();
+
+            GetMock(sut.Postcode)
+                .Setup(x => x.LookupAsync(thePostCode))
+                .Returns(Task.FromResult((PostcodeResult)null));
+
+            var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
+            GetMock(theLoggingScope)
+                .Setup(x => x.EnterMethod("GetTouchpointIDFromPostcode"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"seeking postcode '{thePostCode}'"))
+                .Returns(Task.CompletedTask);
+
+            // act / assert
+            await Assert.ThrowsAsync<InvalidPostcodeException>(() => sut.GetTouchpointIDFromPostcode(thePostCode, theLoggingScope));
+        }
+
+        /// <summary>
+        /// get touchpoint id from postcode with valid postcode meets expectation
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetTouchpointIDFromPostcodeWithValidPostcodeMeetsExpectation()
+        {
+            // arrange
+            const string thePostCode = "SA38 9RD";
+            const string theAdminDistrict = "E06000060";
+            const string theExpectation = "0000000456";
+
+            var sut = MakeSUT();
+
+            GetMock(sut.Postcode)
+                .Setup(x => x.LookupAsync(thePostCode))
+                .Returns(Task.FromResult(new PostcodeResult
+                {
+                    Postcode = thePostCode,
+                    Codes = new Codes { AdminDistrict = theAdminDistrict }
+                }));
+
+            GetMock(sut.Authority)
+                .Setup(x => x.Get(theAdminDistrict))
+                .Returns(Task.FromResult<ILocalAuthority>(new LocalAuthority { LADCode = theAdminDistrict, TouchpointID = theExpectation }));
+
+            var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
+            GetMock(theLoggingScope)
+                .Setup(x => x.EnterMethod("GetTouchpointIDFromPostcode"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"seeking postcode '{thePostCode}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"found postcode for '{thePostCode}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"seeking local authority '{theAdminDistrict}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"found local authority '{theAdminDistrict}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.ExitMethod("GetTouchpointIDFromPostcode"))
+                .Returns(Task.CompletedTask);
+
+            // act
+            var result = await sut.GetTouchpointIDFromPostcode(thePostCode, theLoggingScope);
+
+            // assert
+            Assert.Equal(theExpectation, result);
+        }
+
+        /// <summary>
+        /// get touchpoint id from town currently throws not supported
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetTouchpointIDFromTownCurrentlyThrowsNotSupported()
+        {
+            // arrange
+            const string theCandidate = "";
+
+            var sut = MakeSUT();
+            var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
+
+            // act / assert
+            await Assert.ThrowsAsync<NotSupportedException>(() => sut.GetTouchpointIDFromTown(theCandidate, theLoggingScope));
         }
 
         /// <summary>

@@ -63,15 +63,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         public Func<string, IScopeLoggingContext, Task<string>> GetActionFor(TypeOfExpression theExpressionType) =>
             ActionMap.ContainsKey(theExpressionType)
                 ? ActionMap[theExpressionType]
-                : DefaultAction(theExpressionType);
+                : DefaultAction();
 
         /// <summary>
         /// the default action for unkown types
         /// </summary>
         /// <param name="forExpression">for the expression</param>
         /// <returns>nothing, it just throws</returns>
-        public Func<string, IScopeLoggingContext, Task<string>> DefaultAction(TypeOfExpression forExpression) =>
-            (x, y) => UnknownCandidateTypeAction(x, y, forExpression);
+        public Func<string, IScopeLoggingContext, Task<string>> DefaultAction() =>
+            UnknownCandidateTypeAction;
 
         /// <summary>
         /// this is the default unknown candidate type action
@@ -80,7 +80,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <param name="usingScope">using scope</param>
         /// <param name="forExpression">for (the) expression</param>
         /// <returns>nothing, this should throw</returns>
-        public async Task<string> UnknownCandidateTypeAction(string theCandidate, IScopeLoggingContext usingScope, TypeOfExpression forExpression)
+        public async Task<string> UnknownCandidateTypeAction(string theCandidate, IScopeLoggingContext usingScope)
         {
             await usingScope.EnterMethod();
 
@@ -88,11 +88,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             await usingScope.ExitMethod();
 
-            (forExpression == TypeOfExpression.Unknown)
-                .AsGuard<MalformedRequestException>();
-
-            // we never expect to get here...
-            return default;
+            throw new MalformedRequestException(theCandidate);
         }
 
         /// <summary>
@@ -117,7 +113,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             await usingScope.EnterMethod();
 
-            It.IsNull(theCandidate)
+            It.IsEmpty(theCandidate)
                 .AsGuard<ArgumentNullException>(nameof(theCandidate));
 
             await usingScope.Information($"seeking postcode via outward code: '{theCandidate}'");
@@ -125,7 +121,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var result = await Postcode.LookupOutwardCodeAsync(theCandidate);
 
             It.IsEmpty(result)
-                .AsGuard<MalformedRequestException>();
+                .AsGuard<NoContentException>();
 
             await usingScope.ExitMethod();
 
@@ -145,10 +141,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             var result = await Postcode.LookupAsync(theCandidate);
 
-            It.IsNull(result)
+            It.IsEmpty(result?.Postcode)
                 .AsGuard<InvalidPostcodeException>(theCandidate);
 
-            await usingScope.Information($"found postcode for '{result.OutCode} {result.InCode}'");
+            await usingScope.Information($"found postcode for '{result.Postcode}'");
             await usingScope.Information($"seeking local authority '{result.Codes.AdminDistrict}'");
 
             var authority = await Authority.Get(result.Codes.AdminDistrict);

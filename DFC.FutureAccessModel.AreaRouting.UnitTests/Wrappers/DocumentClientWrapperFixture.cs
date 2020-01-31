@@ -31,6 +31,22 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         }
 
         /// <summary>
+        /// build with client meets expectation
+        /// </summary>
+        [Fact]
+        public void BuildWithClientMeetsExpectation()
+        {
+            // arrange
+            var client = MakeStrictMock<IDocumentClient>();
+
+            // act
+            var sut = new DocumentClientWrapper(client);
+
+            // assert
+            Assert.Equal(client, sut.Client);
+        }
+
+        /// <summary>
         /// create document (async) meets expectation
         /// </summary>
         /// <returns></returns>
