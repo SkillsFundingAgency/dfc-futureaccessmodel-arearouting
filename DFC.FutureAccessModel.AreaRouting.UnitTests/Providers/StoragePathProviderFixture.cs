@@ -117,10 +117,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         }
 
         /// <summary>
-        /// get routing details resource path for the touchpoint id meets expectation
+        /// get (the) routing details resource path for the touchpoint id meets expectation
         /// </summary>
         [Fact]
-        public void GetRoutingDetailResourcePathFortheTouchpointIDMeetsExpectation()
+        public void GetRoutingDetailResourcePathForTheTouchpointIDMeetsExpectation()
         {
             // arrange
             var sut = MakeSUT();
@@ -130,6 +130,22 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             // assert
             Assert.Equal("dbs/Store/colls/Details/docs/0000000001", result.OriginalString);
+        }
+
+        /// <summary>
+        /// get (the) local authority resource path for the admin district meets expectation
+        /// </summary>
+        [Fact]
+        public void GetLocalAuthorityResourcePathForTheAdminDistrictMeetsExpectation()
+        {
+            // arrange
+            var sut = MakeSUT();
+
+            // act
+            var result = sut.GetLocalAuthorityResourcePathFor("0000000001");
+
+            // assert
+            Assert.Equal("dbs/Store/colls/Authorities/docs/0000000001", result.OriginalString);
         }
 
         /// <summary>

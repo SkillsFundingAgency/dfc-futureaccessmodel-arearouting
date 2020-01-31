@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using DFC.FutureAccessModel.AreaRouting.Helpers;
 
 namespace DFC.FutureAccessModel.AreaRouting.Faults
 {
@@ -13,15 +14,20 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         Exception
     {
         /// <summary>
-        /// the exception message
+        /// get message...
         /// </summary>
-        public const string ExceptionMessage = "Invalid postcode submitted";
+        /// <param name="forTheSubmittedValue">for hte submitted value</param>
+        /// <returns></returns>
+        public static string GetMessage(string forTheSubmittedValue = null) =>
+            It.Has(forTheSubmittedValue)
+                ? $"Invalid postcode submitted: '{forTheSubmittedValue}'"
+                : "Invalid postcode submitted";
 
         /// <summary>
         /// instaniates a new instance of <see cref="InvalidPostcodeException"/>
         /// </summary>
         public InvalidPostcodeException() :
-            this(ExceptionMessage)
+            base(GetMessage())
         {
         }
 
@@ -30,7 +36,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// </summary>
         /// <param name="message">message</param>
         public InvalidPostcodeException(string message) :
-            base(ExceptionMessage)
+            base(GetMessage(message))
         {
         }
 
@@ -40,7 +46,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// <param name="message">message</param>
         /// <param name="innerException">inner exception</param>
         public InvalidPostcodeException(string message, Exception innerException) :
-            base(ExceptionMessage, innerException)
+            base(GetMessage(message), innerException)
         {
         }
 

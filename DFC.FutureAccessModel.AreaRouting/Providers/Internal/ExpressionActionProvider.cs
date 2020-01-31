@@ -20,7 +20,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <summary>
         /// the action maps
         /// </summary>
-        private readonly IDictionary<TypeOfExpression, Func<string, IScopeLoggingContext, Task<string>>> _actionMap = new Dictionary<TypeOfExpression, Func<string, IScopeLoggingContext, Task<string>>>();
+        public IReadOnlyDictionary<TypeOfExpression, Func<string, IScopeLoggingContext, Task<string>>> ActionMap { get; }
 
         /// <summary>
         /// the postcode (client)
@@ -47,10 +47,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             Postcode = factory.CreateClient();
             Authority = authorityProvider;
-
-            _actionMap.Add(TypeOfExpression.Town, GetTouchpointIDFromTown);
-            _actionMap.Add(TypeOfExpression.Outward, GetTouchpointIDFromOutwardCode);
-            _actionMap.Add(TypeOfExpression.Postcode, GetTouchpointIDFromPostcode);
+            ActionMap = new Dictionary<TypeOfExpression, Func<string, IScopeLoggingContext, Task<string>>>()
+            {
+                [TypeOfExpression.Town] = GetTouchpointIDFromTown,
+                [TypeOfExpression.Outward] = GetTouchpointIDFromOutwardCode,
+                [TypeOfExpression.Postcode] = GetTouchpointIDFromPostcode
+            };
         }
 
         /// <summary>
@@ -59,8 +61,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <param name="theExpressionType">the expression type</param>
         /// <returns>the action for the exression type or throws <seealso cref="MalformedRequestException"/> for unknown types</returns>
         public Func<string, IScopeLoggingContext, Task<string>> GetActionFor(TypeOfExpression theExpressionType) =>
-            _actionMap.ContainsKey(theExpressionType)
-                ? _actionMap[theExpressionType]
+            ActionMap.ContainsKey(theExpressionType)
+                ? ActionMap[theExpressionType]
                 : DefaultAction(theExpressionType);
 
         /// <summary>
@@ -68,9 +70,29 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <param name="forExpression">for the expression</param>
         /// <returns>nothing, it just throws</returns>
-        public Func<string, IScopeLoggingContext, Task<string>> DefaultAction(TypeOfExpression forExpression)
+        public Func<string, IScopeLoggingContext, Task<string>> DefaultAction(TypeOfExpression forExpression) =>
+            (x, y) => UnknownCandidateTypeAction(x, y, forExpression);
+
+        /// <summary>
+        /// this is the default unknown candidate type action
+        /// </summary>
+        /// <param name="theCandidate">the candidate</param>
+        /// <param name="usingScope">using scope</param>
+        /// <param name="forExpression">for (the) expression</param>
+        /// <returns>nothing, this should throw</returns>
+        public async Task<string> UnknownCandidateTypeAction(string theCandidate, IScopeLoggingContext usingScope, TypeOfExpression forExpression)
         {
-            throw new MalformedRequestException(nameof(forExpression));
+            await usingScope.EnterMethod();
+
+            await usingScope.Information($"malformed request candidate: '{theCandidate}'");
+
+            await usingScope.ExitMethod();
+
+            (forExpression == TypeOfExpression.Unknown)
+                .AsGuard<MalformedRequestException>();
+
+            // we never expect to get here...
+            return default;
         }
 
         /// <summary>
@@ -124,7 +146,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var result = await Postcode.LookupAsync(theCandidate);
 
             It.IsNull(result)
-                .AsGuard<InvalidPostcodeException>();
+                .AsGuard<InvalidPostcodeException>(theCandidate);
 
             await usingScope.Information($"found postcode for '{result.OutCode} {result.InCode}'");
             await usingScope.Information($"seeking local authority '{result.Codes.AdminDistrict}'");

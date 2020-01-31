@@ -12,6 +12,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration
         MoqTestingFixture
     {
         /// <summary>
+        /// the system under test supports it's service contract
+        /// </summary>
+        [Fact]
+        public void TheSystemUnderTestSupportsItsServiceContract()
+        {
+            // arrange
+            var sut = ServiceRegistrationProvider.CreateService(GetAssemblyfor<ServiceRegistrationProvider>());
+
+            // act / assert
+            Assert.IsAssignableFrom<IRegisterServices>(sut);
+        }
+
+        /// <summary>
         /// add scoped meets expectation
         /// </summary>
         [Fact]

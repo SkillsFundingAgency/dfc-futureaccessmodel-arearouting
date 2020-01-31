@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
@@ -31,8 +32,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// using the principle of poor man's DI
         /// </summary>
         /// <param name="theClient">the client</param>
-        public PostcodesClientWrapper(IPostcodesIOClient theClient) =>
+        public PostcodesClientWrapper(IPostcodesIOClient theClient)
+        {
+            It.IsNull(theClient)
+                .AsGuard<ArgumentNullException>(nameof(theClient));
+
             Client = theClient;
+        }
 
         /// <summary>
         /// look up (async)

@@ -35,9 +35,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// initialises an instance of <see cref="DocumentClientWrapper"/>
         /// using the principle of poor man's DI
         /// </summary>
-        /// <param name="client"></param>
-        public DocumentClientWrapper(IDocumentClient client) =>
-            Client = client;
+        /// <param name="theClient">the client</param>
+        public DocumentClientWrapper(IDocumentClient theClient)
+        {
+            It.IsNull(theClient)
+                .AsGuard<ArgumentNullException>(nameof(theClient));
+
+            Client = theClient;
+        }
 
         /// <summary>
         /// create document (async)

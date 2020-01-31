@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MarkEmbling.PostcodesIO;
@@ -21,6 +22,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         {
             // arrange / act / assert
             Assert.IsAssignableFrom<IWrapPostcodesClient>(MakeSUT());
+        }
+
+        /// <summary>
+        /// build with null client throws
+        /// </summary>
+        [Fact]
+        public void BuildWithNullClientThrows()
+        {
+            // arrange / act / assert
+            Assert.Throws<ArgumentNullException>(() => new PostcodesClientWrapper(null));
         }
 
         /// <summary>

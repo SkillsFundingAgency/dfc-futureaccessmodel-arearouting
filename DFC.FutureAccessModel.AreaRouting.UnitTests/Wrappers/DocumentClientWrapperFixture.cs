@@ -20,8 +20,22 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             Assert.IsAssignableFrom<IWrapDocumentClient>(MakeSUT());
         }
 
+        /// <summary>
+        /// build with null client throws
+        /// </summary>
         [Fact]
-        public async Task CreateDocumentAsyncMeetsVerification()
+        public void BuildWithNullClientThrows()
+        {
+            // arrange / act / assert
+            Assert.Throws<ArgumentNullException>(() => new DocumentClientWrapper(null));
+        }
+
+        /// <summary>
+        /// create document (async) meets expectation
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task CreateDocumentAsyncMeetsExpectation()
         {
             // arrange
             const string keyValue = "0000123";
@@ -44,8 +58,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             Assert.IsAssignableFrom<ILocalAuthority>(result);
         }
 
+        /// <summary>
+        /// document exists (async) false with null response meets expectation
+        /// </summary>
+        /// <returns></returns>
         [Fact]
-        public async Task DocumentExistsAsyncFalseWithNullResponseMeetsVerification()
+        public async Task DocumentExistsAsyncFalseWithNullResponseMeetsExpectation()
         {
             // arrange
             var sut = MakeSUT();
@@ -62,8 +80,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             Assert.False(result);
         }
 
+        /// <summary>
+        /// document exists (async) true meets expectation
+        /// </summary>
+        /// <returns></returns>
         [Fact]
-        public async Task DocumentExistsAsyncTrueMeetsVerification()
+        public async Task DocumentExistsAsyncTrueMeetsExpectation()
         {
             // arrange
             var sut = MakeSUT();
@@ -80,8 +102,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             Assert.True(result);
         }
 
+        /// <summary>
+        /// read document (async) with valid URI meets expectation
+        /// </summary>
+        /// <returns></returns>
         [Fact]
-        public async Task ReadDocumentAsyncWithValidURIMeetVerification()
+        public async Task ReadDocumentAsyncWithValidURIMeetsExpectation()
         {
             // arrange
             var sut = MakeSUT();
@@ -99,10 +125,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             Assert.IsAssignableFrom<ILocalAuthority>(result);
         }
 
+        /// <summary>
+        /// make document path for key value and collection meets expectation
+        /// </summary>
+        /// <param name="keyValue"></param>
+        /// <param name="collectionPath"></param>
         [Theory]
         [InlineData("0000123", "dbs/areas/colls/routing")]
         [InlineData("E0600032", "dbs/regions/colls/authorities")]
-        public void MakeDocumentPathForMeetsExpectation(string keyValue, string collectionPath)
+        public void MakeDocumentPathForKeyValueAndCollectionMeetsExpectation(string keyValue, string collectionPath)
         {
             // arrange
             var document = new LocalAuthority { LADCode = keyValue };
