@@ -152,7 +152,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             where TDocument : class =>
             await Task.Run(() =>
             {
-                ProcessError(theException as DocumentClientException);
+                ProcessError(theException);
 
                 // we don't expect to ever get here...
                 return default(TDocument);
@@ -162,10 +162,26 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// process (the) error
         /// </summary>
         /// <param name="theException">the exception</param>
-        internal void ProcessError(DocumentClientException theException)
+        internal void ProcessError(Exception theException)
         {
-            It.IsNull(theException)
+            ProcessDocumentClientError(theException as DocumentClientException);
+
+            (theException is ArgumentNullException)
                 .AsGuard<MalformedRequestException>();
+
+            throw theException;
+        }
+
+        /// <summary>
+        /// process (the) error
+        /// </summary>
+        /// <param name="theException">the exception</param>
+        internal void ProcessDocumentClientError(DocumentClientException theException)
+        {
+            if (It.IsNull(theException))
+            {
+                return;
+            }
 
             (HttpStatusCode.NotFound == theException.StatusCode)
                 .AsGuard<NoContentException>();
