@@ -164,6 +164,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <param name="theException">the exception</param>
         internal void ProcessError(Exception theException)
         {
+            It.IsNull(theException)
+                .AsGuard<MalformedRequestException>();
+
             ProcessDocumentClientError(theException as DocumentClientException);
 
             (theException is ArgumentNullException)

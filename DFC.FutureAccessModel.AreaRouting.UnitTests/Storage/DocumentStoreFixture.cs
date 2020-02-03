@@ -359,10 +359,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var exception = MakeDocumentClientException(null);
 
             // act / assert
-            var result = await sut.ProcessDocumentErrorHandler<RoutingDetail>(exception);
-
-            // assert
-            Assert.Null(result);
+            await Assert.ThrowsAsync<DocumentClientException>(() => sut.ProcessDocumentErrorHandler<RoutingDetail>(exception));
         }
 
         /// <summary>
