@@ -181,7 +181,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
                 .Returns(Task.FromResult(expectation));
 
             // act
-            var result = await sut.DocumentExists(testPath);
+            var result = await sut.DocumentExists<RoutingDetail>(testPath);
 
             // assert
             GetMock(sut.Client).VerifyAll();
@@ -204,11 +204,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
 
             GetMock(sut.Client)
-                .Setup(x => x.DocumentExistsAsync(testPath))
+                .Setup(x => x.DocumentExistsAsync<RoutingDetail>(testPath))
                 .Returns(Task.FromResult(expectation));
 
             // act
-            var result = await sut.ProcessDocumentExists(testPath);
+            var result = await sut.ProcessDocumentExists<RoutingDetail>(testPath);
 
             // assert
             GetMock(sut.Client).VerifyAll();

@@ -13,9 +13,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage
         /// <summary>
         /// document exists...
         /// </summary>
+        /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="usingStoragePath">using (the) storage path</param>
         /// <returns>true if the document exists</returns>
-        Task<bool> DocumentExists(Uri usingStoragePath);
+        Task<bool> DocumentExists<TDocument>(Uri usingStoragePath)
+            where TDocument : class;
 
         /// <summary>
         /// add (a) document (to the document store)

@@ -64,26 +64,56 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// document exists (async)
         /// this will throw if the document does not exist
         /// </summary>
+        /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="documentUri">the path to the document</param>
         /// <returns>true if it does</returns>
-        public async Task<bool> DocumentExistsAsync(Uri documentUri)
-        {
-            var response = await Client.ReadDocumentAsync(documentUri);
-            return It.Has(response?.Resource);
-        }
+        public async Task<bool> DocumentExistsAsync<TDocument>(Uri documentUri)
+            where TDocument : class =>
+            It.Has(await ReadDocumentAsync<TDocument>(documentUri));
 
         /// <summary>
         /// read document (async)
         /// throws if the document does not exist
         /// </summary>
-        /// <typeparam name="TResource">the type of resource</typeparam>
+        /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="documentUri">the doucment path</param>
         /// <returns>an instance of the requested type <typeparamref name="TResource"/></returns>
         public async Task<TDocument> ReadDocumentAsync<TDocument>(Uri documentUri)
             where TDocument : class
         {
-            var response = await Client.ReadDocumentAsync<TDocument>(documentUri);
+            var response = await Client.ReadDocumentAsync<TDocument>(documentUri, GetRequestOptions<TDocument>());
             return response.Document;
+        }
+
+        /// <summary>
+        /// make resource path
+        /// </summary>
+        /// <typeparam name="TResource">the type of resource</typeparam>
+        /// <param name="theResource">the resource</param>
+        /// <param name="usingCollectionPath"></param>
+        /// <returns></returns>
+        internal PropertyInfo GetKeyDetails<TResource>() =>
+            typeof(TResource)
+                .GetProperties()
+                .FirstOrDefault(x => x.GetCustomAttribute<KeyAttribute>() != null);
+
+        /// <summary>
+        /// get request options
+        /// </summary>
+        /// <typeparam name="TDocument">the document type</typeparam>
+        /// <returns>hte request options with the partitiion key info</returns>
+        internal RequestOptions GetRequestOptions<TDocument>()
+            where TDocument : class
+        {
+            var keyValueName = GetKeyDetails<TDocument>();
+
+            It.IsNull(keyValueName)
+                .AsGuard<ArgumentNullException>(nameof(keyValueName));
+
+            return new RequestOptions
+            {
+                PartitionKey = new PartitionKey(keyValueName.Name)
+            };
         }
 
         /// <summary>
@@ -95,9 +125,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// <returns></returns>
         internal Uri MakeDocumentPathFor<TResource>(TResource theResource, Uri usingCollectionPath)
         {
-            var keyValueName = theResource.GetType()
-                .GetProperties()
-                .FirstOrDefault(x => x.GetCustomAttribute<KeyAttribute>() != null);
+            var keyValueName = GetKeyDetails<TResource>();
 
             It.IsNull(keyValueName)
                 .AsGuard<ArgumentNullException>(nameof(keyValueName));

@@ -78,20 +78,24 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <summary>
         /// document exists
         /// </summary>
+        /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="usingStoragePath">using (the) storage path</param>
         /// <returns>true if the document exists</returns>
-        public async Task<bool> DocumentExists(Uri usingStoragePath) =>
+        public async Task<bool> DocumentExists<TDocument>(Uri usingStoragePath)
+            where TDocument : class =>
             await SafeOperations.Try(
-                () => ProcessDocumentExists(usingStoragePath),
+                () => ProcessDocumentExists<TDocument>(usingStoragePath),
                 x => Task.FromResult(false));
 
         /// <summary>
         /// document exists
         /// </summary>
+        /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="usingStoragePath">using (the) storage path</param>
         /// <returns>true if the document exists</returns>
-        internal async Task<bool> ProcessDocumentExists(Uri usingStoragePath) =>
-            await Client.DocumentExistsAsync(usingStoragePath);
+        internal async Task<bool> ProcessDocumentExists<TDocument>(Uri usingStoragePath)
+            where TDocument : class =>
+            await Client.DocumentExistsAsync<TDocument>(usingStoragePath);
 
         /// <summary>
         /// add (a) document (to the document store)

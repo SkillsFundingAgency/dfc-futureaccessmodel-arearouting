@@ -21,9 +21,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers
         /// <summary>
         /// document exists (async)
         /// </summary>
+        /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="documentUri">the path to the document</param>
         /// <returns>true if it does</returns>
-        Task<bool> DocumentExistsAsync(Uri documentUri);
+        Task<bool> DocumentExistsAsync<TDocument>(Uri documentUri)
+            where TDocument : class;
 
         /// <summary>
         /// read document (async).

@@ -68,7 +68,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 
             var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
 
-            (await DocumentStore.DocumentExists(usingPath))
+            (await DocumentStore.DocumentExists<RoutingDetail>(usingPath))
                 .AsGuard<ConflictingResourceException>();
 
             return await DocumentStore.AddDocument(theCandidate, StoragePaths.RoutingDetailCollection);

@@ -90,7 +90,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
                 .Returns(Task.FromResult<ResourceResponse<Document>>(null));
 
             // act
-            var result = await sut.DocumentExistsAsync(documentUri);
+            var result = await sut.DocumentExistsAsync<RoutingDetail>(documentUri);
 
             // assert
             Assert.False(result);
@@ -112,7 +112,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
                 .Returns(Task.FromResult(new ResourceResponse<Document>(new Document())));
 
             // act
-            var result = await sut.DocumentExistsAsync(documentUri);
+            var result = await sut.DocumentExistsAsync<RoutingDetail>(documentUri);
 
             // assert
             Assert.True(result);
