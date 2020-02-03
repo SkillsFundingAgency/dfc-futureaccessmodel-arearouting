@@ -173,8 +173,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 
             ProcessDocumentClientError(theException as DocumentClientException);
 
-            (theException is ArgumentNullException)
-                .AsGuard<MalformedRequestException>();
+            //(theException is ArgumentNullException)
+            //    .AsGuard<MalformedRequestException>()
 
             throw theException;
         }
