@@ -82,7 +82,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             where TDocument : class
         {
             var response = await Client.ReadDocumentAsync<TDocument>(documentUri, GetRequestOptions<TDocument>());
-            return response.Document;
+            return response?.Document;
         }
 
         /// <summary>

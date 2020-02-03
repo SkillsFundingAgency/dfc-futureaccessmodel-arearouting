@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Moq;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
@@ -64,7 +65,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
                 .Setup(x => x.CreateDocumentAsync(collectionUri, document, null, false, default))
                 .Returns(Task.FromResult(new ResourceResponse<Document>(new Document())));
             GetMock(sut.Client)
-                .Setup(x => x.ReadDocumentAsync<LocalAuthority>(documentUri, null, default))
+                .Setup(x => x.ReadDocumentAsync<LocalAuthority>(documentUri, It.IsAny<RequestOptions>(), default))
                 .Returns(Task.FromResult(new DocumentResponse<LocalAuthority>(document)));
 
             // act
@@ -86,8 +87,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             var documentUri = new Uri("dbs/areas/colls/routing/docs/0000123", UriKind.Relative);
 
             GetMock(sut.Client)
-                .Setup(x => x.ReadDocumentAsync(documentUri, null, default))
-                .Returns(Task.FromResult<ResourceResponse<Document>>(null));
+                .Setup(x => x.ReadDocumentAsync<RoutingDetail>(documentUri, It.IsAny<RequestOptions>(), default))
+                .Returns(Task.FromResult<DocumentResponse<RoutingDetail>>(null));
 
             // act
             var result = await sut.DocumentExistsAsync<RoutingDetail>(documentUri);
@@ -108,8 +109,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             var documentUri = new Uri("dbs/areas/colls/routing/docs/0000123", UriKind.Relative);
 
             GetMock(sut.Client)
-                .Setup(x => x.ReadDocumentAsync(documentUri, null, default))
-                .Returns(Task.FromResult(new ResourceResponse<Document>(new Document())));
+                .Setup(x => x.ReadDocumentAsync<RoutingDetail>(documentUri, It.IsAny<RequestOptions>(), default))
+                .Returns(Task.FromResult(new DocumentResponse<RoutingDetail>(new RoutingDetail())));
 
             // act
             var result = await sut.DocumentExistsAsync<RoutingDetail>(documentUri);
@@ -131,7 +132,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             var document = new LocalAuthority();
 
             GetMock(sut.Client)
-                .Setup(x => x.ReadDocumentAsync<LocalAuthority>(documentUri, null, default))
+                .Setup(x => x.ReadDocumentAsync<LocalAuthority>(documentUri, It.IsAny<RequestOptions>(), default))
                 .Returns(Task.FromResult(new DocumentResponse<LocalAuthority>(document)));
 
             // act
