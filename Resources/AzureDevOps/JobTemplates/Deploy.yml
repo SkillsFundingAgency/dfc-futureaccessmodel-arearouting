@@ -40,7 +40,7 @@ jobs:
             FunctionResourceGroup: ${{ parameters.ResourceGroup }}
             FunctionPackage: ${{ parameters.FunctionAppPackage }}
             ApimResourceGroup: '${{ parameters.ApimResourceGroup }}'
-            ApimInstanceName: '${{ paramters.ApimInstanceName }}'
+            ApimInstanceName: '${{ parameters.ApimInstanceName }}'
             ApimProductId: ''
             ApiName: '${{ parameters.ApiName }}'
             SwaggerSpecificationUrl: '${{ parameters.SwaggerSpecificationUrl }}'
