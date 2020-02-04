@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DFC.Swagger.Standard.Annotations;
+using Newtonsoft.Json;
 
 namespace DFC.FutureAccessModel.AreaRouting.Models
 {
-    internal sealed class RoutingDetail :
+    public  class RoutingDetail :
         IRoutingDetail
     {
         /// <summary>
@@ -11,6 +12,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Models
         /// </summary>
         [Key]
         [Required]
+        [JsonProperty("id")]
         [Display(Description = "The region's unique identifier")]
         [StringLength(10, MinimumLength = 10)]
         [Example(Description = "0000000101")]

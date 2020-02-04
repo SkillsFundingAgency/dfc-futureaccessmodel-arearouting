@@ -13,12 +13,17 @@
         /// <summary>
         /// email address validation expression
         /// </summary>
-        public const string EmailAddress = @"^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
+        public const string EmailAddress = @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$";
 
         /// <summary>
         /// phone number validation expression
         /// </summary>
-        public const string PhoneNumber = @"^((\\(?0\\d{4}\\)?\\s?\\d{3}\\s?(\\d{3}|\\d{2}))|(\\(?0\\d{3}\\)?\\s?\\d{3}\\s?(\\d{4}|\\d{3}))|(\\(?0\\d{2}\\)?\";
+        public const string PhoneNumber = @"^((\(?0\d{4}\)?\s?\d{3}\s?(\d{3}|\d{2}))|(\(?0\d{3}\)?\s?\d{3}\s?(\d{4}|\d{3}))|(\(?0\d{2}\)?\s?\d{4}\s?(\d{4}|\d{3})))(\s?\#(\d{4}|\d{3}))?$";
+
+        /// <summary>
+        /// mobile number validation expression
+        /// </summary>
+        public const string MobileNumber = @"^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?(\d{3}|\d{2})$";
 
         /// <summary>
         /// postcode validation expression

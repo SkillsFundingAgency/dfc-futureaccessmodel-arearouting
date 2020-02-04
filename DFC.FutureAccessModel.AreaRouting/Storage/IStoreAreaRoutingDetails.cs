@@ -22,6 +22,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage
         /// </summary>
         /// <param name="theCandidate">the candidate (touchpoint)</param>
         /// <returns>the newly stored routing details (touchpoint)</returns>
-        Task<IRoutingDetail> Add(IRoutingDetail theCandidate);
+        Task<IRoutingDetail> Add(IncomingRoutingDetail theCandidate);
     }
 }

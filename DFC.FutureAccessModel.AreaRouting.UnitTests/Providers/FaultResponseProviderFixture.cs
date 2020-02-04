@@ -15,7 +15,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
     public sealed class FaultResponseProviderFixture :
         MoqTestingFixture
     {
-        const string fallbackContent = "{\"TouchpointID\":\"0000000999\",\"Area\":\"National Call Centre\",\"TelephoneNumber\":\"0800 123456\",\"SMSNumber\":\"\",\"EmailAddress\":\"nationalcareersservice@education.gov.uk\"}";
+        const string fallbackContent = "{\"id\":\"0000000999\",\"Area\":\"National Call Centre\",\"TelephoneNumber\":\"0800 123456\",\"SMSNumber\":\"\",\"EmailAddress\":\"nationalcareersservice@education.gov.uk\"}";
 
         /// <summary>
         /// the system under test supports it's service contract
