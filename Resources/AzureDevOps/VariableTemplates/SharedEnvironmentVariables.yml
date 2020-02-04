@@ -5,3 +5,5 @@
   value: futureaccessmodel/arearouting
 - name: ApimApiName
   value: arearouting
+- name: SwaggerDefinitionPath
+  value: /api/areas/api-definition

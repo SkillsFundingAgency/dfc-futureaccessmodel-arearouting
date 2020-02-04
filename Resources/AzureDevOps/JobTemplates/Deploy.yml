@@ -47,9 +47,6 @@ jobs:
             ResourceGroupName: ${{ parameters.ResourceGroup }}
             SourceSlot: staging
 
-        - checkout: dfc-devops
-          path: 's/dfc-devops/'
-
         - task: AzurePowerShell@3
           displayName: 'Refresh API definition in APIM'
           inputs:
