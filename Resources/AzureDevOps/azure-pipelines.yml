@@ -59,7 +59,7 @@ stages:
       ApimInstanceName: '$(ApimServiceName)'
       ApimProductId: '${{ variables.ApimProductId }}'
       ApiName: '${{ variables.ApimApiName }}'
-      SwaggerSpecificationUrl: 'https://dfc-dev-fam-arearoute-fa.${{ variables.FunctionDomainName }}${{ variables.SwaggerDefinitionPath }}'
+      SwaggerSpecificationUrl: 'https://dfc-dev-fam-arearoute-fa.$(FunctionAppDomain)${{ variables.SwaggerDefinitionPath }}'
 
 - stage: DeployTo_SIT
   displayName: Deploy to SIT_FUTUREACCESSMODEL environment
