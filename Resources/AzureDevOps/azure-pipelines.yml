@@ -14,7 +14,7 @@ resources:
   - repository: dfc-devops
     type: github
     name: SkillsFundingAgency/dfc-devops
-    # ref: refs/tags/v1.10.3
+    ref: refs/tags/v1.10.3
     endpoint: 'GitHub (ESFA)'
 
 pool:
@@ -59,7 +59,7 @@ stages:
       ApimInstanceName: '$(ApimServiceName)'
       ApimProductId: '${{ variables.ApimProductId }}'
       ApiName: '${{ variables.ApimApiName }}'
-      SwaggerSpecificationUrl: 'https://dfc-dev-fam-arearoute-fa.$(FunctionDomainName)${{ variables.SwaggerDefinitionPath }}'
+      SwaggerSpecificationUrl: 'https://dfc-dev-fam-arearoute-fa.${{ variables.FunctionDomainName }}${{ variables.SwaggerDefinitionPath }}'
 
 - stage: DeployTo_SIT
   displayName: Deploy to SIT_FUTUREACCESSMODEL environment
