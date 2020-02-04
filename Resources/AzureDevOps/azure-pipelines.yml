@@ -72,8 +72,6 @@ stages:
   - template: VariableTemplates\SharedEnvironmentVariables.yml
   - template: VariableTemplates\SitEnvironmentVariables.yml
   jobs:
-  - checkout: dfc-devops
-    path: 's/dfc-devops/'
   - template: JobTemplates/Deploy.yml
     parameters:
       AzureSubscription: 'SFA-CDH-Dev/Test (962cae10-2950-412a-93e3-d8ae92b17896)'

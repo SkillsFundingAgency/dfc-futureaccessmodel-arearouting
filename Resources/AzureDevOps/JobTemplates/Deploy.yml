@@ -21,6 +21,9 @@ jobs:
     runOnce:
       deploy:
         steps:
+        - checkout: dfc-devops
+          path: 's/dfc-devops/'
+
         - template: AzureDevOpsTemplates/Deploy/StepTemplates/dfc-arm-deploy.yml@dfc-devops
           parameters:
             ArmTemplateRoot: ${{ parameters.ArmTemplateRoot }}
