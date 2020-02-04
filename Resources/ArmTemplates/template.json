@@ -51,7 +51,7 @@
         "apimInstanceName": {
             "type": "string"
         },
-        "apimProductDisplayName": {
+        "apimProductName": {
             "type": "string"
         },
         "apimApiName": {
@@ -249,7 +249,7 @@
                 },
                 "parameters": {
                 "apimProductInstanceName": {
-                    "value": "[parameters('apimProductDisplayName')]"
+                    "value": "[parameters('apimProductName')]"
                 },
                 "apimServiceName": {
                     "value": "[parameters('apimInstanceName')]"

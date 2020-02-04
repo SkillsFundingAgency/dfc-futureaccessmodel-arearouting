@@ -1,7 +1,7 @@
 ﻿variables:
-- name: ApimProductDisplayName
-  value: 'Future Access Model'
+- name: ApimProductName
+  value: future-access-model
 - name: ApimApiUrlSuffix
-  value: 'futureaccessmodel/arearouting'
+  value: futureaccessmodel/arearouting
 - name: ApimApiName
-  value: 'arearouting'
+  value: arearouting

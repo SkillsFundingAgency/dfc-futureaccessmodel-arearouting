@@ -29,7 +29,7 @@
         "apimInstanceName": {
             "value": "dfc-foo-shared-apim"
         },
-        "apimProductDisplayName": {
+        "apimProductName": {
             "value": "AnApimProduct"
         },
         "apimApiName": {
