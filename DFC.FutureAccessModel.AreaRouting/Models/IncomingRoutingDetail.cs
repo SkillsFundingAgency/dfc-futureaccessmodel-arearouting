@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.Swagger.Standard.Annotations;
 using Newtonsoft.Json;
 
 namespace DFC.FutureAccessModel.AreaRouting.Models
 {
-    public sealed class RoutingDetail :
+    public sealed class IncomingRoutingDetail :
         IRoutingDetail
     {
         /// <summary>
@@ -59,17 +60,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Models
         public string EmailAddress { get; set; }
 
         /// <summary>
-        /// the fallback value
-        /// not intended to be a permanent addition
+        /// here to ensure cosmos db grouping is singular
         /// </summary>
-        public static IRoutingDetail Default =>
-            new RoutingDetail
-            {
-                Area = "National Call Centre",
-                EmailAddress = "nationalcareersservice@education.gov.uk",
-                SMSNumber = "",
-                TelephoneNumber = "0800 123456",
-                TouchpointID = "0000000999"
-            };
+        [PartitionKey]
+        public string PartitionKey => "not_required";
     }
 }

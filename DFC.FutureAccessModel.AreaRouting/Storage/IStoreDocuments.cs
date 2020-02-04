@@ -15,8 +15,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage
         /// </summary>
         /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="usingStoragePath">using (the) storage path</param>
+        /// <param name="partitionKey">the partition key</param>
         /// <returns>true if the document exists</returns>
-        Task<bool> DocumentExists<TDocument>(Uri usingStoragePath)
+        Task<bool> DocumentExists<TDocument>(Uri usingStoragePath, string partitionKey)
             where TDocument : class;
 
         /// <summary>
@@ -25,7 +26,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage
         /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="theDocument">the document</param>
         /// <param name="usingCollectionPath">using (the) collection path</param>
-        /// <returns>the currently running task</returns>
+        /// <returns>the submitted document</returns>
         Task<TDocument> AddDocument<TDocument>(TDocument theDocument, Uri usingCollectionPath)
             where TDocument : class;
 
@@ -34,8 +35,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage
         /// </summary>
         /// <typeparam name="TDocument">of this type</typeparam>
         /// <param name="usingStoragePath">using the storage path</param>
-        /// <returns></returns>
-        Task<TDocument> GetDocument<TDocument>(Uri usingStoragePath)
+        /// <param name="partitionKey">the partition key</param>
+        /// <returns>the requested document</returns>
+        Task<TDocument> GetDocument<TDocument>(Uri usingStoragePath, string partitionKey)
             where TDocument : class;
     }
 }

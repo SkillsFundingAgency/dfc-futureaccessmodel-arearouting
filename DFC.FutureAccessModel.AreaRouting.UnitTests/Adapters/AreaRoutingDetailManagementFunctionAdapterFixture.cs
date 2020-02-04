@@ -176,7 +176,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         {
             // arrange
             const string touchpoint = "any old touchpoint";
-            const string resultText = "{\"TouchpointID\":null,\"Area\":null,\"TelephoneNumber\":null,\"SMSNumber\":null,\"EmailAddress\":null}";
+            const string resultText = "{\"id\":null,\"Area\":null,\"TelephoneNumber\":null,\"SMSNumber\":null,\"EmailAddress\":null}";
 
             var sut = MakeSUT();
             GetMock(sut.RoutingDetails)
@@ -265,7 +265,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             // arrange
             const string locationIn = "any old location";
             const string touchpointOut = "any old touchpoint";
-            const string resultText = "{\"TouchpointID\":null,\"Area\":null,\"TelephoneNumber\":null,\"SMSNumber\":null,\"EmailAddress\":null}";
+            const string resultText = "{\"id\":null,\"Area\":null,\"TelephoneNumber\":null,\"SMSNumber\":null,\"EmailAddress\":null}";
 
             var sut = MakeSUT();
             GetMock(sut.Analyser)
@@ -393,11 +393,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         {
             // arrange
             const string theTouchpoint = "0000000123";
-            var theContent = $"{{\"TouchpointID\":\"{theTouchpoint}\", \"Area\": null, \"TelephoneNumber\": null, \"SMSNumber\": null, \"EmailAddress\": null }}";
+            var theContent = $"{{\"id\":\"{theTouchpoint}\", \"Area\": null, \"TelephoneNumber\": null, \"SMSNumber\": null, \"EmailAddress\": null }}";
 
             var sut = MakeSUT();
             GetMock(sut.RoutingDetails)
-                .Setup(x => x.Add(It.IsAny<RoutingDetail>()))
+                .Setup(x => x.Add(It.IsAny<IncomingRoutingDetail>()))
                 .Returns(Task.FromResult<IRoutingDetail>(new RoutingDetail()));
             GetMock(sut.Respond)
                 .Setup(x => x.Created())

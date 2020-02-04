@@ -12,6 +12,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
     internal sealed class LocalAuthorityStore :
         IStoreLocalAuthorities
     {
+        const string _partitionKey = "not_required";
+
         /// <summary>
         /// storage paths
         /// </summary>
@@ -48,7 +50,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public async Task<ILocalAuthority> Get(string theAdminDistrict)
         {
             var usingPath = StoragePaths.GetLocalAuthorityResourcePathFor(theAdminDistrict);
-            return await DocumentStore.GetDocument<LocalAuthority>(usingPath);
+            return await DocumentStore.GetDocument<LocalAuthority>(usingPath, _partitionKey);
         }
     }
 }

@@ -13,6 +13,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
     internal sealed class AreaRoutingDetailStore :
         IStoreAreaRoutingDetails
     {
+        const string _partitionKey = "not_required";
+
         /// <summary>
         /// storage paths
         /// </summary>
@@ -49,7 +51,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public async Task<IRoutingDetail> Get(string theTouchpoint)
         {
             var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
-            return await DocumentStore.GetDocument<RoutingDetail>(usingPath);
+            return await DocumentStore.GetDocument<RoutingDetail>(usingPath, _partitionKey);
         }
 
         /// <summary>
@@ -57,7 +59,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// </summary>
         /// <param name="theCandidate">the candidate (touchpoint)</param>
         /// <returns>the newly stored routing details (touchpoint)</returns>
-        public async Task<IRoutingDetail> Add(IRoutingDetail theCandidate)
+        public async Task<IRoutingDetail> Add(IncomingRoutingDetail theCandidate)
         {
             It.IsNull(theCandidate)
                 .AsGuard<ArgumentNullException>(nameof(theCandidate));
@@ -68,7 +70,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 
             var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
 
-            (await DocumentStore.DocumentExists<RoutingDetail>(usingPath))
+            (await DocumentStore.DocumentExists<RoutingDetail>(usingPath, _partitionKey))
                 .AsGuard<ConflictingResourceException>();
 
             return await DocumentStore.AddDocument(theCandidate, StoragePaths.RoutingDetailCollection);

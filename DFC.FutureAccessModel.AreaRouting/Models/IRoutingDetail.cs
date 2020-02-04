@@ -1,4 +1,6 @@
-﻿namespace DFC.FutureAccessModel.AreaRouting.Models
+﻿using Newtonsoft.Json;
+
+namespace DFC.FutureAccessModel.AreaRouting.Models
 {
     /// <summary>
     /// the routing detail contract

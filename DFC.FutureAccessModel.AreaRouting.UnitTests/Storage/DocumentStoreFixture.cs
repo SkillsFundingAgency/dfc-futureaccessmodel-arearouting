@@ -181,7 +181,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
                 .Returns(Task.FromResult(expectation));
 
             // act
-            var result = await sut.DocumentExists<RoutingDetail>(testPath);
+            var result = await sut.DocumentExists<RoutingDetail>(testPath, string.Empty);
 
             // assert
             GetMock(sut.Client).VerifyAll();
@@ -200,15 +200,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public async Task ProcessDocumentExistsMeetsVerification(bool expectation)
         {
             // arrange
+            const string pKey = "any old partition key";
             var sut = MakeSUT();
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
 
             GetMock(sut.Client)
-                .Setup(x => x.DocumentExistsAsync<RoutingDetail>(testPath))
+                .Setup(x => x.DocumentExistsAsync<RoutingDetail>(testPath, pKey))
                 .Returns(Task.FromResult(expectation));
 
             // act
-            var result = await sut.ProcessDocumentExists<RoutingDetail>(testPath);
+            var result = await sut.ProcessDocumentExists<RoutingDetail>(testPath, pKey);
 
             // assert
             GetMock(sut.Client).VerifyAll();
@@ -273,6 +274,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public async Task GetDocumentMeetsVerification()
         {
             // arrange
+            const string pKey = "any old partition key";
             var sut = MakeSUT();
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
 
@@ -281,7 +283,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
                 .Returns(Task.FromResult(new RoutingDetail()));
 
             // act
-            var result = await sut.GetDocument<RoutingDetail>(testPath);
+            var result = await sut.GetDocument<RoutingDetail>(testPath, pKey);
 
             // assert
             GetMock(sut.Client).VerifyAll();
@@ -297,15 +299,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public async Task ProcessGetDocumentMeetsVerification()
         {
             // arrange
+            const string pKey = "any old partition key";
             var sut = MakeSUT();
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
 
             GetMock(sut.Client)
-                .Setup(x => x.ReadDocumentAsync<RoutingDetail>(testPath))
+                .Setup(x => x.ReadDocumentAsync<RoutingDetail>(testPath, pKey))
                 .Returns(Task.FromResult(new RoutingDetail()));
 
             // act
-            var result = await sut.ProcessGetDocument<RoutingDetail>(testPath);
+            var result = await sut.ProcessGetDocument<RoutingDetail>(testPath, pKey);
 
             // assert
             GetMock(sut.Client).VerifyAll();

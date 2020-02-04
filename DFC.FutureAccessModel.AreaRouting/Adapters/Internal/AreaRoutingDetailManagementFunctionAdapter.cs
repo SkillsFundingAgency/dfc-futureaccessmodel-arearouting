@@ -191,7 +191,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
             await inScope.Information($"deserialising the submitted content: {theContent}");
 
-            var theCandidate = JsonConvert.DeserializeObject<RoutingDetail>(theContent);
+            var theCandidate = JsonConvert.DeserializeObject<IncomingRoutingDetail>(theContent);
 
             await inScope.Information("deserialisation complete...");
 
