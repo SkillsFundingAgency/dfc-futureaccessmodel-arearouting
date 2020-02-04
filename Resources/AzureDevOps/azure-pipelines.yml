@@ -14,19 +14,20 @@ resources:
   - repository: dfc-devops
     type: github
     name: SkillsFundingAgency/dfc-devops
-    ref: refs/tags/v1.8.5
+    ref: refs/tags/v1.10.3
     endpoint: 'GitHub (ESFA)'
+
+pool:
+  name: NCS - CI and CD
+  demands:
+  - msbuild
+  - visualstudio
 
 stages:
 - stage: Build
   displayName: Build, Test and Analyze
   jobs:
   - job: BuildTestAndAnalyze
-    pool:
-      name: NCS - CI and CD
-      demands:
-      - msbuild
-      - visualstudio
     steps:
     - template: AzureDevOpsTemplates/Build/StepTemplates/dfc-arm-build.yml@dfc-devops
       parameters:
@@ -45,6 +46,7 @@ stages:
   variables:
   - group: dfc-shared-dev
   - group: dfc-futureaccessmodel-shared-dev
+  - template: VariableTemplates\SharedEnvironmentVariables.yml
   - template: VariableTemplates\DevEnvironmentVariables.yml
   jobs:
   - template: JobTemplates/Deploy.yml
@@ -53,6 +55,11 @@ stages:
       Environment: DEV_FUTUREACCESSMODEL
       FunctionAppName: dfc-dev-fam-arearoute-fa
       ResourceGroup: dfc-dev-fam-arearoute-rg
+      ApimResourceGroup: '$(sharedResourceGroup)'
+      ApimInstanceName: '$(ApimServiceName)'
+      ApimProductId: '${{ variables.ApimProductId }}'
+      ApiName: '${{ variables.ApimApiName }}'
+      SwaggerSpecificationUrl: 'https://dfc-dev-fam-arearoute-fa.$(FunctionAppDomain)${{ variables.SwaggerDefinitionPath }}'
 
 - stage: DeployTo_SIT
   displayName: Deploy to SIT_FUTUREACCESSMODEL environment
@@ -60,6 +67,7 @@ stages:
   variables:
   - group: dfc-shared-sit
   - group: dfc-futureaccessmodel-shared-sit
+  - template: VariableTemplates\SharedEnvironmentVariables.yml
   - template: VariableTemplates\SitEnvironmentVariables.yml
   jobs:
   - template: JobTemplates/Deploy.yml
@@ -68,6 +76,11 @@ stages:
       Environment: SIT_FUTUREACCESSMODEL
       FunctionAppName: dfc-sit-fam-arearoute-fa
       ResourceGroup: dfc-sit-fam-arearoute-rg
+      ApimResourceGroup: '$(sharedResourceGroup)'
+      ApimInstanceName: '$(ApimServiceName)'
+      ApimProductId: '${{ variables.ApimProductId }}'
+      ApiName: '${{ variables.ApimApiName }}'
+      SwaggerSpecificationUrl: 'https://dfc-dev-fam-arearoute-fa.$(FunctionAppDomain)${{ variables.SwaggerDefinitionPath }}'
 
 - stage: DeployTo_PP
   displayName: Deploy to PP_FUTUREACCESSMODEL environment
@@ -75,6 +88,7 @@ stages:
   variables:
   - group: dfc-shared-pp
   - group: dfc-futureaccessmodel-shared-pp
+  - template: VariableTemplates\SharedEnvironmentVariables.yml
   - template: VariableTemplates\PPEnvironmentVariables.yml
   jobs:
   - template: JobTemplates/Deploy.yml
@@ -83,3 +97,8 @@ stages:
       Environment: PP_FUTUREACCESSMODEL
       FunctionAppName: dfc-pp-fam-arearoute-fa
       ResourceGroup: dfc-pp-fam-arearoute-rg
+      ApimResourceGroup: '$(sharedResourceGroup)'
+      ApimInstanceName: '$(ApimServiceName)'
+      ApimProductId: '${{ variables.ApimProductId }}'
+      ApiName: '${{ variables.ApimApiName }}'
+      SwaggerSpecificationUrl: 'https://dfc-dev-fam-arearoute-fa.$(FunctionAppDomain)${{ variables.SwaggerDefinitionPath }}'
