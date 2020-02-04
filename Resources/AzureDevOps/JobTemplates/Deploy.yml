@@ -2,7 +2,6 @@ parameters:
   AzureSubscription: ''
   Environment: ''
   FunctionAppName: ''
-  FunctionAppDomain: ''
   ResourceGroup: ''
   ArmTemplateRoot: '$(Pipeline.Workspace)/Dfc.FutureAccessModel.AreaRouting.Resources.ArmTemplates'
   FunctionAppPackage: '$(Pipeline.Workspace)/Dfc.FutureAccessModel.AreaRouting.DeploymentPackages/Dfc.FutureAccessModel.AreaRouting.zip'
@@ -11,8 +10,9 @@ parameters:
   ServiceOfferingTag: $(ServiceOffering)
   ApimResourceGroup: ''
   ApimInstanceName: ''
+  ApimProductId: ''
   ApiName: ''
-  SwaggerSpecificationPath: ''
+  SwaggerSpecificationUrl: ''
 
 jobs:
 - deployment: DeployTo_${{ parameters.Environment }}
@@ -29,29 +29,15 @@ jobs:
             ParentBusinessTag: ${{ parameters.ParentBusinessTag }}
             ResourceGroup: ${{ parameters.ResourceGroup }}
             ServiceOfferingTag: ${{ parameters.ServiceOfferingTag }}
-        - task: AzureFunctionApp@1
-          displayName: 'Azure Function App Deploy: ${{ parameters.FunctionAppName }}'
-          inputs:
-            azureSubscription: ${{ parameters.AzureSubscription }}
-            appType: functionApp
-            appName: ${{ parameters.FunctionAppName }}
-            deployToSlotOrASE: true
-            resourceGroupName: ${{ parameters.ResourceGroup }}
-            slotName: staging
-            package: ${{ parameters.FunctionAppPackage }}
-        - task: AzureAppServiceManage@0
-          displayName: 'Swap Slots: ${{ parameters.FunctionAppName }} staging to production'
-          inputs:
-            azureSubscription: ${{ parameters.AzureSubscription }}
-            WebAppName: ${{ parameters.FunctionAppName }}
-            ResourceGroupName: ${{ parameters.ResourceGroup }}
-            SourceSlot: staging
 
-        - task: AzurePowerShell@3
-          displayName: 'Refresh API definition in APIM'
-          inputs:
-            azureSubscription: ${{ parameters.AzureSubscription }}
-            scriptType: filePath
-            ScriptPath: '$(Agent.BuildDirectory)/s/dfc-devops/PSScripts/Import-ApimSwaggerApiDefinition.ps1'
-            ScriptArguments: '-ApimResourceGroup ${{ parameters.ApimResourceGroup }} -InstanceName ${{ parameters.ApimInstanceName }} -ApiName ${{ parameters.ApiName }} -SwaggerSpecificationUrl https://${{ parameters.FunctionAppName }}.${{ parameters.FunctionAppDomain }}${{ parameters.SwaggerSpecificationPath }}'
-            azurePowerShellVersion: LatestVersion
+        - template: AzureDevOpsTemplates/Deploy/StepTemplates/dfc-functionapp-apimapi-deploy.yml@dfc-devops
+          parameters:
+            AzureSubscription: ${{ parameters.AzureSubscription }}
+            FunctionAppName: ${{ parameters.FunctionAppName }}
+            FunctionResourceGroup: ${{ parameters.ResourceGroup }}
+            FunctionPackage: ${{ parameters.FunctionAppPackage }}
+            ApimResourceGroup: '${{ parameters.ApimResourceGroup }}'
+            ApimInstanceName: '${{ paramters.ApimInstanceName }}'
+            ApimProductId: ''
+            ApiName: '${{ parameters.ApiName }}'
+            SwaggerSpecificationUrl: '${{ parameters.SwaggerSpecificationUrl }}'
