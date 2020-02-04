@@ -49,8 +49,6 @@ stages:
   - template: VariableTemplates\SharedEnvironmentVariables.yml
   - template: VariableTemplates\DevEnvironmentVariables.yml
   jobs:
-  - checkout: dfc-devops
-    path: 's/dfc-devops/'
   - template: JobTemplates/Deploy.yml
     parameters:
       AzureSubscription: 'SFA-CDH-Dev/Test (962cae10-2950-412a-93e3-d8ae92b17896)'
@@ -93,8 +91,6 @@ stages:
   - template: VariableTemplates\SharedEnvironmentVariables.yml
   - template: VariableTemplates\PPEnvironmentVariables.yml
   jobs:
-  - checkout: dfc-devops
-    path: 's/dfc-devops/'
   - template: JobTemplates/Deploy.yml
     parameters:
       AzureSubscription: 'SFA-DIG-PreProd (931bc9f6-359c-4f65-a753-1ee191a1fd6c)'
