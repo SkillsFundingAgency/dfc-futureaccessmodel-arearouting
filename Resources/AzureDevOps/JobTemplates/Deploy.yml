@@ -5,7 +5,7 @@ parameters:
   FunctionAppDomain: ''
   ResourceGroup: ''
   ArmTemplateRoot: '$(Pipeline.Workspace)/Dfc.FutureAccessModel.AreaRouting.Resources.ArmTemplates'
-  FunctionAppPackage: '$(Pipeline.Workspace)/Dfc.FutureAccessModel.AreaRouting/DeploymentPackages/Dfc.FutureAccessModel.AreaRouting.zip'
+  FunctionAppPackage: '$(Pipeline.Workspace)/Dfc.FutureAccessModel.AreaRouting.DeploymentPackages/Dfc.FutureAccessModel.AreaRouting.zip'
   EnvironmentTag: $(EnvironmentTag)
   ParentBusinessTag: $(ParentBusiness)
   ServiceOfferingTag: $(ServiceOffering)
