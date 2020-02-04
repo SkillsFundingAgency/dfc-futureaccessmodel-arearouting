@@ -2,17 +2,20 @@ parameters:
   AzureSubscription: ''
   Environment: ''
   FunctionAppName: ''
+  FunctionAppDomain: ''
   ResourceGroup: ''
   ArmTemplateRoot: '$(Pipeline.Workspace)/Dfc.FutureAccessModel.AreaRouting.Resources.ArmTemplates'
   FunctionAppPackage: '$(Pipeline.Workspace)/Dfc.FutureAccessModel.AreaRouting/DeploymentPackages/Dfc.FutureAccessModel.AreaRouting.zip'
   EnvironmentTag: $(EnvironmentTag)
   ParentBusinessTag: $(ParentBusiness)
   ServiceOfferingTag: $(ServiceOffering)
+  ApimResourceGroup: ''
+  ApimInstanceName: ''
+  ApiName: ''
+  SwaggerSpecificationPath: ''
 
 jobs:
 - deployment: DeployTo_${{ parameters.Environment }}
-  pool:
-    name: 'NCS - CI and CD'
   environment: ${{ parameters.Environment }}
   strategy:
     runOnce:
@@ -43,3 +46,15 @@ jobs:
             WebAppName: ${{ parameters.FunctionAppName }}
             ResourceGroupName: ${{ parameters.ResourceGroup }}
             SourceSlot: staging
+
+        - checkout: dfc-devops
+          path: 's/dfc-devops/'
+
+        - task: AzurePowerShell@3
+          displayName: 'Refresh API definition in APIM'
+          inputs:
+            azureSubscription: ${{ parameters.AzureSubscription }}
+            scriptType: filePath
+            ScriptPath: '$(Agent.BuildDirectory)/s/dfc-devops/PSScripts/Import-ApimSwaggerApiDefinition.ps1'
+            ScriptArguments: '-ApimResourceGroup ${{ parameters.ApimResourceGroup }} -InstanceName ${{ parameters.ApimInstanceName }} -ApiName ${{ parameters.ApiName }} -SwaggerSpecificationUrl https://${{ parameters.FunctionAppName }}.${{ parameters.FunctionAppDomain }}${{ parameters.SwaggerSpecificationPath }}'
+            azurePowerShellVersion: LatestVersion
