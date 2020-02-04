@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace DFC.FutureAccessModel.AreaRouting.Models
 {
-    public sealed class RoutingDetail :
+    public  class RoutingDetail :
         IRoutingDetail
     {
         /// <summary>
