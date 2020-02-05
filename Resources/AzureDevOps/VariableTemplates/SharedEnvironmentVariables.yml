@@ -1,0 +1,11 @@
+﻿variables:
+- name: ApimProductName
+  value: 'Future Access Model'
+- name:  ApimProductId
+  value: 'future-access-model'
+- name: ApimApiUrlSuffix
+  value: futureaccessmodel/arearouting
+- name: ApimApiName
+  value: arearouting
+- name: SwaggerDefinitionPath
+  value: /api/areas/api-definition
