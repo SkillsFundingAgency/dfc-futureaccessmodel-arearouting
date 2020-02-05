@@ -22,7 +22,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         public void TitleMeetsExpectation()
         {
             // arrange / act / assert
-            Assert.Equal("areas", ApiDefinitionFunction.ApiTitle);
+            Assert.Equal("Omni Channel Area Routing API", ApiDefinitionFunction.ApiTitle);
         }
 
         /// <summary>
