@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -17,12 +18,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
     /// </summary>
     public static class ApiDefinitionFunction
     {
-        public const string ApiTitle = "areas";
+        public const string ApiTitle = "Omni Channel Area Routing API";
         public const string ApiVersion = "1.0.0";
         public const string ApiDefinitionName = "api-definition";
-        public const string ApiDefinitionRoute = ApiTitle + "/" + ApiDefinitionName;
         public const string ApiDescription =
-            @"To support email routing requirements between DSS and the ABC's";
+            @"To support phone and email based request routing requirements between the NCS and the ABC's";
 
         /// <summary>
         /// run... (the api document generator function)
@@ -31,8 +31,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="theDocumentGenerator">the document generator</param>
         /// <returns>a http response containing the generated document</returns>
         [FunctionName("ApiDefinition")]
+        [Display(Name = "Get the API Definition", Description = @"Returns this swagger document")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = ApiDefinitionRoute)]HttpRequest theRequest,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/api-definition")]HttpRequest theRequest,
             [Inject]ISwaggerDocumentGenerator theDocumentGenerator) =>
                 await Task.Run(() =>
                 {

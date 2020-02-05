@@ -176,14 +176,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         {
             // arrange
             const string touchpoint = "any old touchpoint";
-            const string resultText = "{\"id\":null,\"Area\":null,\"TelephoneNumber\":null,\"SMSNumber\":null,\"EmailAddress\":null}";
 
             var sut = MakeSUT();
             GetMock(sut.RoutingDetails)
                 .Setup(x => x.Get(touchpoint))
                 .Returns(Task.FromResult<IRoutingDetail>(new RoutingDetail()));
             GetMock(sut.Respond)
-                .Setup(x => x.Ok(resultText))
+                .Setup(x => x.Ok())
                 .Returns(new HttpResponseMessage());
 
             var scope = MakeStrictMock<IScopeLoggingContext>();
@@ -265,7 +264,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             // arrange
             const string locationIn = "any old location";
             const string touchpointOut = "any old touchpoint";
-            const string resultText = "{\"id\":null,\"Area\":null,\"TelephoneNumber\":null,\"SMSNumber\":null,\"EmailAddress\":null}";
 
             var sut = MakeSUT();
             GetMock(sut.Analyser)
@@ -278,7 +276,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .Setup(x => x.Get(touchpointOut))
                 .Returns(Task.FromResult<IRoutingDetail>(new RoutingDetail()));
             GetMock(sut.Respond)
-                .Setup(x => x.Ok(resultText))
+                .Setup(x => x.Ok())
                 .Returns(new HttpResponseMessage());
 
             var scope = MakeStrictMock<IScopeLoggingContext>();

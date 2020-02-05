@@ -114,8 +114,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .AsGuard<MalformedRequestException>();
 
             var theDetail = await RoutingDetails.Get(theTouchpointID);
-            var withContent = JsonConvert.SerializeObject(theDetail);
-            var response = Respond.Ok(withContent);
+            var response = Respond.Ok().SetContent(theDetail);
 
             await inLoggingScope.ExitMethod();
 

@@ -35,14 +35,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = FunctionDescription.MalformedRequest, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
-        [Display(Name = "Get", Description =
+        [Display(Name = "Get Area Routing Details By Location", Description =
             @"Ability to return:
                 a list of Touchpoint ID's
                 or a singluar full area routing detail when coupled with the use of the location parameter
                 Examples:
                     ?location=TS14 6AH
                     ?location=Stafford (search by town proposed, not yet implemented)
-                    ?locaiton=WS11 (search by outward code proposed, not yet implemented)")]
+                    ?location=WS11 (search by outward code proposed, not yet implemented)")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas")]HttpRequest theRequest,
             ILogger usingTraceWriter,
