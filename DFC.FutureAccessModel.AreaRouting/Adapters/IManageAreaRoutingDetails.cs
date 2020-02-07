@@ -15,17 +15,17 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters
         /// get (the) area routing detail for...
         /// </summary>
         /// <param name="theTouchpointID">the touchpoint id</param>
-        /// <param name="inLoggingScope">in logging scope</param>
+        /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inLoggingScope);
+        Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inScope);
 
         /// <summary>
         /// get (the) area routing detail by...
         /// </summary>
         /// <param name="theLocation">the location</param>
-        /// <param name="inLoggingScope">in logging scope</param>
+        /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inLoggingScope);
+        Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inScope);
 
         /// <summary>
         /// add area routing detail using

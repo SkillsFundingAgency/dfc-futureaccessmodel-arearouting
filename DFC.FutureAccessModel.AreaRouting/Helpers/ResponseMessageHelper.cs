@@ -11,9 +11,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Helpers
     public static class ResponseMessageHelper
     {
         /// <summary>
-        /// the specified content type
+        /// the (required) response content type
         /// </summary>
         public const string ResponseContentType = "application/json";
+
+        /// <summary>
+        /// the cosmos db's id tag
+        /// </summary>
+        public const string CosmosDBIDTag = "\"id\"";
+
+        /// <summary>
+        ///  the proper object tag
+        /// </summary>
+        public static readonly string ProperObjectTag = $"\"{nameof(IRoutingDetail.TouchpointID)}\"";
 
         /// <summary>
         /// set the content of the response
@@ -24,7 +34,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Helpers
         /// <returns>the message with new content</returns>
         public static HttpResponseMessage SetContent<TDocument>(this HttpResponseMessage source, TDocument theContent)
             where TDocument : IRoutingDetail =>
-            SetContent(source, JsonConvert.SerializeObject(theContent).Replace("\"id\"", $"\"{nameof(IRoutingDetail.TouchpointID)}\""));
+            SetContent(source, JsonConvert.SerializeObject(theContent).Replace(CosmosDBIDTag, ProperObjectTag));
 
         /// <summary>
         /// set the content of the response

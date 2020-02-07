@@ -327,7 +327,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var sut = MakeSUT();
 
             // act / assert
-            await Assert.ThrowsAsync<MalformedRequestException>(() => sut.ProcessDocumentErrorHandler<RoutingDetail>(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ProcessDocumentErrorHandler<RoutingDetail>(null));
         }
 
         /// <summary>
@@ -363,6 +363,24 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 
             // act / assert
             await Assert.ThrowsAsync<DocumentClientException>(() => sut.ProcessDocumentErrorHandler<RoutingDetail>(exception));
+        }
+
+        /// <summary>
+        /// process document client error with null passes witout event
+        /// this shouldn't happen and is the test in place only for code coverage
+        /// </summary>
+        [Fact]
+        public void ProcessDocumentClientErrorWithNullPassesWithoutEvent()
+        {
+            // arrange
+            var sut = MakeSUT();
+
+            // act
+            sut.ProcessDocumentClientError(null);
+
+            // assert
+            GetMock(sut.Client).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
         }
 
         /// <summary>

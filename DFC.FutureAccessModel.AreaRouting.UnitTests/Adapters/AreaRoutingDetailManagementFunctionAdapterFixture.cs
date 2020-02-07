@@ -13,9 +13,11 @@ using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 {
+    /// <summary>
+    /// area routing detail management function adapter fixture
+    /// </summary>
     public sealed class AreaRoutingDetailManagementFunctionAdapterFixture :
         MoqTestingFixture
-
     {
         /// <summary>
         /// build with null response helper throws
@@ -180,7 +182,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             var sut = MakeSUT();
             GetMock(sut.RoutingDetails)
                 .Setup(x => x.Get(touchpoint))
-                .Returns(Task.FromResult<IRoutingDetail>(new RoutingDetail()));
+                .Returns(Task.FromResult<IRoutingDetail>(new RoutingDetail { TouchpointID = touchpoint }));
             GetMock(sut.Respond)
                 .Setup(x => x.Ok())
                 .Returns(new HttpResponseMessage());
@@ -189,6 +191,20 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             GetMock(scope)
                 .Setup(x => x.EnterMethod("ProcessGetAreaRoutingDetailFor"))
                 .Returns(Task.CompletedTask);
+
+            GetMock(scope)
+                .Setup(x => x.Information("seeking the routing details: 'any old touchpoint'"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("candidate search complete: 'any old touchpoint'"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("preparing response..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("preparation complete..."))
+                .Returns(Task.CompletedTask);
+
             GetMock(scope)
                 .Setup(x => x.ExitMethod("ProcessGetAreaRoutingDetailFor"))
                 .Returns(Task.CompletedTask);
@@ -274,7 +290,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .Returns((x, y) => Task.FromResult(touchpointOut));
             GetMock(sut.RoutingDetails)
                 .Setup(x => x.Get(touchpointOut))
-                .Returns(Task.FromResult<IRoutingDetail>(new RoutingDetail()));
+                .Returns(Task.FromResult<IRoutingDetail>(new RoutingDetail { TouchpointID = touchpointOut }));
             GetMock(sut.Respond)
                 .Setup(x => x.Ok())
                 .Returns(new HttpResponseMessage());
@@ -284,10 +300,37 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .Setup(x => x.EnterMethod("ProcessGetAreaRoutingDetailBy"))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
+                .Setup(x => x.Information("seeking the routing details for: 'any old location'"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("analysing the expression type..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("seeking the action for expression type: 'Postcode'"))
+                .Returns(Task.CompletedTask);
+
+            // this is the anonymous test lambda
+            GetMock(scope)
+                .Setup(x => x.Information("action for expression type: '<ProcessGetAreaRoutingDetailByValidLocationMeetsVerification>b__11_2'"))
+                .Returns(Task.CompletedTask);
+
+            GetMock(scope)
                 .Setup(x => x.ExitMethod("ProcessGetAreaRoutingDetailBy"))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
                 .Setup(x => x.EnterMethod("ProcessGetAreaRoutingDetailFor"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("seeking the routing details: 'any old touchpoint'"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("candidate search complete: 'any old touchpoint'"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("preparing response..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("preparation complete..."))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
                 .Setup(x => x.ExitMethod("ProcessGetAreaRoutingDetailFor"))
@@ -372,7 +415,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .Setup(x => x.EnterMethod("ProcessAddAreaRoutingDetailUsing"))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
-                .Setup(x => x.Information($"deserialising the submitted content: {theContent}"))
+                .Setup(x => x.Information($"deserialising the submitted content: '{theContent}'"))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
                 .Setup(x => x.Information("deserialisation complete..."))
@@ -406,13 +449,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .Setup(x => x.EnterMethod("ProcessAddAreaRoutingDetailUsing"))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
-                .Setup(x => x.Information($"deserialising the submitted content: {theContent}"))
+                .Setup(x => x.Information($"deserialising the submitted content: '{theContent}'"))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
                 .Setup(x => x.Information("deserialisation complete..."))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
-                .Setup(x => x.Information($"adding the area routing candidate: {theTouchpoint}"))
+                .Setup(x => x.Information($"adding the area routing candidate: '{theTouchpoint}'"))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
                 .Setup(x => x.Information($"candidate addition complete..."))

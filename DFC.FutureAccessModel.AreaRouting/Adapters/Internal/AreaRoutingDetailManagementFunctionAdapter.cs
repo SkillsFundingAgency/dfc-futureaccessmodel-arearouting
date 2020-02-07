@@ -92,31 +92,45 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// excluded from coverage as moq doesn't support the lambda complexity for this routine
         /// </summary>
         /// <param name="theTouchpointID">the touchpoint id</param>
-        /// <param name="inLoggingScope">in logging scope</param>
+        /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
         [ExcludeFromCodeCoverage]
-        public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inLoggingScope) =>
+        public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inScope) =>
             await SafeOperations.Try(
-                () => ProcessGetAreaRoutingDetailFor(theTouchpointID, inLoggingScope),
-                x => Faults.GetResponseFor(x, TypeofMethod.Get, inLoggingScope));
+                () => ProcessGetAreaRoutingDetailFor(theTouchpointID, inScope),
+                x => Faults.GetResponseFor(x, TypeofMethod.Get, inScope));
 
         /// <summary>
         /// process, get (the) area routing detail for...
         /// </summary>
         /// <param name="theTouchpointID">the touchpoint id</param>
-        /// <param name="inLoggingScope">in logging scope</param>
+        /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success only)</returns>
-        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inLoggingScope)
+        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inScope)
         {
-            await inLoggingScope.EnterMethod();
+            await inScope.EnterMethod();
 
             It.IsEmpty(theTouchpointID)
                 .AsGuard<MalformedRequestException>();
 
+            await inScope.Information($"seeking the routing details: '{theTouchpointID}'");
+
             var theDetail = await RoutingDetails.Get(theTouchpointID);
+
+            It.IsNull(theDetail)
+                .AsGuard<MalformedRequestException>(theTouchpointID);
+            It.IsEmpty(theDetail.TouchpointID)
+                .AsGuard<MalformedRequestException>(theTouchpointID);
+
+            await inScope.Information($"candidate search complete: '{theDetail.TouchpointID}'");
+
+            await inScope.Information($"preparing response...");
+
             var response = Respond.Ok().SetContent(theDetail);
 
-            await inLoggingScope.ExitMethod();
+            await inScope.Information($"preparation complete...");
+
+            await inScope.ExitMethod();
 
             return response;
         }
@@ -126,34 +140,43 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// excluded from coverage as moq doesn't support the lambda complexity for this routine
         /// </summary>
         /// <param name="theLocation">the location</param>
-        /// <param name="inLoggingScope">in logging scope</param>
+        /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
         [ExcludeFromCodeCoverage]
-        public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inLoggingScope) =>
+        public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inScope) =>
             await SafeOperations.Try(
-                () => ProcessGetAreaRoutingDetailBy(theLocation, inLoggingScope),
-                x => Faults.GetResponseFor(x, TypeofMethod.Get, inLoggingScope));
+                () => ProcessGetAreaRoutingDetailBy(theLocation, inScope),
+                x => Faults.GetResponseFor(x, TypeofMethod.Get, inScope));
 
         /// <summary>
         /// process, get (the) area routing detail by...
         /// </summary>
         /// <param name="theLocation">the location</param>
-        /// <param name="inLoggingScope">in logging scope</param>
+        /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inLoggingScope)
+        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inScope)
         {
-            await inLoggingScope.EnterMethod();
+            await inScope.EnterMethod();
 
             It.IsEmpty(theLocation)
                 .AsGuard<MalformedRequestException>();
 
+            await inScope.Information($"seeking the routing details for: '{theLocation}'");
+            await inScope.Information($"analysing the expression type...");
+
             var theExpressionType = Analyser.GetTypeOfExpressionFor(theLocation);
+
+            await inScope.Information($"seeking the action for expression type: '{theExpressionType}'");
+
             var actionDo = Actions.GetActionFor(theExpressionType);
-            var theTouchpoint = await actionDo(theLocation, inLoggingScope);
 
-            await inLoggingScope.ExitMethod();
+            await inScope.Information($"action for expression type: '{actionDo.Method.Name}'");
 
-            return await ProcessGetAreaRoutingDetailFor(theTouchpoint, inLoggingScope);
+            var theTouchpoint = await actionDo(theLocation, inScope);
+
+            await inScope.ExitMethod();
+
+            return await ProcessGetAreaRoutingDetailFor(theTouchpoint, inScope);
         }
 
         /// <summary>
@@ -188,7 +211,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             It.IsEmpty(theContent)
                 .AsGuard<MalformedRequestException>();
 
-            await inScope.Information($"deserialising the submitted content: {theContent}");
+            await inScope.Information($"deserialising the submitted content: '{theContent}'");
 
             var theCandidate = JsonConvert.DeserializeObject<IncomingRoutingDetail>(theContent);
 
@@ -197,15 +220,17 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             It.IsEmpty(theCandidate?.TouchpointID)
                 .AsGuard<MalformedRequestException>();
 
-            await inScope.Information($"adding the area routing candidate: {theCandidate?.TouchpointID}");
+            await inScope.Information($"adding the area routing candidate: '{theCandidate?.TouchpointID}'");
 
             var result = await RoutingDetails.Add(theCandidate);
 
             await inScope.Information($"candidate addition complete...");
 
+            var response = Respond.Created().SetContent(result);
+
             await inScope.ExitMethod();
 
-            return Respond.Created().SetContent(result);
+            return response;
         }
     }
 }
