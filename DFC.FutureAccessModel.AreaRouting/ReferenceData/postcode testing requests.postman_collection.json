@@ -1,0 +1,56 @@
+{
+	"info": {
+		"_postman_id": "76fa5835-240f-4fbf-9da1-e4a1535dae13",
+		"name": "postcode testing requests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get touchpoint",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "38343bd5-e3b7-4392-b237-4259cbdb9a40",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var touchpoint = pm.variables.get(\"TouchpointID\");",
+							"pm.test(\"Body contains expected touchpoint\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"0000000\" + touchpoint + \"\\\"\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:7071/api/areas?location={{Outward}}%20{{Inward}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7071",
+					"path": [
+						"api",
+						"areas"
+					],
+					"query": [
+						{
+							"key": "location",
+							"value": "{{Outward}}%20{{Inward}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

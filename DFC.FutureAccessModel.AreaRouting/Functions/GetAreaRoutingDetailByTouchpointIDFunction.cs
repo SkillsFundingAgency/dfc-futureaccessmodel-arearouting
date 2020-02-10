@@ -36,10 +36,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// </summary>
         /// <param name="theRequest">the request</param>
         /// <param name="usingTraceWriter">using (the) trace writer</param>
-        /// <param name="touchpointID"></param>
-        /// <param name="factory"></param>
-        /// <param name="adapter"></param>
-        /// <returns></returns>
+        /// <param name="touchpointID">(the) touchpoint id</param>
+        /// <param name="factory">(the logging scope) factory</param>
+        /// <param name="adapter">(the routing details) adapter</param>
+        /// <returns>the http response to the operation</returns>
         [FunctionName("GetAreaRoutingDetailByTouchpointID")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = FunctionDescription.ResourceFound, ShowSchema = true)]

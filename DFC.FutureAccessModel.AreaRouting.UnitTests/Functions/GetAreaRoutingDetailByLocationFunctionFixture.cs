@@ -87,11 +87,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         public async Task RunMeetsExpectation()
         {
             const string location = "any old location";
+            const string locationKey = "location";
 
             // arrange
             var request = MakeStrictMock<HttpRequest>();
+
             GetMock(request)
-                .Setup(x => x.Query["location"])
+                .Setup(x => x.Query.ContainsKey(locationKey))
+                .Returns(true);
+            GetMock(request)
+                .Setup(x => x.Query[locationKey])
                 .Returns(location);
 
             var trace = MakeStrictMock<ILogger>();

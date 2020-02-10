@@ -317,6 +317,54 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
+        /// delete document meets verification
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task DeleteDocumentMeetsVerification()
+        {
+            // arrange
+            const string pKey = "any old partition key";
+            var sut = MakeSUT();
+            var testPath = new Uri("http://blahStore/blahCollection/blahID");
+
+            GetMock(sut.SafeOperations)
+                .Setup(x => x.Try(It.IsAny<Func<Task>>(), It.IsAny<Func<Exception, Task>>()))
+                .Returns(Task.CompletedTask);
+
+            // act
+            await sut.DeleteDocument(testPath, pKey);
+
+            // assert
+            GetMock(sut.Client).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
+        /// <summary>
+        /// process delete document meets verification
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task ProcessDeleteDocumentMeetsVerification()
+        {
+            // arrange
+            const string pKey = "any old partition key";
+            var sut = MakeSUT();
+            var testPath = new Uri("http://blahStore/blahCollection/blahID");
+
+            GetMock(sut.Client)
+                .Setup(x => x.DeleteDocumentAsync(testPath, pKey))
+                .Returns(Task.CompletedTask);
+
+            // act
+            await sut.ProcessDeleteDocument(testPath, pKey);
+
+            // assert
+            GetMock(sut.Client).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
+        /// <summary>
         /// process get document error handler throws malformed request exception for null incoming exception
         /// </summary>
         /// <returns>the currently running (test) task</returns>

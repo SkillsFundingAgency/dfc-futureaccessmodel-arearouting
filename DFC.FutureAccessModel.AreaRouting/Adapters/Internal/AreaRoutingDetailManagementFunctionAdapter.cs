@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
@@ -227,6 +228,82 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await inScope.Information($"candidate addition complete...");
 
             var response = Respond.Created().SetContent(result);
+
+            await inScope.ExitMethod();
+
+            return response;
+        }
+
+        /// <summary>
+        /// get all route id's
+        /// </summary>
+        /// <param name="inScope">in logging scope</param>
+        /// <returns>the currently running task containing the response message (success or fail)</returns>
+        public async Task<HttpResponseMessage> GetAllRouteIDs(IScopeLoggingContext inScope) =>
+            await SafeOperations.Try(
+                () => ProcessGetAllRouteIDs(inScope),
+                x => Faults.GetResponseFor(x, TypeofMethod.Get, inScope));
+
+        /// <summary>
+        /// process, get all route id's
+        /// </summary>
+        /// <param name="inScope">in logging scope</param>
+        /// <returns>the currently running task containing the response message (success only)</returns>
+        internal async Task<HttpResponseMessage> ProcessGetAllRouteIDs(IScopeLoggingContext inScope)
+        {
+            await inScope.EnterMethod();
+
+            await inScope.Information("seeking all routing ids");
+
+            var result = await RoutingDetails.GetAll();
+
+            await inScope.Information($"found {result.Count} record(s)...");
+
+            var theCandidate = $"{{ [{string.Join(", ", result.Select(x => $"\"{x.TouchpointID}\""))}] }}";
+
+            await inScope.Information($"candidate content: '{theCandidate}'");
+
+            await inScope.Information($"preparing response...");
+
+            var response = Respond.Ok().SetContent(theCandidate);
+
+            await inScope.Information($"preparation complete...");
+
+            await inScope.ExitMethod();
+
+            return response;
+        }
+
+        /// <summary>
+        /// delete an area routing detail using...
+        /// </summary>
+        /// <param name="theTouchpointID">the touchpoint id</param>
+        /// <param name="inScope">in logging scope</param>
+        /// <returns>the currently running task containing the response message (success or fail)</returns>
+        public async Task<HttpResponseMessage> DeleteAreaRoutingDetailUsing(string theTouchpointID, IScopeLoggingContext inScope) =>
+            await SafeOperations.Try(
+                () => ProcessDeleteAreaRoutingDetailUsing(theTouchpointID, inScope),
+                x => Faults.GetResponseFor(x, TypeofMethod.Delete, inScope));
+
+        /// <summary>
+        /// process, delete an area routing detail using...
+        /// </summary>
+        /// <param name="theTouchpointID">the touchpoint id</param>
+        /// <param name="inScope">in logging scope</param>
+        /// <returns>the currently running task containing the response message (success or fail)</returns>
+        internal async Task<HttpResponseMessage> ProcessDeleteAreaRoutingDetailUsing(string theTouchpointID, IScopeLoggingContext inScope)
+        {
+            await inScope.EnterMethod();
+
+            await inScope.Information($"deleting the routing details for '{theTouchpointID}'");
+
+            await RoutingDetails.Delete(theTouchpointID);
+
+            await inScope.Information($"preparing response...");
+
+            var response = Respond.Ok();
+
+            await inScope.Information($"preparation complete...");
 
             await inScope.ExitMethod();
 

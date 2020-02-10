@@ -80,12 +80,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// </summary>
         /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="usingStoragePath">using (the) storage path</param>
-        /// <param name="partitionKey">the partition key</param>
+        /// <param name="andPartitionKey">and partition key</param>
         /// <returns>true if the document exists</returns>
-        public async Task<bool> DocumentExists<TDocument>(Uri usingStoragePath, string partitionKey)
+        public async Task<bool> DocumentExists<TDocument>(Uri usingStoragePath, string andPartitionKey)
             where TDocument : class =>
             await SafeOperations.Try(
-                () => ProcessDocumentExists<TDocument>(usingStoragePath, partitionKey),
+                () => ProcessDocumentExists<TDocument>(usingStoragePath, andPartitionKey),
                 x => Task.FromResult(false));
 
         /// <summary>
@@ -93,11 +93,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// </summary>
         /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="usingStoragePath">using (the) storage path</param>
-        /// <param name="partitionKey">the partition key</param>
+        /// <param name="andPartitionKey">and partition key</param>
         /// <returns>true if the document exists</returns>
-        internal async Task<bool> ProcessDocumentExists<TDocument>(Uri usingStoragePath, string partitionKey)
+        internal async Task<bool> ProcessDocumentExists<TDocument>(Uri usingStoragePath, string andPartitionKey)
             where TDocument : class =>
-            await Client.DocumentExistsAsync<TDocument>(usingStoragePath, partitionKey);
+            await Client.DocumentExistsAsync<TDocument>(usingStoragePath, andPartitionKey);
 
         /// <summary>
         /// add (a) document (to the document store)
@@ -113,7 +113,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
                 x => ProcessDocumentErrorHandler<TDocument>(x));
 
         /// <summary>
-        /// process add document
+        /// process, add document
         /// </summary>
         /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="usingCollectionPath">using (the) collection path</param>
@@ -128,27 +128,47 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// </summary>
         /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="usingStoragePath">using (the) storage path</param>
-        /// <param name="partitionKey">the partition key</param>
+        /// <param name="andPartitionKey">and partition key</param>
         /// <returns>the currently running task</returns>
-        public async Task<TDocument> GetDocument<TDocument>(Uri usingStoragePath, string partitionKey)
+        public async Task<TDocument> GetDocument<TDocument>(Uri usingStoragePath, string andPartitionKey)
             where TDocument : class =>
             await SafeOperations.Try(
-                () => ProcessGetDocument<TDocument>(usingStoragePath, partitionKey),
+                () => ProcessGetDocument<TDocument>(usingStoragePath, andPartitionKey),
                 x => ProcessDocumentErrorHandler<TDocument>(x));
 
         /// <summary>
-        /// process get document
+        /// process, get document
         /// </summary>
         /// <typeparam name="TDocument">the document type</typeparam>
         /// <param name="usingStoragePath">using (the) storage path</param>
-        /// <param name="partitionKey">the partition key</param>
+        /// <param name="andPartitionKey">and partition key</param>
         /// <returns>the currently running task containing the dcoument</returns>
-        internal async Task<TDocument> ProcessGetDocument<TDocument>(Uri usingStoragePath, string partitionKey)
+        internal async Task<TDocument> ProcessGetDocument<TDocument>(Uri usingStoragePath, string andPartitionKey)
             where TDocument : class =>
-            await Client.ReadDocumentAsync<TDocument>(usingStoragePath, partitionKey);
+            await Client.ReadDocumentAsync<TDocument>(usingStoragePath, andPartitionKey);
 
         /// <summary>
-        /// process get document error handler. 
+        /// delete document...
+        /// </summary>
+        /// <param name="usingStoragePath">using (the) storage path</param>
+        /// <param name="andPartitionKey">and partition key</param>
+        /// <returns>the currently running task</returns>
+        public async Task DeleteDocument(Uri usingStoragePath, string andPartitionKey) =>
+            await SafeOperations.Try(
+                () => ProcessDeleteDocument(usingStoragePath, andPartitionKey),
+                x => ProcessDocumentErrorHandler<RoutingDetail>(x));
+
+        /// <summary>
+        /// process, delete document...
+        /// </summary>
+        /// <param name="usingStoragePath">using (the) storage path</param>
+        /// <param name="andPartitionKey">and partition key</param>
+        /// <returns>the currently running task</returns>
+        internal async Task ProcessDeleteDocument(Uri usingStoragePath, string andPartitionKey) =>
+            await Client.DeleteDocumentAsync(usingStoragePath, andPartitionKey);
+
+        /// <summary>
+        /// process, document error handler. 
         /// safe handling and exception transformation into something the API can deal with. 
         /// an incoming null is likely to be the result of an argument null 
         /// exception for an 'invalid' uri in the read document call. 

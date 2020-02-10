@@ -34,5 +34,20 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters
         /// <param name="inScope">in scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
         Task<HttpResponseMessage> AddAreaRoutingDetailUsing(string theContent, IScopeLoggingContext inScope);
+
+        /// <summary>
+        /// get all route id's
+        /// </summary>
+        /// <param name="inScope">in scope</param>
+        /// <returns>the currently running task containing the response message (success or fail)</returns>
+        Task<HttpResponseMessage> GetAllRouteIDs(IScopeLoggingContext inScope);
+
+        /// <summary>
+        /// delete an area routing detail using...
+        /// </summary>
+        /// <param name="theTouchpointID">the touchpoint id</param>
+        /// <param name="inScope">in logging scope</param>
+        /// <returns>the currently running task containing the response message (success or fail)</returns>
+        Task<HttpResponseMessage> DeleteAreaRoutingDetailUsing(string theTouchpointID, IScopeLoggingContext inScope);
     }
 }

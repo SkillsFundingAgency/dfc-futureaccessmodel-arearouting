@@ -49,5 +49,6 @@
         <Folder Include="Registration\Internal\" />
         <Folder Include="Wrappers\" />
         <Folder Include="Wrappers\Internal\" />
+        <Folder Include="ReferenceData\" />
     </ItemGroup>
 </Project>

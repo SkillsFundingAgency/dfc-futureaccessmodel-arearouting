@@ -17,28 +17,28 @@ using Microsoft.Extensions.Logging;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
-    public static class PostAreaRoutingDetailFunction
+    public static class DeleteAreaRoutingDetailFunction
     {
         /// <summary>
         /// run...
         /// </summary>
         /// <param name="theRequest">the request</param>
         /// <param name="usingTraceWriter">using (the) trace writer</param>
+        /// <param name="touchpointID">(the) touchpoint id</param>
         /// <param name="factory">(the logging scope) factory</param>
         /// <param name="adapter">(the routing details) adapter</param>
         /// <returns>the http response to the operation</returns>
-        [FunctionName("PostAreaRoutingDetail")]
+        [FunctionName("DeleteAreaRoutingDetail")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.Created, Description = FunctionDescription.ResourceCreated, ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.NoParentContent, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = FunctionDescription.MalformedRequest, ShowSchema = false)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.Conflict, Description = FunctionDescription.Conflict, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
-        [Display(Name = "Post a new Area Routing Detail", Description = "Ability to add an Area Routing Detail.")]
+        [Display(Name = "Delete an Area Routing Detail", Description = "Ability to delete an Area Routing Detail.")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "areas")]HttpRequest theRequest,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "areas/{touchpointID}")]HttpRequest theRequest,
             ILogger usingTraceWriter,
+            string touchpointID,
             [Inject] ICreateLoggingContextScopes factory,
             [Inject] IManageAreaRoutingDetails adapter)
         {
@@ -53,8 +53,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
 
             using (var inScope = await factory.BeginScopeFor(theRequest, usingTraceWriter))
             {
-                var theContent = await theRequest.ReadAsStringAsync();
-                return await adapter.AddAreaRoutingDetailUsing(theContent, inScope);
+                return await adapter.DeleteAreaRoutingDetailUsing(touchpointID, inScope);
             }
         }
     }

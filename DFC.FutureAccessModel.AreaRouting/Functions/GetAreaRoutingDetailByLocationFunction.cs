@@ -23,11 +23,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// run...
         /// </summary>
         /// <param name="theRequest">the request</param>
-        /// <param name="usingTraceWriter">using (the) trace writer)</param>
-        /// <param name="theLocation"></param>
-        /// <param name="factory"></param>
-        /// <param name="adapter"></param>
-        /// <returns></returns>
+        /// <param name="usingTraceWriter">using (the) trace writer</param>
+        /// <param name="factory">(the logging scope) factory</param>
+        /// <param name="adapter">(the routing details) adapter</param>
+        /// <returns>the http response to the operation</returns>
         [FunctionName("GetAreaRoutingDetailByLocation")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = FunctionDescription.ResourceFound, ShowSchema = true)]
@@ -36,13 +35,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Get Area Routing Details By Location", Description =
-            @"Ability to return:
-                a list of Touchpoint ID's
-                or a singluar full area routing detail when coupled with the use of the location parameter
-                Examples:
-                    ?location=TS14 6AH
-                    ?location=Stafford (search by town proposed, not yet implemented)
-                    ?location=WS11 (search by outward code proposed, not yet implemented)")]
+            @"Ability to return:<br />
+                a list of Touchpoint ID's<br />
+                or a singluar full area routing detail when coupled with the use of the location parameter<br />
+                Examples:<br />
+                <ul>
+                    <li>?location=TS14 6AH</li>
+                    <li>?location=Stafford (search by town proposed, not yet implemented)</li>
+                    <li>?location=WS11 (search by outward code proposed, not yet implemented)</li>
+                </ul>")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas")]HttpRequest theRequest,
             ILogger usingTraceWriter,
@@ -60,8 +61,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
 
             using (var scope = await factory.BeginScopeFor(theRequest, usingTraceWriter))
             {
-                var theLocation = theRequest.Query["location"];
-                return await adapter.GetAreaRoutingDetailBy(theLocation, scope);
+                const string _locationKey = "location";
+
+                var hasSelector = theRequest.Query.ContainsKey(_locationKey);
+                var theLocation = theRequest.Query[_locationKey];
+
+                return hasSelector
+                    ? await adapter.GetAreaRoutingDetailBy(theLocation, scope)
+                    : await adapter.GetAllRouteIDs(scope);
             }
         }
     }

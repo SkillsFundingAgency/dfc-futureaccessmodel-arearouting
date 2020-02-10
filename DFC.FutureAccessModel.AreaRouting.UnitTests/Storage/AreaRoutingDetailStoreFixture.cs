@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
 using Moq;
@@ -93,6 +94,87 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             GetMock(sut.DocumentStore).VerifyAll();
             GetMock(sut.StoragePaths).VerifyAll();
             Assert.IsAssignableFrom<IRoutingDetail>(result);
+        }
+
+        /// <summary>
+        /// get all throws not supported, until the code is completed.
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task GetAllThrowsNotSupported()
+        {
+            // arrange
+            var sut = MakeSUT();
+
+            // act / assert
+            await Assert.ThrowsAsync<NotSupportedException>(() => sut.GetAll());
+        }
+
+        /// <summary>
+        /// delete routing detail with null touchpoint throws
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task DeleteRoutingDetailWithNullTouchpointThrows()
+        {
+            // arrange
+            var sut = MakeSUT();
+
+            // act / assert
+            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.Delete(null));
+        }
+
+        /// <summary>
+        /// delete routing detail with invalid touchpoint throws
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task DeleteRoutingDetailWithInvalidTouchpointThrows()
+        {
+            // arrange
+            var sut = MakeSUT();
+            const string touchpoint = "0000000001";
+            var documentPath = new Uri("/", UriKind.Relative);
+
+            GetMock(sut.DocumentStore)
+                .Setup(x => x.DocumentExists<RoutingDetail>(documentPath, "not_required"))
+                .Returns(Task.FromResult(false));
+            GetMock(sut.StoragePaths)
+                .Setup(x => x.GetRoutingDetailResourcePathFor(touchpoint))
+                .Returns(documentPath);
+
+            // act / assert
+            await Assert.ThrowsAsync<NoContentException>(() => sut.Delete(touchpoint));
+        }
+
+        /// <summary>
+        /// delete routing detail with valid touchpoint meets verificaiton
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task DeleteRoutingDetailWithValidTouchpointMeetsVerification()
+        {
+            // arrange
+            var sut = MakeSUT();
+            const string touchpoint = "0000000001";
+            var documentPath = new Uri("/", UriKind.Relative);
+
+            GetMock(sut.DocumentStore)
+                .Setup(x => x.DocumentExists<RoutingDetail>(documentPath, "not_required"))
+                .Returns(Task.FromResult(true));
+            GetMock(sut.DocumentStore)
+                .Setup(x => x.DeleteDocument(documentPath, "not_required"))
+                .Returns(Task.CompletedTask);
+            GetMock(sut.StoragePaths)
+                .Setup(x => x.GetRoutingDetailResourcePathFor(touchpoint))
+                .Returns(documentPath);
+
+            // act
+            await sut.Delete(touchpoint);
+
+            // assert
+            GetMock(sut.DocumentStore).VerifyAll();
+            GetMock(sut.StoragePaths).VerifyAll();
         }
 
         /// <summary>

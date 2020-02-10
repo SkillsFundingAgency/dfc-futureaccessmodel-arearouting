@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -466,6 +467,141 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
             // act
             var result = await sut.ProcessAddAreaRoutingDetailUsing(theContent, scope);
+
+            // assert
+            Assert.IsAssignableFrom<HttpResponseMessage>(result);
+            GetMock(sut.RoutingDetails).VerifyAll();
+            GetMock(sut.Respond).VerifyAll();
+            GetMock(sut.Faults).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
+        /// <summary>
+        /// process, get all route ids meets verification
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task ProcessGetAllRouteIDsMeetsVerification()
+        {
+            // arrange
+            const string candidate = "{ [\"000101\", \"000102\", \"000102\"] }";
+            IRoutingDetail[] touchpoints = {
+                new RoutingDetail { TouchpointID = "000101" },
+                new RoutingDetail { TouchpointID = "000102" },
+                new RoutingDetail { TouchpointID = "000102" },
+            };
+
+            var sut = MakeSUT();
+            GetMock(sut.RoutingDetails)
+                .Setup(x => x.GetAll())
+                .Returns(Task.FromResult<IReadOnlyCollection<IRoutingDetail>>(touchpoints));
+            GetMock(sut.Respond)
+                .Setup(x => x.Ok())
+                .Returns(new HttpResponseMessage());
+
+            var scope = MakeStrictMock<IScopeLoggingContext>();
+            GetMock(scope)
+                .Setup(x => x.EnterMethod("ProcessGetAllRouteIDs"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("seeking all routing ids"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("found 3 record(s)..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information($"candidate content: '{candidate}'"))
+                .Returns(Task.CompletedTask);
+
+            GetMock(scope)
+                .Setup(x => x.Information("preparing response..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("preparation complete..."))
+                .Returns(Task.CompletedTask);
+
+            GetMock(scope)
+                .Setup(x => x.ExitMethod("ProcessGetAllRouteIDs"))
+                .Returns(Task.CompletedTask);
+
+            // act
+            var result = await sut.ProcessGetAllRouteIDs(scope);
+
+            // assert
+            Assert.IsAssignableFrom<HttpResponseMessage>(result);
+            Assert.Equal(candidate, await result.Content.ReadAsStringAsync());
+
+            GetMock(sut.RoutingDetails).VerifyAll();
+            GetMock(sut.Respond).VerifyAll();
+            GetMock(sut.Faults).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
+        /// <summary>
+        /// delete area routing detail using meets verification
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task DeleteAreaRoutingDetailUsingMeetsVerification()
+        {
+            // arrange
+            var sut = MakeSUT();
+            var scope = MakeStrictMock<IScopeLoggingContext>();
+
+            GetMock(sut.SafeOperations)
+                .Setup(x => x.Try(
+                    It.IsAny<Func<Task<HttpResponseMessage>>>(),
+                    It.IsAny<Func<Exception, Task<HttpResponseMessage>>>()))
+                .Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)));
+
+            // act
+            var result = await sut.DeleteAreaRoutingDetailUsing(string.Empty, scope);
+
+            // assert
+            Assert.IsAssignableFrom<HttpResponseMessage>(result);
+            GetMock(sut.RoutingDetails).VerifyAll();
+            GetMock(sut.Respond).VerifyAll();
+            GetMock(sut.Faults).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
+        /// <summary>
+        /// delete area routing detail using meets verification
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task ProcessDeleteAreaRoutingDetailUsingMeetsVerification()
+        {
+            // arrange
+            const string touchpoint = "000101";
+            var sut = MakeSUT();
+            var scope = MakeStrictMock<IScopeLoggingContext>();
+
+            GetMock(scope)
+                .Setup(x => x.EnterMethod("ProcessDeleteAreaRoutingDetailUsing"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("deleting the routing details for '000101'"))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("preparing response..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("preparation complete..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.ExitMethod("ProcessDeleteAreaRoutingDetailUsing"))
+                .Returns(Task.CompletedTask);
+
+            GetMock(sut.RoutingDetails)
+                .Setup(x => x.Delete(touchpoint))
+                .Returns(Task.CompletedTask);
+            GetMock(sut.Respond)
+                .Setup(x => x.Ok())
+                .Returns(new HttpResponseMessage());
+
+            // act
+            var result = await sut.ProcessDeleteAreaRoutingDetailUsing(touchpoint, scope);
 
             // assert
             Assert.IsAssignableFrom<HttpResponseMessage>(result);
