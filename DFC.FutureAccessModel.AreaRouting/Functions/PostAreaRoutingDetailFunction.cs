@@ -35,7 +35,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Conflict, Description = FunctionDescription.Conflict, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
-        [Display(Name = "Post a new Area Routing Detail", Description = "Ability to add an Area Routing Detail.")]
+        [Display(Name = "Create a new Area Routing Detail", Description = "Ability to add an Area Routing Detail.")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "areas")]HttpRequest theRequest,
             ILogger usingTraceWriter,

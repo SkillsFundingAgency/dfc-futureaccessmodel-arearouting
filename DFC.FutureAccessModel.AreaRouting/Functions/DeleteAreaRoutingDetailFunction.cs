@@ -30,11 +30,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <returns>the http response to the operation</returns>
         [FunctionName("DeleteAreaRoutingDetail")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.NoParentContent, ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.NoContent, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = FunctionDescription.MalformedRequest, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
-        [Display(Name = "Delete an Area Routing Detail", Description = "Ability to delete an Area Routing Detail.")]
+        [Display(Name = "Delete an Area Routing Detail by ID", Description = "Ability to delete an Area Routing Detail for the given Touchpoint.")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "areas/{touchpointID}")]HttpRequest theRequest,
             ILogger usingTraceWriter,

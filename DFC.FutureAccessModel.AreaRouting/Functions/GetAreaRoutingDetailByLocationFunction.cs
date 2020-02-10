@@ -34,7 +34,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = FunctionDescription.MalformedRequest, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
-        [Display(Name = "Get Area Routing Details By Location", Description =
+        [Display(Name = "Get an Area Routing Detail By Location", Description =
             @"Ability to return:<br />
                 a list of Touchpoint ID's<br />
                 or a singluar full area routing detail when coupled with the use of the location parameter<br />
