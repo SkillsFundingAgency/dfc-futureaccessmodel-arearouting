@@ -49,7 +49,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Get an Area Routing Detail By ID", Description = "Ability to return a Routing Detail for the given Touchpoint.")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/{touchpointID}")]HttpRequest theRequest,
+            [HttpTrigger(AuthorizationLevel.Admin, "get", Route = "areas/{touchpointID}")]HttpRequest theRequest,
             ILogger usingTraceWriter,
             string touchpointID,
             [Inject] ICreateLoggingContextScopes factory,
