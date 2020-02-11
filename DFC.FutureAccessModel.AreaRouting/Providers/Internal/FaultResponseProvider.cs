@@ -7,10 +7,21 @@ using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
+using DFC.FutureAccessModel.AreaRouting.Storage;
 using MarkEmbling.PostcodesIO.Exceptions;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
+    /// <summary>
+    /// function maps used inside the fault response provider
+    /// </summary>
+    internal sealed class FunctionMaps : Dictionary<Type, Func<Exception, HttpResponseMessage>> { }
+
+    /// <summary>
+    /// methods maps used inside the fault response provider
+    /// </summary>
+    internal sealed class MethodMaps : Dictionary<TypeofMethod, FunctionMaps> { }
+
     /// <summary>
     /// the fault response provider
     /// </summary>
@@ -20,22 +31,26 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <summary>
         /// the method action map
         /// </summary>
-        private readonly Dictionary<TypeofMethod, Dictionary<Type, Func<Exception, HttpResponseMessage>>> _methodMap = new Dictionary<TypeofMethod, Dictionary<Type, Func<Exception, HttpResponseMessage>>>();
+        private readonly MethodMaps _methodMap = new MethodMaps();
+
+        public IStoreAreaRoutingDetails Store { get; }
 
         /// <summary>
         /// initialises an instance of <see cref="FaultResponseProvider"/>
         /// </summary>
-        public FaultResponseProvider()
+        public FaultResponseProvider(IStoreAreaRoutingDetails storage)
         {
+            Store = storage;
+
             _methodMap.Add(TypeofMethod.Delete, AddDefaultFaultMap());
             _methodMap.Add(TypeofMethod.Get, AddGetFaultMap());
             _methodMap.Add(TypeofMethod.Patch, AddDefaultFaultMap());
             _methodMap.Add(TypeofMethod.Post, AddPostFaultMap());
         }
 
-        public Dictionary<Type, Func<Exception, HttpResponseMessage>> AddDefaultFaultMap()
+        public FunctionMaps AddDefaultFaultMap()
         {
-            var _faultMap = new Dictionary<Type, Func<Exception, HttpResponseMessage>>();
+            var _faultMap = new FunctionMaps();
 
             _faultMap.Add(typeof(ConflictingResourceException), Conflicted);
             _faultMap.Add(typeof(MalformedRequestException), Malformed);
@@ -52,9 +67,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             return _faultMap;
         }
 
-        public Dictionary<Type, Func<Exception, HttpResponseMessage>> AddGetFaultMap()
+        public FunctionMaps AddGetFaultMap()
         {
-            var _faultMap = new Dictionary<Type, Func<Exception, HttpResponseMessage>>();
+            var _faultMap = new FunctionMaps();
 
             _faultMap.Add(typeof(ConflictingResourceException), Conflicted);
             _faultMap.Add(typeof(MalformedRequestException), Fallback);
@@ -71,9 +86,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             return _faultMap;
         }
 
-        public Dictionary<Type, Func<Exception, HttpResponseMessage>> AddPostFaultMap()
+        public FunctionMaps AddPostFaultMap()
         {
-            var _faultMap = new Dictionary<Type, Func<Exception, HttpResponseMessage>>();
+            var _faultMap = new FunctionMaps();
 
             _faultMap.Add(typeof(ConflictingResourceException), Conflicted);
             _faultMap.Add(typeof(MalformedRequestException), Malformed);
@@ -127,20 +142,27 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         }
 
         /// <summary>
+        /// gets the latest version of the fallback values
+        /// </summary>
+        /// <returns></returns>
+        internal IRoutingDetail GetFallbackValue() =>
+            Store.Get(RoutingDetail.FallbackID).Result;
+
+        /// <summary>
         /// the fallback message
         /// </summary>
         /// <param name="theException">the exception (is ignored in here)</param>
         /// <returns>a 'fallback' message</returns>
         internal HttpResponseMessage Fallback(Exception theException) =>
-            new HttpResponseMessage(HttpStatusCode.OK)
-                .SetContent(RoutingDetail.Default);
+            CreateMessage(HttpStatusCode.OK)
+                .SetContent(GetFallbackValue());
 
         /// <summary>
         /// the malformed request action
         /// </summary>
         /// <returns>a 'bad request' message</returns>
         internal HttpResponseMessage Malformed(Exception theException) =>
-            new HttpResponseMessage(HttpStatusCode.BadRequest)
+            CreateMessage(HttpStatusCode.BadRequest)
                 .SetContent(string.Empty);
 
         /// <summary>
@@ -149,7 +171,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <param name="theException">the exception</param>
         /// <returns>a conflicted message</returns>
         internal HttpResponseMessage Conflicted(Exception theException) =>
-            new HttpResponseMessage(HttpStatusCode.Conflict)
+            CreateMessage(HttpStatusCode.Conflict)
                 .SetContent(string.Empty);
 
         /// <summary>
@@ -157,7 +179,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <returns>a 'forbidden' message</returns>
         internal HttpResponseMessage Forbidden(Exception theException) =>
-            new HttpResponseMessage(HttpStatusCode.Forbidden)
+            CreateMessage(HttpStatusCode.Forbidden)
                 .SetContent(theException.Message);
 
         /// <summary>
@@ -165,7 +187,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <returns>a 'no content' message</returns>
         internal HttpResponseMessage NoContent(Exception theException) =>
-            new HttpResponseMessage(HttpStatusCode.NoContent)
+            CreateMessage(HttpStatusCode.NoContent)
                 .SetContent(theException.Message);
 
         /// <summary>
@@ -173,7 +195,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <returns>a 'unprocessable entity' message</returns>
         internal HttpResponseMessage UnprocessableEntity(Exception theException) =>
-            new HttpResponseMessage(LocalHttpStatusCode.UnprocessableEntity.AsHttpStatusCode())
+            CreateMessage(LocalHttpStatusCode.UnprocessableEntity.AsHttpStatusCode())
                 .SetContent(theException.Message);
 
         /// <summary>
@@ -181,7 +203,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <returns>an 'unauthorised' message</returns>
         internal HttpResponseMessage Unauthorized(Exception theException) =>
-            new HttpResponseMessage(HttpStatusCode.Unauthorized)
+            CreateMessage(HttpStatusCode.Unauthorized)
                 .SetContent(string.Empty);
 
         /// <summary>
@@ -189,7 +211,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <returns>an 'internal server error' message</returns>
         internal HttpResponseMessage UnknownError(Exception theException) =>
-            new HttpResponseMessage(HttpStatusCode.InternalServerError)
+             CreateMessage(HttpStatusCode.InternalServerError)
                 .SetContent(theException?.Message ?? string.Empty);
+
+        internal HttpResponseMessage CreateMessage(HttpStatusCode forCode) =>
+            new HttpResponseMessage(forCode);
     }
 }

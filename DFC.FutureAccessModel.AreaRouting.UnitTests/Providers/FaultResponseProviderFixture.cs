@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
+using DFC.FutureAccessModel.AreaRouting.Storage;
 using MarkEmbling.PostcodesIO.Exceptions;
 using Xunit;
 
@@ -15,7 +16,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
     public sealed class FaultResponseProviderFixture :
         MoqTestingFixture
     {
-        const string fallbackContent = "{\"TouchpointID\":\"0000000999\",\"Area\":\"National Call Centre\",\"TelephoneNumber\":\"0800 123456\",\"SMSNumber\":\"\",\"EmailAddress\":\"nationalcareersservice@education.gov.uk\"}";
+        const string fallbackID = "0000000999";
+        const string fallbackArea = "National Careers Centre";
+        const string fallbackPhone = "0800 123456";
+        const string fallbackMail = "nationalcareersservice@education.gov.uk";
+        static readonly string fallbackContent = $"{{\"TouchpointID\":\"{fallbackID}\",\"Area\":\"{fallbackArea}\",\"TelephoneNumber\":\"{fallbackPhone}\",\"SMSNumber\":null,\"EmailAddress\":\"{fallbackMail}\"}}";
 
         /// <summary>
         /// the system under test supports it's service contract
@@ -36,11 +41,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         [Theory]
         [InlineData(typeof(MalformedRequestException), "")]
         [InlineData(typeof(NoContentException), "Resource does not exist")]
-        [InlineData(typeof(InvalidPostcodeException), "Invalid postcode submitted")]        
+        [InlineData(typeof(InvalidPostcodeException), "Invalid postcode submitted")]
         public async Task GetResponseForUsingFallbackMeetsExpectation(Type testException, string expectedMessage)
         {
             // arrange
             var sut = MakeSUT();
+            GetMock(sut.Store)
+                .Setup(x => x.Get(fallbackID))
+                .Returns(Task.FromResult(MakeTestFallbackItem()));
+
             var logger = MakeLoggingContext($"Exception of type '{testException.FullName}' was thrown.");
             GetMock(logger)
                 .Setup(x => x.Information(expectedMessage))
@@ -65,6 +74,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
+            GetMock(sut.Store)
+                .Setup(x => x.Get(fallbackID))
+                .Returns(Task.FromResult(MakeTestFallbackItem()));
+
             var logger = MakeLoggingContext($"Exception of type '{typeof(PostcodesIOApiException).FullName}' was thrown.");
             GetMock(logger)
                 .Setup(x => x.Information($"Exception of type '{typeof(Exception).FullName}' was thrown."))
@@ -90,6 +103,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
+            GetMock(sut.Store)
+                .Setup(x => x.Get(fallbackID))
+                .Returns(Task.FromResult(MakeTestFallbackItem()));
+
             var logger = MakeLoggingContext($"Exception of type '{typeof(PostcodesIOEmptyResponseException).FullName}' was thrown.");
             GetMock(logger)
                 .Setup(x => x.Information("No response was provided; HTTP status: 501"))
@@ -118,12 +135,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
+
+            var exception = (Exception)testException.Assembly.CreateInstance(testException.FullName);
+
             var logger = MakeLoggingContext($"Exception of type '{testException.FullName}' was thrown.");
             GetMock(logger)
                 .Setup(x => x.Information(expectedMessage))
                 .Returns(Task.CompletedTask);
-
-            var exception = (Exception)testException.Assembly.CreateInstance(testException.FullName);
 
             // act
             var result = await sut.GetResponseFor(exception, TypeofMethod.Get, logger);
@@ -146,6 +164,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
+            GetMock(sut.Store)
+                .Setup(x => x.Get(fallbackID))
+                .Returns(Task.FromResult(MakeTestFallbackItem()));
 
             var exception = (Exception)testException.Assembly.CreateInstance(testException.FullName);
 
@@ -282,6 +303,19 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         }
 
         /// <summary>
+        /// make a test fallback item
+        /// </summary>
+        /// <returns>a routing detail</returns>
+        internal IRoutingDetail MakeTestFallbackItem() =>
+            new RoutingDetail
+            {
+                TouchpointID = fallbackID,
+                Area = fallbackArea,
+                EmailAddress = fallbackMail,
+                TelephoneNumber = fallbackPhone
+            };
+
+        /// <summary>
         /// make scope logging context 
         /// </summary>
         /// <param name="itemBeingRecorded"></param>
@@ -301,6 +335,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <returns>the system under test</returns>
         internal FaultResponseProvider MakeSUT() =>
-            new FaultResponseProvider();
+            new FaultResponseProvider(MakeStrictMock<IStoreAreaRoutingDetails>());
     }
 }
