@@ -165,7 +165,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             GetMock(sut.Client).VerifyAll();
         }
 
-
         /// <summary>
         /// make document path for key value and collection meets expectation
         /// </summary>

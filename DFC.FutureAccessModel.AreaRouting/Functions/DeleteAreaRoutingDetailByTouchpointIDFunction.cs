@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
-    public static class DeleteAreaRoutingDetailFunction
+    public static class DeleteAreaRoutingDetailByTouchpointIDFunction
     {
         /// <summary>
         /// run...

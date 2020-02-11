@@ -365,11 +365,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// process get document error handler throws malformed request exception for null incoming exception
+        /// process document error handler throws malformed request exception for null incoming exception
         /// </summary>
         /// <returns>the currently running (test) task</returns>
         [Fact]
-        public async Task ProcessGetDocumentErrorHandlerThrowsMalformedRequestForIncomingNull()
+        public async Task ProcessDocumentErrorHandlerThrowsMalformedRequestForIncomingNull()
         {
             // arrange
             var sut = MakeSUT();
@@ -379,7 +379,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// process get document error handler meets expectation
+        /// process document error handler meets expectation
         /// </summary>
         /// <param name="httpCode">the http code</param>
         /// <param name="expectedException">the expected exception</param>
@@ -387,7 +387,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         [Theory]
         [InlineData(HttpStatusCode.NotFound, typeof(NoContentException))]
         [InlineData(HttpStatusCode.TooManyRequests, typeof(MalformedRequestException))]
-        public async Task ProcessGetDocumentErrorHandlerMeetsExpectation(HttpStatusCode httpCode, Type expectedException)
+        public async Task ProcessDocumentErrorHandlerMeetsExpectation(HttpStatusCode httpCode, Type expectedException)
         {
             // arrange
             var sut = MakeSUT();
@@ -398,12 +398,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// process get document error handler with null http status code
+        /// process document error handler with null http status code
         /// this shouldn't happen and is the test in place only for code coverage
         /// </summary>
         /// <returns>the currently running (test) task</returns>
         [Fact]
-        public async Task ProcessGetDocumentErrorHandlerWithNullHttpStatusCode()
+        public async Task ProcessDocumentErrorHandlerWithNullHttpStatusCode()
         {
             // arrange
             var sut = MakeSUT();
