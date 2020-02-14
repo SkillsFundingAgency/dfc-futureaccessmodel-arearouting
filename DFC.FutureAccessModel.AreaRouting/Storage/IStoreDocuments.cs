@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Registration;
 
@@ -47,5 +48,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage
         /// <param name="andPartitionKey">and partition key</param>
         /// <returns>the currently running task</returns>
         Task DeleteDocument(Uri usingStoragePath, string andPartitionKey);
+
+        /// <summary>
+        /// creat document query
+        /// </summary>
+        /// <typeparam name="TReturn">for return type</typeparam>
+        /// <param name="usingCollection">using (the) collection (path)</param>
+        /// <param name="andSQLCommand">and SQL command (default: select * from c)</param>
+        /// <returns>the result of the command</returns>
+        Task<IReadOnlyCollection<TReturn>> CreateDocumentQuery<TReturn>(Uri usingCollection, string andSQLCommand = "select * from c");
     }
 }

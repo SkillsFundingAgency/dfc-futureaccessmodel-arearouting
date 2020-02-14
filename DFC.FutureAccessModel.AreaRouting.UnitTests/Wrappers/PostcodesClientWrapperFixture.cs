@@ -31,7 +31,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         public void BuildWithNullClientThrows()
         {
             // arrange / act / assert
-            Assert.Throws<ArgumentNullException>(() => new PostcodesClientWrapper(null));
+            Assert.Throws<ArgumentNullException>(() => MakeSUT(null));
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             var client = MakeStrictMock<IPostcodesIOClient>();
 
             // act
-            var sut = new PostcodesClientWrapper(client);
+            var sut = MakeSUT(client);
 
             // assert
             Assert.Equal(client, sut.Client);
@@ -53,7 +53,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// <summary>
         /// lookup async meets expectation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the currently running (test) task</returns>
         [Fact]
         public async Task LookupAsyncMeetsExpectation()
         {
@@ -75,7 +75,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// <summary>
         /// lookup outward code async meets expectation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the currently running (test) task</returns>
         [Fact]
         public async Task LookupOutwardCodeAsyncMeetsExpectation()
         {
@@ -101,7 +101,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// validate async meets expectation
         /// </summary>
         /// <param name="expectation"></param>
-        /// <returns></returns>
+        /// <returns>the currently running (test) task</returns>
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
@@ -127,6 +127,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// </summary>
         /// <returns>a system under test</returns>
         internal PostcodesClientWrapper MakeSUT() =>
-            new PostcodesClientWrapper(MakeStrictMock<IPostcodesIOClient>());
+            MakeSUT(MakeStrictMock<IPostcodesIOClient>());
+
+        /// <summary>
+        /// make a 'system under test'
+        /// </summary>
+        /// <returns>a system under test</returns>
+        internal PostcodesClientWrapper MakeSUT(IPostcodesIOClient client) =>
+            new PostcodesClientWrapper(client);
     }
 }

@@ -8,7 +8,6 @@ using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Storage;
-using MarkEmbling.PostcodesIO.Exceptions;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
@@ -20,7 +19,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
     /// <summary>
     /// methods maps used inside the fault response provider
     /// </summary>
-    internal sealed class MethodMaps : Dictionary<TypeofMethod, FunctionMaps> { }
+    internal sealed class MethodMaps : Dictionary<TypeOfFunction, FunctionMaps> { }
 
     /// <summary>
     /// the fault response provider
@@ -38,55 +37,103 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <summary>
         /// initialises an instance of <see cref="FaultResponseProvider"/>
         /// </summary>
-        public FaultResponseProvider(IStoreAreaRoutingDetails storage)
+        /// <param name="store">the routing detail 'fallback' store</param>
+        public FaultResponseProvider(IStoreAreaRoutingDetails store)
         {
-            Store = storage;
+            It.IsNull(store)
+                .AsGuard<ArgumentNullException>(nameof(store));
 
-            _methodMap.Add(TypeofMethod.Delete, AddDefaultFaultMap());
-            _methodMap.Add(TypeofMethod.Get, AddGetFaultMap());
-            _methodMap.Add(TypeofMethod.Patch, AddDefaultFaultMap());
-            _methodMap.Add(TypeofMethod.Post, AddPostFaultMap());
+            Store = store;
+
+            _methodMap.Add(TypeOfFunction.GetByLocation, GetByLocationFaultMap());
+            _methodMap.Add(TypeOfFunction.GetByID, GetByIDFaultMap());
+            _methodMap.Add(TypeOfFunction.GetAll, GetAllFaultMap());
+            _methodMap.Add(TypeOfFunction.Delete, DeleteFaultMap());
+            _methodMap.Add(TypeOfFunction.Post, PostFaultMap());
         }
 
-        public FunctionMaps AddDefaultFaultMap()
+        /// <summary>
+        /// get's the 'by location' fault map
+        /// </summary>
+        /// <returns>a function map</returns>
+        public FunctionMaps GetByLocationFaultMap()
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(ConflictingResourceException), Conflicted);
-            _faultMap.Add(typeof(MalformedRequestException), Malformed);
-            _faultMap.Add(typeof(NoContentException), NoContent);
-            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
-            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
-            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
-
-            _faultMap.Add(typeof(PostcodesIOApiException), Malformed);
-            _faultMap.Add(typeof(PostcodesIOEmptyResponseException), Malformed);
-            _faultMap.Add(typeof(InvalidPostcodeException), Malformed);
-            _faultMap.Add(typeof(FallbackActionException), UnknownError);
-
-            return _faultMap;
-        }
-
-        public FunctionMaps AddGetFaultMap()
-        {
-            var _faultMap = new FunctionMaps();
-
-            _faultMap.Add(typeof(ConflictingResourceException), Conflicted);
             _faultMap.Add(typeof(MalformedRequestException), Fallback);
             _faultMap.Add(typeof(NoContentException), Fallback);
             _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
             _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
             _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
 
-            _faultMap.Add(typeof(PostcodesIOApiException), Fallback);
-            _faultMap.Add(typeof(PostcodesIOEmptyResponseException), Fallback);
             _faultMap.Add(typeof(InvalidPostcodeException), Fallback);
             _faultMap.Add(typeof(FallbackActionException), Fallback);
 
             return _faultMap;
         }
 
-        public FunctionMaps AddPostFaultMap()
+        /// <summary>
+        /// get's the 'by id' fault map
+        /// </summary>
+        /// <returns>a function map</returns>
+        public FunctionMaps GetByIDFaultMap()
+        {
+            var _faultMap = new FunctionMaps();
+
+            _faultMap.Add(typeof(MalformedRequestException), Malformed);
+            _faultMap.Add(typeof(NoContentException), NoContent);
+            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
+            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
+            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
+
+            _faultMap.Add(typeof(FallbackActionException), NoContent);
+
+            return _faultMap;
+        }
+
+        /// <summary>
+        /// get's the 'all id's' fault map
+        /// </summary>
+        /// <returns>a function map</returns>
+        public FunctionMaps GetAllFaultMap()
+        {
+            var _faultMap = new FunctionMaps();
+
+            _faultMap.Add(typeof(MalformedRequestException), Malformed);
+            _faultMap.Add(typeof(NoContentException), NoContent);
+            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
+            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
+            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
+
+            _faultMap.Add(typeof(FallbackActionException), CollectionFallback);
+
+            return _faultMap;
+        }
+
+        /// <summary>
+        /// the 'delete' fault map
+        /// </summary>
+        /// <returns>a function map</returns>
+        public FunctionMaps DeleteFaultMap()
+        {
+            var _faultMap = new FunctionMaps();
+
+            _faultMap.Add(typeof(MalformedRequestException), Malformed);
+            _faultMap.Add(typeof(NoContentException), NoContent);
+            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
+            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
+            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
+
+            _faultMap.Add(typeof(FallbackActionException), UnknownError);
+
+            return _faultMap;
+        }
+
+        /// <summary>
+        /// the 'post' fault map
+        /// </summary>
+        /// <returns>a function map</returns>
+        public FunctionMaps PostFaultMap()
         {
             var _faultMap = new FunctionMaps();
 
@@ -97,9 +144,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
             _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
 
-            _faultMap.Add(typeof(PostcodesIOApiException), NoContent);
-            _faultMap.Add(typeof(PostcodesIOEmptyResponseException), NoContent);
-            _faultMap.Add(typeof(InvalidPostcodeException), NoContent);
             _faultMap.Add(typeof(FallbackActionException), UnknownError);
 
             return _faultMap;
@@ -112,7 +156,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <param name="theMethod">the type of method</param>
         /// <param name="useLoggingScope">use (the) logging scope</param>
         /// <returns>the currently running task containing the http response message</returns>
-        public async Task<HttpResponseMessage> GetResponseFor(Exception theException, TypeofMethod theMethod, IScopeLoggingContext useLoggingScope)
+        public async Task<HttpResponseMessage> GetResponseFor(Exception theException, TypeOfFunction theMethod, IScopeLoggingContext useLoggingScope)
         {
             if (_methodMap[theMethod].ContainsKey(theException.GetType()))
             {
@@ -126,11 +170,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         }
 
         /// <summary>
-        /// infomr on...
+        /// inform on...
         /// </summary>
         /// <param name="theException">the exception</param>
         /// <param name="useLoggingScope">using (the) logging scope</param>
-        /// <returns></returns>
+        /// <returns>the currently running task</returns>
         internal async Task InformOn(Exception theException, IScopeLoggingContext useLoggingScope)
         {
             await useLoggingScope.Information(theException.Message);
@@ -156,6 +200,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         internal HttpResponseMessage Fallback(Exception theException) =>
             CreateMessage(HttpStatusCode.OK)
                 .SetContent(GetFallbackValue());
+
+        /// <summary>
+        /// the collection fallback ??
+        /// </summary>
+        /// <param name="theException">the exception (is ignored in here)</param>
+        /// <returns>a 'collection fallback' message</returns>
+        internal HttpResponseMessage CollectionFallback(Exception theException) =>
+            CreateMessage(HttpStatusCode.OK)
+                .SetContent("{ [ ] }");
 
         /// <summary>
         /// the malformed request action
@@ -214,6 +267,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
              CreateMessage(HttpStatusCode.InternalServerError)
                 .SetContent(theException?.Message ?? string.Empty);
 
+        /// <summary>
+        /// create's the base http response message
+        /// </summary>
+        /// <param name="forCode">for (the given) coe</param>
+        /// <returns>a http response message</returns>
         internal HttpResponseMessage CreateMessage(HttpStatusCode forCode) =>
             new HttpResponseMessage(forCode);
     }

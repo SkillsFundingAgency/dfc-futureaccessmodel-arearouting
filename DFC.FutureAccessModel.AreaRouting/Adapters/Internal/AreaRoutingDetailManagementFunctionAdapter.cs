@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -95,11 +94,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="theTouchpointID">the touchpoint id</param>
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        [ExcludeFromCodeCoverage]
         public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inScope) =>
-            await SafeOperations.Try(
-                () => ProcessGetAreaRoutingDetailFor(theTouchpointID, inScope),
-                x => Faults.GetResponseFor(x, TypeofMethod.Get, inScope));
+            await SafeOperations.Try(() => ProcessGetAreaRoutingDetailFor(theTouchpointID, inScope), x => Faults.GetResponseFor(x, TypeOfFunction.GetByID, inScope));
 
         /// <summary>
         /// process, get (the) area routing detail for...
@@ -143,11 +139,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="theLocation">the location</param>
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        [ExcludeFromCodeCoverage]
         public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inScope) =>
-            await SafeOperations.Try(
-                () => ProcessGetAreaRoutingDetailBy(theLocation, inScope),
-                x => Faults.GetResponseFor(x, TypeofMethod.Get, inScope));
+            await SafeOperations.Try(() => ProcessGetAreaRoutingDetailBy(theLocation, inScope), x => Faults.GetResponseFor(x, TypeOfFunction.GetByLocation, inScope));
 
         /// <summary>
         /// process, get (the) area routing detail by...
@@ -188,13 +181,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="usingContent">using content</param>
         /// <param name="inScope">in scope</param>
         /// <returns>the result of the operation</returns>
-        [ExcludeFromCodeCoverage]
-        public async Task<HttpResponseMessage> AddAreaRoutingDetailUsing(
-            string theContent,
-            IScopeLoggingContext inScope) =>
-            await SafeOperations.Try(
-                () => ProcessAddAreaRoutingDetailUsing(theContent, inScope),
-                x => Faults.GetResponseFor(x, TypeofMethod.Post, inScope));
+        public async Task<HttpResponseMessage> AddAreaRoutingDetailUsing(string theContent, IScopeLoggingContext inScope) =>
+            await SafeOperations.Try(() => ProcessAddAreaRoutingDetailUsing(theContent, inScope), x => Faults.GetResponseFor(x, TypeOfFunction.Post, inScope));
 
         /// <summary>
         /// process, add new area routing detail
@@ -240,9 +228,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
         public async Task<HttpResponseMessage> GetAllRouteIDs(IScopeLoggingContext inScope) =>
-            await SafeOperations.Try(
-                () => ProcessGetAllRouteIDs(inScope),
-                x => Faults.GetResponseFor(x, TypeofMethod.Get, inScope));
+            await SafeOperations.Try(() => ProcessGetAllRouteIDs(inScope), x => Faults.GetResponseFor(x, TypeOfFunction.GetAll, inScope));
 
         /// <summary>
         /// process, get all route id's
@@ -255,11 +241,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
             await inScope.Information("seeking all routing ids");
 
-            var result = await RoutingDetails.GetAll();
+            var result = await RoutingDetails.GetAllIDs();
 
             await inScope.Information($"found {result.Count} record(s)...");
 
-            var theCandidate = $"{{ [{string.Join(", ", result.Select(x => $"\"{x.TouchpointID}\""))}] }}";
+            var theCandidate = $"{{ [{string.Join(", ", result.Select(x => $"\"{x}\""))}] }}";
 
             await inScope.Information($"candidate content: '{theCandidate}'");
 
@@ -281,9 +267,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
         public async Task<HttpResponseMessage> DeleteAreaRoutingDetailUsing(string theTouchpointID, IScopeLoggingContext inScope) =>
-            await SafeOperations.Try(
-                () => ProcessDeleteAreaRoutingDetailUsing(theTouchpointID, inScope),
-                x => Faults.GetResponseFor(x, TypeofMethod.Delete, inScope));
+            await SafeOperations.Try(() => ProcessDeleteAreaRoutingDetailUsing(theTouchpointID, inScope), x => Faults.GetResponseFor(x, TypeOfFunction.Delete, inScope));
 
         /// <summary>
         /// process, delete an area routing detail using...

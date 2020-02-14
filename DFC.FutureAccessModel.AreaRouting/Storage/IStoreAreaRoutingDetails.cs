@@ -19,10 +19,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage
         Task<IRoutingDetail> Get(string theTouchpoint);
 
         /// <summary>
-        /// get all routing details
+        /// get all routing detail id's
         /// </summary>
-        /// <returns>return the full list of routing details</returns>
-        Task<IReadOnlyCollection<IRoutingDetail>> GetAll();
+        /// <returns>the full list of routing detail id's</returns>
+        Task<IReadOnlyCollection<string>> GetAllIDs();
 
         /// <summary>
         /// add...

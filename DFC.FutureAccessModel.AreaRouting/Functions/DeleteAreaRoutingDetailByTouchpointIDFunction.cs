@@ -1,12 +1,9 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DFC.Functions.DI.Standard.Attributes;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
-using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
@@ -17,16 +14,34 @@ using Microsoft.Extensions.Logging;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
-    public static class DeleteAreaRoutingDetailByTouchpointIDFunction
+    /// <summary>
+    /// the delete area rouing detail by touchpoint id function
+    /// </summary>
+    public sealed class DeleteAreaRoutingDetailByTouchpointIDFunction :
+        AreaRoutingDetailFunction
     {
+        /// <summary>
+        /// initialises an instance of the <see cref="DeleteAreaRoutingDetailByTouchpointIDFunction"/>
+        /// </summary>
+        /// <param name="factory">the logging scope factory</param>
+        /// <param name="adapter">the area routing detail management function adapter</param>
+        public DeleteAreaRoutingDetailByTouchpointIDFunction(ICreateLoggingContextScopes factory, IManageAreaRoutingDetails adapter) : base(factory, adapter) { }
+
+        /// <summary>
+        /// delete an area routing detail using...
+        /// </summary>
+        /// <param name="theTouchpoint">the touchpoint (id)</param>
+        /// <param name="inScope">in scope</param>
+        /// <returns></returns>
+        public async Task<HttpResponseMessage> DeleteAreaRoutingDetailUsing(string theTouchpoint, IScopeLoggingContext inScope) =>
+            await Adapter.DeleteAreaRoutingDetailUsing(theTouchpoint, inScope);
+
         /// <summary>
         /// run...
         /// </summary>
         /// <param name="theRequest">the request</param>
         /// <param name="usingTraceWriter">using (the) trace writer</param>
         /// <param name="touchpointID">(the) touchpoint id</param>
-        /// <param name="factory">(the logging scope) factory</param>
-        /// <param name="adapter">(the routing details) adapter</param>
         /// <returns>the http response to the operation</returns>
         [FunctionName("DeleteAreaRoutingDetail")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
@@ -35,26 +50,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Delete an Area Routing Detail by ID", Description = "Ability to delete an Area Routing Detail for the given Touchpoint.")]
-        public static async Task<HttpResponseMessage> Run(
+        public async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Admin, "delete", Route = "areas/{touchpointID}")]HttpRequest theRequest,
             ILogger usingTraceWriter,
-            string touchpointID,
-            [Inject] ICreateLoggingContextScopes factory,
-            [Inject] IManageAreaRoutingDetails adapter)
-        {
-            It.IsNull(theRequest)
-                .AsGuard<ArgumentNullException>(nameof(theRequest));
-            It.IsNull(usingTraceWriter)
-                .AsGuard<ArgumentNullException>(nameof(usingTraceWriter));
-            It.IsNull(factory)
-                .AsGuard<ArgumentNullException>(nameof(factory));
-            It.IsNull(adapter)
-                .AsGuard<ArgumentNullException>(nameof(adapter));
-
-            using (var inScope = await factory.BeginScopeFor(theRequest, usingTraceWriter))
-            {
-                return await adapter.DeleteAreaRoutingDetailUsing(touchpointID, inScope);
-            }
-        }
+            string touchpointID) =>
+                await RunActionScope(theRequest, usingTraceWriter, x => DeleteAreaRoutingDetailUsing(touchpointID, x));
     }
 }

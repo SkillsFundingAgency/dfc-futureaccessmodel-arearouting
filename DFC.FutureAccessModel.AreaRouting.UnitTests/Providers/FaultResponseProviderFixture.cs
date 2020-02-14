@@ -33,6 +33,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         }
 
         /// <summary>
+        /// build with null store throws
+        /// </summary>
+        [Fact]
+        public void BuildWithNullStoreThrows()
+        {
+            // arrange / act / assert
+            Assert.Throws<ArgumentNullException>(() => MakeSUT(null));
+        }
+
+        /// <summary>
         /// get response for, using fallback, meets expectation
         /// </summary>
         /// <param name="testException">the test exception (type)</param>
@@ -58,7 +68,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var exception = (Exception)testException.Assembly.CreateInstance(testException.FullName);
 
             // act
-            var result = await sut.GetResponseFor(exception, TypeofMethod.Get, logger);
+            var result = await sut.GetResponseFor(exception, TypeOfFunction.GetByLocation, logger);
 
             // assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -78,16 +88,18 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Setup(x => x.Get(fallbackID))
                 .Returns(Task.FromResult(MakeTestFallbackItem()));
 
+            var theException = new PostcodesIOApiException(new Exception());
             var logger = MakeLoggingContext($"Exception of type '{typeof(PostcodesIOApiException).FullName}' was thrown.");
             GetMock(logger)
                 .Setup(x => x.Information($"Exception of type '{typeof(Exception).FullName}' was thrown."))
                 .Returns(Task.CompletedTask);
+
             GetMock(logger)
-                .Setup(x => x.Information("Error retrieving response. Please check inner exception for details."))
+                .Setup(x => x.ExceptionDetail(theException))
                 .Returns(Task.CompletedTask);
 
             // act
-            var result = await sut.GetResponseFor(new PostcodesIOApiException(new Exception()), TypeofMethod.Get, logger);
+            var result = await sut.GetResponseFor(theException, TypeOfFunction.GetByLocation, logger);
 
             // assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -107,13 +119,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Setup(x => x.Get(fallbackID))
                 .Returns(Task.FromResult(MakeTestFallbackItem()));
 
+            var theException = new PostcodesIOEmptyResponseException(HttpStatusCode.NotImplemented);
             var logger = MakeLoggingContext($"Exception of type '{typeof(PostcodesIOEmptyResponseException).FullName}' was thrown.");
             GetMock(logger)
-                .Setup(x => x.Information("No response was provided; HTTP status: 501"))
+                .Setup(x => x.ExceptionDetail(theException))
                 .Returns(Task.CompletedTask);
 
             // act
-            var result = await sut.GetResponseFor(new PostcodesIOEmptyResponseException(HttpStatusCode.NotImplemented), TypeofMethod.Get, logger);
+            var result = await sut.GetResponseFor(theException, TypeOfFunction.GetByLocation, logger);
 
             // assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -144,7 +157,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Returns(Task.CompletedTask);
 
             // act
-            var result = await sut.GetResponseFor(exception, TypeofMethod.Get, logger);
+            var result = await sut.GetResponseFor(exception, TypeOfFunction.GetByLocation, logger);
 
             // assert
             Assert.Equal(expectedState, result.StatusCode);
@@ -176,7 +189,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Returns(Task.CompletedTask);
 
             // act
-            var result = await sut.GetResponseFor(exception, TypeofMethod.Get, logger);
+            var result = await sut.GetResponseFor(exception, TypeOfFunction.GetByLocation, logger);
 
             // assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -335,6 +348,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <returns>the system under test</returns>
         internal FaultResponseProvider MakeSUT() =>
-            new FaultResponseProvider(MakeStrictMock<IStoreAreaRoutingDetails>());
+            MakeSUT(MakeStrictMock<IStoreAreaRoutingDetails>());
+
+        /// <summary>
+        /// make a 'system under test'
+        /// </summary>
+        /// <returns>the system under test</returns>
+        internal FaultResponseProvider MakeSUT(IStoreAreaRoutingDetails store) =>
+            new FaultResponseProvider(store);
     }
 }

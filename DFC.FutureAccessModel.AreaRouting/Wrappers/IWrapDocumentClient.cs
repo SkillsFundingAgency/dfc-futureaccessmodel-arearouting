@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents.Linq;
 
 namespace DFC.FutureAccessModel.AreaRouting.Wrappers
 {
@@ -48,5 +49,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers
         /// <param name="andPartitionKey">and partition key</param>
         /// <returns>the running task</returns>
         Task DeleteDocumentAsync(Uri usingStoragePath, string andPartitionKey);
+
+        /// <summary>
+        /// create document query...
+        /// </summary>
+        /// <typeparam name="TReturn">for return type</typeparam>
+        /// <param name="usingCollection">using (the) collection (path)</param>
+        /// <param name="andSQLCommand">and SQL command</param>
+        /// <returns>a docuement query</returns>
+        IDocumentQuery<TReturn> CreateDocumentQuery<TReturn>(Uri usingCollection, string andSQLCommand);
     }
 }

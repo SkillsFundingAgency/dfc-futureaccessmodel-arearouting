@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
@@ -78,13 +79,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// get all routing details
+        /// get all routing detail id's
         /// </summary>
-        /// <returns>return the full list of routing details</returns>
-        public async Task<IReadOnlyCollection<IRoutingDetail>> GetAll()
+        /// <returns>the full list of routing detail id's</returns>
+        public async Task<IReadOnlyCollection<string>> GetAllIDs()
         {
-            await Task.CompletedTask;
-            throw new NotSupportedException("not yet supported");
+            var result = await DocumentStore.CreateDocumentQuery<RoutingDetail>(StoragePaths.RoutingDetailCollection);
+            return result.Select(x => x.TouchpointID).AsSafeReadOnlyList();
         }
 
         /// <summary>

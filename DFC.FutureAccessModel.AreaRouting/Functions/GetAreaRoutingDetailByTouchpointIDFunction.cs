@@ -1,12 +1,9 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DFC.Functions.DI.Standard.Attributes;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
-using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
@@ -17,8 +14,25 @@ using Microsoft.Extensions.Logging;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
-    public static class GetAreaRoutingDetailByTouchpointIDFunction
+    public sealed class GetAreaRoutingDetailByTouchpointIDFunction :
+        AreaRoutingDetailFunction
     {
+        /// <summary>
+        /// initialises an instance of the <see cref="GetAreaRoutingDetailByTouchpointIDFunction"/>
+        /// </summary>
+        /// <param name="factory">the logging scope factory</param>
+        /// <param name="adapter">the area routing detail management function adapter</param>
+        public GetAreaRoutingDetailByTouchpointIDFunction(ICreateLoggingContextScopes factory, IManageAreaRoutingDetails adapter) : base(factory, adapter) { }
+
+        /// <summary>
+        /// get area routing detail for...
+        /// </summary>
+        /// <param name="theTouchpoint">the touchpoint</param>
+        /// <param name="inScope">in scope</param>
+        /// <returns>a message result</returns>
+        public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpoint, IScopeLoggingContext inScope) =>
+            await Adapter.GetAreaRoutingDetailFor(theTouchpoint, inScope);
+
         /// <summary>
         /// run...
         /// touchpoint details (2020-01-16)
@@ -37,8 +51,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="theRequest">the request</param>
         /// <param name="usingTraceWriter">using (the) trace writer</param>
         /// <param name="touchpointID">(the) touchpoint id</param>
-        /// <param name="factory">(the logging scope) factory</param>
-        /// <param name="adapter">(the routing details) adapter</param>
         /// <returns>the http response to the operation</returns>
         [FunctionName("GetAreaRoutingDetailByTouchpointID")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
@@ -48,26 +60,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Get an Area Routing Detail By ID", Description = "Ability to return a Routing Detail for the given Touchpoint.")]
-        public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Admin, "get", Route = "areas/{touchpointID}")]HttpRequest theRequest,
+        public async Task<HttpResponseMessage> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/{touchpointID}")]HttpRequest theRequest,
             ILogger usingTraceWriter,
-            string touchpointID,
-            [Inject] ICreateLoggingContextScopes factory,
-            [Inject] IManageAreaRoutingDetails adapter)
-        {
-            It.IsNull(theRequest)
-                .AsGuard<ArgumentNullException>(nameof(theRequest));
-            It.IsNull(usingTraceWriter)
-                .AsGuard<ArgumentNullException>(nameof(usingTraceWriter));
-            It.IsNull(factory)
-                .AsGuard<ArgumentNullException>(nameof(factory));
-            It.IsNull(adapter)
-                .AsGuard<ArgumentNullException>(nameof(adapter));
-
-            using (var inScope = await factory.BeginScopeFor(theRequest, usingTraceWriter))
-            {
-                return await adapter.GetAreaRoutingDetailFor(touchpointID, inScope);
-            }
-        }
+            string touchpointID) =>
+                await RunActionScope(theRequest, usingTraceWriter, x => GetAreaRoutingDetailFor(touchpointID, x));
     }
 }

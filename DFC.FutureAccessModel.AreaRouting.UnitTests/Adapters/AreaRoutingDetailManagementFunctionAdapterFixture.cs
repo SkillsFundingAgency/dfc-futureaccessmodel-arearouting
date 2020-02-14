@@ -477,6 +477,34 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         }
 
         /// <summary>
+        /// get all route ids meets verification
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task GetAllRouteIDsMeetsVerification()
+        {
+            // arrange
+            var sut = MakeSUT();
+            var scope = MakeStrictMock<IScopeLoggingContext>();
+
+            GetMock(sut.SafeOperations)
+                .Setup(x => x.Try(
+                    It.IsAny<Func<Task<HttpResponseMessage>>>(),
+                    It.IsAny<Func<Exception, Task<HttpResponseMessage>>>()))
+                .Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)));
+
+            // act
+            var result = await sut.GetAllRouteIDs(scope);
+
+            // assert
+            Assert.IsAssignableFrom<HttpResponseMessage>(result);
+            GetMock(sut.RoutingDetails).VerifyAll();
+            GetMock(sut.Respond).VerifyAll();
+            GetMock(sut.Faults).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
+        /// <summary>
         /// process, get all route ids meets verification
         /// </summary>
         /// <returns>the currently running (test) task</returns>
@@ -485,16 +513,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         {
             // arrange
             const string candidate = "{ [\"000101\", \"000102\", \"000102\"] }";
-            IRoutingDetail[] touchpoints = {
-                new RoutingDetail { TouchpointID = "000101" },
-                new RoutingDetail { TouchpointID = "000102" },
-                new RoutingDetail { TouchpointID = "000102" },
-            };
+            string[] touchpoints = { "000101", "000102", "000102" };
 
             var sut = MakeSUT();
             GetMock(sut.RoutingDetails)
-                .Setup(x => x.GetAll())
-                .Returns(Task.FromResult<IReadOnlyCollection<IRoutingDetail>>(touchpoints));
+                .Setup(x => x.GetAllIDs())
+                .Returns(Task.FromResult<IReadOnlyCollection<string>>(touchpoints));
             GetMock(sut.Respond)
                 .Setup(x => x.Ok())
                 .Returns(new HttpResponseMessage());

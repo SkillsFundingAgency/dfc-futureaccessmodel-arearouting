@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
@@ -97,17 +99,36 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// get all throws not supported, until the code is completed.
+        /// get all meets expectation
         /// </summary>
         /// <returns>the currently running (test) task</returns>
         [Fact]
-        public async Task GetAllThrowsNotSupported()
+        public async Task GetAllMeetsExpectation()
         {
             // arrange
+            RoutingDetail[] touchpoints = {
+                new RoutingDetail { TouchpointID = "000101" },
+                new RoutingDetail { TouchpointID = "000102" },
+                new RoutingDetail { TouchpointID = "000103" }
+            };
+
+            var collectionPath = new Uri("dbs/cosmicThingy/colls/collectionThingy", UriKind.Relative);
+
             var sut = MakeSUT();
 
-            // act / assert
-            await Assert.ThrowsAsync<NotSupportedException>(() => sut.GetAll());
+            GetMock(sut.StoragePaths)
+                .SetupGet(x => x.RoutingDetailCollection)
+                .Returns(collectionPath);
+            GetMock(sut.DocumentStore)
+                .Setup(x => x.CreateDocumentQuery<RoutingDetail>(collectionPath, "select * from c"))
+                .Returns(Task.FromResult<IReadOnlyCollection<RoutingDetail>>(touchpoints));
+
+            // act
+            var result = await sut.GetAllIDs();
+
+            // assert
+            Assert.Equal(3, result.Count);
+            Assert.Contains(result, x => touchpoints.Any(y => y.TouchpointID == x));
         }
 
         /// <summary>

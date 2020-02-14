@@ -56,29 +56,26 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         }
 
         /// <summary>
-        /// the api definition run routine throws with a null http request
+        /// build with null generator throws
+        /// </summary>
+        [Fact]
+        public void BuildWithNullDocumentGeneratorThrows()
+        {
+            // arrange / act / assert
+            Assert.Throws<ArgumentNullException>(() => MakeSUT(null));
+        }
+
+        /// <summary>
+        /// run with null request throws
         /// </summary>
         [Fact]
         public async Task RunWithNullRequestThrows()
         {
             // arrange
-            var generator = MakeStrictMock<ISwaggerDocumentGenerator>();
+            var sut = MakeSUT();
 
             // act / assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => ApiDefinitionFunction.Run(null, generator));
-        }
-
-        /// <summary>
-        /// the api definition run routine throws with a null document generator
-        /// </summary>
-        [Fact]
-        public async Task RunWithNullDocumentGeneratorThrows()
-        {
-            // arrange
-            var request = MakeStrictMock<HttpRequest>();
-
-            // act / assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => ApiDefinitionFunction.Run(request, null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.Run(null));
         }
 
         /// <summary>
@@ -91,10 +88,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
 
             // arrange
             var request = MakeStrictMock<HttpRequest>();
-            var generator = MakeStrictMock<ISwaggerDocumentGenerator>();
+
+            var sut = MakeSUT();
 
             // the mock expects the defaults to be sent in on optional values
-            GetMock(generator)
+            GetMock(sut.Generator)
                 .Setup(x => x.GenerateSwaggerDocument(
                     request,
                     ApiDefinitionFunction.ApiTitle,
@@ -108,12 +106,32 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
                 .Returns(documentContent);
 
             // act
-            var result = await ApiDefinitionFunction.Run(request, generator);
+            var result = await sut.Run(request);
 
             // assert
             Assert.IsAssignableFrom<HttpResponseMessage>(result);
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
             Assert.Equal(documentContent, await result.Content.ReadAsStringAsync());
         }
+
+
+        /// <summary>
+        /// make (a) 'system under test'
+        /// </summary>
+        /// <returns>the system under test</returns>
+        internal ApiDefinitionFunction MakeSUT()
+        {
+            var generator = MakeStrictMock<ISwaggerDocumentGenerator>();
+
+            return MakeSUT(generator);
+        }
+
+        /// <summary>
+        /// make (a) 'system under test'
+        /// </summary>
+        /// <param name="generator">the document generator</param>
+        /// <returns>the system under test</returns>
+        internal ApiDefinitionFunction MakeSUT(ISwaggerDocumentGenerator generator) =>
+            new ApiDefinitionFunction(generator);
     }
 }

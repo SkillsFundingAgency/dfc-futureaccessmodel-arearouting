@@ -17,6 +17,34 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         MoqTestingFixture
     {
         /// <summary>
+        /// run with null factory throws
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public void RunWithNullFactoryThrows()
+        {
+            // arrange
+            var adapter = MakeStrictMock<IManageAreaRoutingDetails>();
+
+            // act / assert
+            Assert.Throws<ArgumentNullException>(() => MakeSUT(null, adapter));
+        }
+
+        /// <summary>
+        /// run with null adapter throws
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public void RunWithNullAdapterThrows()
+        {
+            // arrange
+            var factory = MakeStrictMock<ICreateLoggingContextScopes>();
+
+            // act / assert
+            Assert.Throws<ArgumentNullException>(() => MakeSUT(factory, null));
+        }
+
+        /// <summary>
         /// run with null request throws
         /// </summary>
         /// <returns>the currently running (test) task</returns>
@@ -24,12 +52,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         public async Task RunWithNullRequestThrows()
         {
             // arrange
+            var sut = MakeSUT();
             var trace = MakeStrictMock<ILogger>();
-            var factory = MakeStrictMock<ICreateLoggingContextScopes>();
-            var adapter = MakeStrictMock<IManageAreaRoutingDetails>();
 
             // act / assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => GetAreaRoutingDetailByTouchpointIDFunction.Run(null, trace, "", factory, adapter));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.Run(null, trace, ""));
         }
 
         /// <summary>
@@ -40,44 +67,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         public async Task RunWithNullTraceThrows()
         {
             // arrange
+            var sut = MakeSUT();
             var request = MakeStrictMock<HttpRequest>();
-            var factory = MakeStrictMock<ICreateLoggingContextScopes>();
-            var adapter = MakeStrictMock<IManageAreaRoutingDetails>();
 
             // act / assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => GetAreaRoutingDetailByTouchpointIDFunction.Run(request, null, "", factory, adapter));
-        }
-
-        /// <summary>
-        /// run with null factory throws
-        /// </summary>
-        /// <returns>the currently running (test) task</returns>
-        [Fact]
-        public async Task RunWithNullFactoryThrows()
-        {
-            // arrange
-            var request = MakeStrictMock<HttpRequest>();
-            var trace = MakeStrictMock<ILogger>();
-            var adapter = MakeStrictMock<IManageAreaRoutingDetails>();
-
-            // act / assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => GetAreaRoutingDetailByTouchpointIDFunction.Run(request, trace, "", null, adapter));
-        }
-
-        /// <summary>
-        /// run with null adapter throws
-        /// </summary>
-        /// <returns>the currently running (test) task</returns>
-        [Fact]
-        public async Task RunWithNullAdapterThrows()
-        {
-            // arrange
-            var request = MakeStrictMock<HttpRequest>();
-            var trace = MakeStrictMock<ILogger>();
-            var factory = MakeStrictMock<ICreateLoggingContextScopes>();
-
-            // act / assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => GetAreaRoutingDetailByTouchpointIDFunction.Run(request, trace, "", factory, null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.Run(request, null, ""));
         }
 
         /// <summary>
@@ -86,30 +80,51 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Fact]
         public async Task RunMeetsExpectation()
         {
-            const string location = "any old touchpoint";
-
             // arrange
+            const string theTouchpoint = "any old touchpoint";
+
             var request = MakeStrictMock<HttpRequest>();
             var trace = MakeStrictMock<ILogger>();
             var scope = MakeStrictMock<IScopeLoggingContext>();
             GetMock(scope)
                 .Setup(x => x.Dispose());
 
-            var factory = MakeStrictMock<ICreateLoggingContextScopes>();
-            GetMock(factory)
-                .Setup(x => x.BeginScopeFor(request, trace, "Run"))
+            var sut = MakeSUT();
+            GetMock(sut.Factory)
+                .Setup(x => x.BeginScopeFor(request, trace, "RunActionScope"))
                 .Returns(Task.FromResult(scope));
-
-            var adapter = MakeStrictMock<IManageAreaRoutingDetails>();
-            GetMock(adapter)
-                .Setup(x => x.GetAreaRoutingDetailFor(location, scope))
+            GetMock(sut.Adapter)
+                .Setup(x => x.GetAreaRoutingDetailFor(theTouchpoint, scope))
                 .Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)));
 
             // act
-            var result = await GetAreaRoutingDetailByTouchpointIDFunction.Run(request, trace, location, factory, adapter);
+            var result = await sut.Run(request, trace, theTouchpoint);
 
             // assert
             Assert.IsAssignableFrom<HttpResponseMessage>(result);
         }
+
+        /// <summary>
+        /// make (a) 'system under test'
+        /// </summary>
+        /// <returns>the system under test</returns>
+        internal GetAreaRoutingDetailByTouchpointIDFunction MakeSUT()
+        {
+            var factory = MakeStrictMock<ICreateLoggingContextScopes>();
+            var adapter = MakeStrictMock<IManageAreaRoutingDetails>();
+
+            return MakeSUT(factory, adapter);
+        }
+
+        /// <summary>
+        /// make (a) 'system under test'
+        /// </summary>
+        /// <param name="factory">the logging scope factory</param>
+        /// <param name="adapter">the area routing management function adapter</param>
+        /// <returns>the system under test</returns>
+        internal GetAreaRoutingDetailByTouchpointIDFunction MakeSUT(
+            ICreateLoggingContextScopes factory,
+            IManageAreaRoutingDetails adapter) =>
+                new GetAreaRoutingDetailByTouchpointIDFunction(factory, adapter);
     }
 }

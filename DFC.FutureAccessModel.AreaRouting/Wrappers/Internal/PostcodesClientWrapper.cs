@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using MarkEmbling.PostcodesIO;
@@ -22,10 +21,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// <summary>
         /// initialises an instance of the <see cref="PostcodesClientWrapper"/>
         /// </summary>
-        [ExcludeFromCodeCoverage]
-        public PostcodesClientWrapper() :
-            this(new PostcodesIOClient())
-        { }
+        public PostcodesClientWrapper() : this(new PostcodesIOClient()) { }
 
         /// <summary>
         /// initialises an instance of the <see cref="PostcodesClientWrapper"/>

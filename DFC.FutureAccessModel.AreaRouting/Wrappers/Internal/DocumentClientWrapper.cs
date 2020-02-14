@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -8,6 +7,7 @@ using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 
 namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
 {
@@ -27,7 +27,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// </summary>
         /// <param name="forEndpoint">for end point</param>
         /// <param name="usingAccountKey">using account key</param>
-        [ExcludeFromCodeCoverage]
         public DocumentClientWrapper(Uri forEndpoint, string usingAccountKey) :
             this(new DocumentClient(forEndpoint, usingAccountKey))
         { }
@@ -101,6 +100,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             await Client.DeleteDocumentAsync(usingStoragePath, GetRequestOptions(andPartitionKey));
 
         /// <summary>
+        /// create document query...
+        /// </summary>
+        /// <typeparam name="TReturn">for return type</typeparam>
+        /// <param name="usingCollection">using (the) collection (path)</param>
+        /// <param name="andSQLCommand">and SQL command</param>
+        /// <returns>a docuement query</returns>
+        public IDocumentQuery<TReturn> CreateDocumentQuery<TReturn>(Uri usingCollection, string andSQLCommand) =>
+            Client.CreateDocumentQuery<TReturn>(usingCollection, andSQLCommand, GetDefaultFeedOptions()).AsDocumentQuery();
+
+        /// <summary>
         /// get (the) property details for...
         /// </summary>
         /// <typeparam name="TResource">the type of resource</typeparam>
@@ -116,6 +125,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
                 .GetProperties()
                 .FirstOrDefault(x => x.GetCustomAttribute<TAttribute>() != null);
         }
+
+        /// <summary>
+        /// get the default document query feed options
+        /// </summary>
+        /// <returns>a new set of default feed options</returns>
+        internal FeedOptions GetDefaultFeedOptions() =>
+            new FeedOptions
+            {
+                EnableCrossPartitionQuery = true
+            };
 
         /// <summary>
         /// get's the partition key from the item
@@ -136,10 +155,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// <typeparam name="TDocument">the document type</typeparam>
         /// <returns>the request options with the partition key info</returns>
         internal RequestOptions GetRequestOptions(string partitionKey) =>
-        new RequestOptions
-        {
-            PartitionKey = new PartitionKey(partitionKey), 
-        };
+            new RequestOptions
+            {
+                PartitionKey = new PartitionKey(partitionKey),
+            };
 
         /// <summary>
         /// make resource path

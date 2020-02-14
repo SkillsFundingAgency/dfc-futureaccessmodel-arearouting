@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
@@ -84,9 +85,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>true if the document exists</returns>
         public async Task<bool> DocumentExists<TDocument>(Uri usingStoragePath, string andPartitionKey)
             where TDocument : class =>
-            await SafeOperations.Try(
-                () => ProcessDocumentExists<TDocument>(usingStoragePath, andPartitionKey),
-                x => Task.FromResult(false));
+            await SafeOperations.Try(() => ProcessDocumentExists<TDocument>(usingStoragePath, andPartitionKey), x => Task.FromResult(false));
 
         /// <summary>
         /// document exists
@@ -108,9 +107,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>the currently running task</returns>
         public async Task<TDocument> AddDocument<TDocument>(TDocument theDocument, Uri usingCollectionPath)
             where TDocument : class =>
-            await SafeOperations.Try(
-                () => ProcessAddDocument(usingCollectionPath, theDocument),
-                x => ProcessDocumentErrorHandler<TDocument>(x));
+            await SafeOperations.Try(() => ProcessAddDocument(usingCollectionPath, theDocument), x => ProcessDocumentErrorHandler<TDocument>(x));
 
         /// <summary>
         /// process, add document
@@ -132,9 +129,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>the currently running task</returns>
         public async Task<TDocument> GetDocument<TDocument>(Uri usingStoragePath, string andPartitionKey)
             where TDocument : class =>
-            await SafeOperations.Try(
-                () => ProcessGetDocument<TDocument>(usingStoragePath, andPartitionKey),
-                x => ProcessDocumentErrorHandler<TDocument>(x));
+            await SafeOperations.Try(() => ProcessGetDocument<TDocument>(usingStoragePath, andPartitionKey), x => ProcessDocumentErrorHandler<TDocument>(x));
 
         /// <summary>
         /// process, get document
@@ -154,9 +149,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <param name="andPartitionKey">and partition key</param>
         /// <returns>the currently running task</returns>
         public async Task DeleteDocument(Uri usingStoragePath, string andPartitionKey) =>
-            await SafeOperations.Try(
-                () => ProcessDeleteDocument(usingStoragePath, andPartitionKey),
-                x => ProcessDocumentErrorHandler<RoutingDetail>(x));
+            await SafeOperations.Try(() => ProcessDeleteDocument(usingStoragePath, andPartitionKey), x => ProcessDocumentErrorHandler<RoutingDetail>(x));
 
         /// <summary>
         /// process, delete document...
@@ -166,6 +159,38 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>the currently running task</returns>
         internal async Task ProcessDeleteDocument(Uri usingStoragePath, string andPartitionKey) =>
             await Client.DeleteDocumentAsync(usingStoragePath, andPartitionKey);
+
+        /// <summary>
+        /// create document query...
+        /// </summary>
+        /// <typeparam name="TReturn">for return type</typeparam>
+        /// <param name="usingCollection">using (the) collection (path)</param>
+        /// <param name="andSQLCommand">and SQL command (default: select * from c)</param>
+        /// <returns>a collection containing the the result of the command</returns>
+        public async Task<IReadOnlyCollection<TReturn>> CreateDocumentQuery<TReturn>(Uri usingCollection, string andSQLCommand = "select * from c") =>
+            await SafeOperations.Try(() => ProcessCreateDocumentQuery<TReturn>(usingCollection, andSQLCommand), x => ProcessDocumentErrorHandler<IReadOnlyCollection<TReturn>>(x));
+
+        /// <summary>
+        /// process, create document query
+        /// </summary>
+        /// <typeparam name="TReturn">for return type</typeparam>
+        /// <param name="usingCollection">using (the) collection (path)</param>
+        /// <param name="andSQLCommand">and SQL command (default: select * from c)</param>
+        /// <returns>a collection containing the the result of the command</returns>
+        internal async Task<IReadOnlyCollection<TReturn>> ProcessCreateDocumentQuery<TReturn>(Uri usingCollection, string andSQLCommand)
+        {
+            var list = Collection.Empty<TReturn>();
+
+            using (var queryable = Client.CreateDocumentQuery<TReturn>(usingCollection, andSQLCommand))
+            {
+                while (queryable.HasMoreResults)
+                {
+                    await queryable.ExecuteNextAsync<TReturn>().ForEach(list.Add);
+                }
+            }
+
+            return list.AsSafeReadOnlyList();
+        }
 
         /// <summary>
         /// process, document error handler. 
@@ -203,9 +228,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 
             (HttpStatusCode.Conflict == theException.StatusCode)
                 .AsGuard<ConflictingResourceException>();
-
-            LocalHttpStatusCode.TooManyRequests.ComparesTo(theException.StatusCode)
-                .AsGuard<MalformedRequestException>();
         }
 
         /// <summary>
