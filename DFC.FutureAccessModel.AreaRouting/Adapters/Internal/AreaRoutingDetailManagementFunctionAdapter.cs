@@ -152,6 +152,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         {
             await inScope.EnterMethod();
 
+            theLocation = theLocation.Trim();
+
             It.IsEmpty(theLocation)
                 .AsGuard<MalformedRequestException>();
 
