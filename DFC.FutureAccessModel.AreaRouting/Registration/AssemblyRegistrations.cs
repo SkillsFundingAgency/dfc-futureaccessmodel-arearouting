@@ -8,6 +8,8 @@ using DFC.FutureAccessModel.AreaRouting.Providers.Internal;
 using DFC.FutureAccessModel.AreaRouting.Registration;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.FutureAccessModel.AreaRouting.Storage.Internal;
+using DFC.FutureAccessModel.AreaRouting.Validation;
+using DFC.FutureAccessModel.AreaRouting.Validation.Internal;
 using DFC.HTTP.Standard;
 using DFC.Swagger.Standard;
 using Microsoft.Azure.WebJobs.Hosting;
@@ -28,6 +30,7 @@ using Microsoft.Azure.WebJobs.Hosting;
 [assembly: InternalRegistration(typeof(ICreatePostcodeClients), typeof(PostcodeClientFactory), TypeOfRegistrationScope.Singleton)]
 [assembly: InternalRegistration(typeof(ICreateDocumentClients), typeof(DocumentClientFactory), TypeOfRegistrationScope.Singleton)]
 [assembly: InternalRegistration(typeof(ICreateLoggingContextScopes), typeof(LoggingContextScopeFactory), TypeOfRegistrationScope.Singleton)]
+[assembly: InternalRegistration(typeof(ICreateValidationMessageContent), typeof(ValidationMessageContentFactory), TypeOfRegistrationScope.Singleton)]
 
 // providers
 [assembly: InternalRegistration(typeof(IAnalyseExpresssions), typeof(ExpressionAnalyser), TypeOfRegistrationScope.Singleton)]
@@ -41,3 +44,6 @@ using Microsoft.Azure.WebJobs.Hosting;
 [assembly: InternalRegistration(typeof(IStoreAreaRoutingDetails), typeof(AreaRoutingDetailStore), TypeOfRegistrationScope.Singleton)]
 [assembly: InternalRegistration(typeof(IStoreLocalAuthorities), typeof(LocalAuthorityStore), TypeOfRegistrationScope.Singleton)]
 [assembly: InternalRegistration(typeof(IStoreDocuments), typeof(DocumentStore), TypeOfRegistrationScope.Singleton)]
+
+// validator
+[assembly: InternalRegistration(typeof(IValidateRoutingDetails), typeof(RoutingDetailValidator), TypeOfRegistrationScope.Singleton)]

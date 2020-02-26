@@ -20,6 +20,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers
         /// <param name="theMethod">the type of method</param>
         /// <param name="useLoggingScope">use (the) logging scope</param>
         /// <returns>the currently running task containing the http response message</returns>
-        Task<HttpResponseMessage> GetResponseFor(Exception theException, TypeofMethod theMethod, IScopeLoggingContext useLoggingScope);
+        Task<HttpResponseMessage> GetResponseFor(Exception theException, TypeOfFunction theMethod, IScopeLoggingContext useLoggingScope);
     }
 }

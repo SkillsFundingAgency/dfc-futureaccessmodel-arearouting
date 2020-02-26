@@ -141,13 +141,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             var result = await Postcode.LookupAsync(theCandidate);
 
-            It.IsEmpty(result?.Postcode)
+            It.IsNull(result)
+                .AsGuard<InvalidPostcodeException>(theCandidate);
+            It.IsEmpty(result.Postcode)
                 .AsGuard<InvalidPostcodeException>(theCandidate);
 
-            await usingScope.Information($"found postcode for '{result?.Postcode}'");
-            await usingScope.Information($"seeking local authority '{result?.Codes.AdminDistrict}'");
+            await usingScope.Information($"found postcode for '{result.Postcode}'");
+            await usingScope.Information($"seeking local authority '{result.Codes.AdminDistrict}'");
 
-            var authority = await Authority.Get(result?.Codes.AdminDistrict);
+            var authority = await Authority.Get(result.Codes.AdminDistrict);
 
             await usingScope.Information($"found local authority '{authority.LADCode}'");
             await usingScope.ExitMethod();

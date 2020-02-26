@@ -3,22 +3,27 @@
     /// <summary>
     /// the type of method will dictate the kind of response we should give
     /// </summary>
-    public enum TypeofMethod
+    public enum TypeOfFunction
     {
         /// <summary>
-        /// get
+        /// get by location
         /// </summary>
-        Get,
+        GetByLocation,
+
+        /// <summary>
+        /// get by id
+        /// </summary>
+        GetByID,
+
+        /// <summary>
+        /// get all
+        /// </summary>
+        GetAll,
 
         /// <summary>
         /// post
         /// </summary>
         Post,
-
-        /// <summary>
-        /// patch
-        /// </summary>
-        Patch,
 
         /// <summary>
         /// delete

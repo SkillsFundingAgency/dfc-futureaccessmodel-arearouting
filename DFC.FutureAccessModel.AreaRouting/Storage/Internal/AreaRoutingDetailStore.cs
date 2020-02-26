@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
@@ -74,6 +76,34 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
                 .AsGuard<ConflictingResourceException>();
 
             return await DocumentStore.AddDocument(theCandidate, StoragePaths.RoutingDetailCollection);
+        }
+
+        /// <summary>
+        /// get all routing detail id's
+        /// </summary>
+        /// <returns>the full list of routing detail id's</returns>
+        public async Task<IReadOnlyCollection<string>> GetAllIDs()
+        {
+            var result = await DocumentStore.CreateDocumentQuery<RoutingDetail>(StoragePaths.RoutingDetailCollection);
+            return result.Select(x => x.TouchpointID).AsSafeReadOnlyList();
+        }
+
+        /// <summary>
+        /// delete...
+        /// </summary>
+        /// <param name="theTouchpoint">the touchpoint (id)</param>
+        /// <returns>an area routing detail (the touchpoint)</returns>
+        public async Task Delete(string theTouchpoint)
+        {
+            It.IsEmpty(theTouchpoint)
+                .AsGuard<ArgumentNullException>(nameof(theTouchpoint));
+
+            var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
+
+            (!await DocumentStore.DocumentExists<RoutingDetail>(usingPath, _partitionKey))
+                .AsGuard<NoContentException>();
+
+            await DocumentStore.DeleteDocument(usingPath, _partitionKey);
         }
     }
 }

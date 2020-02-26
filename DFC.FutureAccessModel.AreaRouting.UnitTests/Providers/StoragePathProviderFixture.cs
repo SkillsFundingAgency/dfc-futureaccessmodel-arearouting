@@ -174,8 +174,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <param name="paths">the storage paths provider</param>
         /// <param name="store">the document store</param>
         /// <returns>the system under test</returns>
-        internal StoragePathProvider MakeSUT(
-            IProvideApplicationSettings settings) =>
+        internal StoragePathProvider MakeSUT(IProvideApplicationSettings settings) =>
             new StoragePathProvider(settings);
     }
 }

@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Helpers
 {
-    public static class CollectionHelper
+    public static class Collection
     {
+        /// <summary>
+        /// empty (collection)
+        /// </summary>
+        /// <typeparam name="T">of type <typeparamref name="T"/></typeparam>
+        /// <returns>an empy collection</returns>
+        public static ICollection<T> Empty<T>() =>
+            new List<T>();
+
         /// <summary>
         /// For each, to safe list and conducts the action
         /// </summary>

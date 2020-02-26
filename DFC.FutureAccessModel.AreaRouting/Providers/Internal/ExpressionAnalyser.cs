@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using DFC.FutureAccessModel.AreaRouting.Models;
+using DFC.FutureAccessModel.AreaRouting.Validation;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
@@ -22,7 +23,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <summary>
         /// location reg
         /// </summary>
-        private readonly Regex locationReg = new Regex(ValidationExpressions.StandardText);
+        private readonly Regex locationReg = new Regex(ValidationExpressions.TownOrRegion);
 
         /// <summary>
         /// get type of expression for...
@@ -31,22 +32,33 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <returns>the expression type</returns>
         public TypeOfExpression GetTypeOfExpressionFor(string theCandidate)
         {
-            if (postcodeReg.Match(theCandidate).Success)
+            if (Matches(postcodeReg.Match(theCandidate), theCandidate))
             {
                 return TypeOfExpression.Postcode;
             }
 
-            if (outwardReg.Match(theCandidate).Success)
+            if (Matches(outwardReg.Match(theCandidate), theCandidate))
             {
                 return TypeOfExpression.Outward;
             }
 
-            if (locationReg.Match(theCandidate).Success)
+            if (Matches(locationReg.Match(theCandidate), theCandidate))
             {
                 return TypeOfExpression.Town;
             }
 
             return TypeOfExpression.Unknown;
         }
+
+        /// <summary>
+        /// matches...
+        /// </summary>
+        /// <param name="theMatch">the match</param>
+        /// <param name="theCandidate">the candidate</param>
+        /// <returns></returns>
+        internal bool Matches(Match theMatch, string theCandidate) =>
+            theMatch.Success
+                && theMatch.Captures.Count == 1
+                && theMatch.Length == theCandidate.Length;
     }
 }

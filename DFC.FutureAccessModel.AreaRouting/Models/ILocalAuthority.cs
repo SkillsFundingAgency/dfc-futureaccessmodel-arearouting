@@ -6,14 +6,14 @@
     public interface ILocalAuthority
     {
         /// <summary>
-        /// the (authorities) touchpoint
-        /// </summary>
-        string TouchpointID { get; }
-
-        /// <summary>
         /// the local admin district code
         /// </summary>
         string LADCode { get; }
+
+        /// <summary>
+        /// the (authorities) touchpoint
+        /// </summary>
+        string TouchpointID { get; }
 
         /// <summary>
         /// the (authority) name

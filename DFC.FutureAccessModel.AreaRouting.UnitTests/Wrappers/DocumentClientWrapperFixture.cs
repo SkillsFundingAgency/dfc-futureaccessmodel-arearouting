@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using Moq;
 using Xunit;
 
@@ -28,7 +31,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         public void BuildWithNullClientThrows()
         {
             // arrange / act / assert
-            Assert.Throws<ArgumentNullException>(() => new DocumentClientWrapper(null));
+            Assert.Throws<ArgumentNullException>(() =>  MakeSUT(null));
         }
 
         /// <summary>
@@ -41,7 +44,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             var client = MakeStrictMock<IDocumentClient>();
 
             // act
-            var sut = new DocumentClientWrapper(client);
+            var sut = MakeSUT(client);
 
             // assert
             Assert.Equal(client, sut.Client);
@@ -50,7 +53,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// <summary>
         /// create document (async) meets expectation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the currently running (test) task</returns>
         [Fact]
         public async Task CreateDocumentAsyncMeetsExpectation()
         {
@@ -78,7 +81,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// <summary>
         /// document exists (async) false with null response meets expectation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the currently running (test) task</returns>
         [Fact]
         public async Task DocumentExistsAsyncFalseWithNullResponseMeetsExpectation()
         {
@@ -100,7 +103,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// <summary>
         /// document exists (async) true meets expectation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the currently running (test) task</returns>
         [Fact]
         public async Task DocumentExistsAsyncTrueMeetsExpectation()
         {
@@ -122,7 +125,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// <summary>
         /// read document (async) with valid URI meets expectation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the currently running (test) task</returns>
         [Fact]
         public async Task ReadDocumentAsyncWithValidURIMeetsExpectation()
         {
@@ -143,6 +146,52 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         }
 
         /// <summary>
+        /// delete document with valid uri meets verfication
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task DeleteDocumentAsyncWithValidURIMeetsVerification()
+        {
+            // arrange
+            var sut = MakeSUT();
+            var documentUri = new Uri("dbs/areas/colls/routing/docs/0000123", UriKind.Relative);
+            var document = new LocalAuthority();
+
+            GetMock(sut.Client)
+                .Setup(x => x.DeleteDocumentAsync(documentUri, It.IsAny<RequestOptions>(), default))
+                .Returns(Task.FromResult(new ResourceResponse<Document>()));
+
+            // act
+            await sut.DeleteDocumentAsync(documentUri, string.Empty);
+
+            // assert
+            GetMock(sut.Client).VerifyAll();
+        }
+
+        /// <summary>
+        /// create document query meet verification
+        /// </summary>
+        [Fact(Skip = "under consideration: can't get this work work due to casting issues inside 'as document query'")]
+        public void CreateDocumentQueryMeetsVerification()
+        {
+            // arrange
+            const string sqlCommand = "any old SQL command";
+            var collectionPath = new Uri("dbs/areas/colls/routing", UriKind.Relative);
+
+            var sut = MakeSUT();
+            GetMock(sut.Client)
+                .Setup(x => x.CreateDocumentQuery<RoutingDetail>(collectionPath, sqlCommand, It.IsAny<FeedOptions>()))
+                .Returns(new List<RoutingDetail>().AsQueryable());
+
+            // act
+            var result = sut.CreateDocumentQuery<RoutingDetail>(collectionPath, sqlCommand);
+
+            // assert
+            GetMock(sut.Client).VerifyAll();
+            Assert.IsAssignableFrom<IDocumentQuery<RoutingDetail>>(result);
+        }
+
+        /// <summary>
         /// make document path for key value and collection meets expectation
         /// </summary>
         /// <param name="keyValue"></param>
@@ -153,7 +202,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         public void MakeDocumentPathForKeyValueAndCollectionMeetsExpectation(string keyValue, string collectionPath)
         {
             // arrange
-            var document = new LocalAuthority { LADCode = keyValue };
+            var document = new RoutingDetail { TouchpointID = keyValue };
             var collectionUri = new Uri(collectionPath, UriKind.Relative);
             var documentPath = $"{collectionPath}/docs/{keyValue}";
 
@@ -171,6 +220,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         /// </summary>
         /// <returns>a system under test</returns>
         internal DocumentClientWrapper MakeSUT() =>
-            new DocumentClientWrapper(MakeStrictMock<IDocumentClient>());
+            MakeSUT(MakeStrictMock<IDocumentClient>());
+
+        /// <summary>
+        /// make a 'system under test'
+        /// </summary>
+        /// <returns>a system under test</returns>
+        internal DocumentClientWrapper MakeSUT(IDocumentClient client) =>
+            new DocumentClientWrapper(client);
     }
 }

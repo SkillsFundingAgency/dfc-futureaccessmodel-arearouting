@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
@@ -8,6 +12,8 @@ using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
 using DFC.FutureAccessModel.AreaRouting.Wrappers;
 using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using Moq;
 using Xunit;
 
@@ -173,8 +179,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public async Task DocumentExistsMeetsExpectation(bool expectation)
         {
             // arrange
-            var sut = MakeSUT();
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
+
+            var sut = MakeSUT();
 
             GetMock(sut.SafeOperations)
                 .Setup(x => x.Try(It.IsAny<Func<Task<bool>>>(), It.IsAny<Func<Exception, Task<bool>>>()))
@@ -201,8 +208,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         {
             // arrange
             const string pKey = "any old partition key";
-            var sut = MakeSUT();
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
+
+            var sut = MakeSUT();
 
             GetMock(sut.Client)
                 .Setup(x => x.DocumentExistsAsync<RoutingDetail>(testPath, pKey))
@@ -226,9 +234,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public async Task AddDocumentMeetsVerification()
         {
             // arrange
-            var sut = MakeSUT();
             var modelItem = new RoutingDetail();
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
+
+            var sut = MakeSUT();
 
             GetMock(sut.SafeOperations)
                 .Setup(x => x.Try(It.IsAny<Func<Task<RoutingDetail>>>(), It.IsAny<Func<Exception, Task<RoutingDetail>>>()))
@@ -250,9 +259,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public async Task ProcessAddDocumentMeetsVerification()
         {
             // arrange
-            var sut = MakeSUT();
             var modelItem = new RoutingDetail();
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
+
+            var sut = MakeSUT();
 
             GetMock(sut.Client)
                 .Setup(x => x.CreateDocumentAsync(testPath, modelItem))
@@ -275,8 +285,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         {
             // arrange
             const string pKey = "any old partition key";
-            var sut = MakeSUT();
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
+
+            var sut = MakeSUT();
 
             GetMock(sut.SafeOperations)
                 .Setup(x => x.Try(It.IsAny<Func<Task<RoutingDetail>>>(), It.IsAny<Func<Exception, Task<RoutingDetail>>>()))
@@ -300,8 +311,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         {
             // arrange
             const string pKey = "any old partition key";
-            var sut = MakeSUT();
             var testPath = new Uri("http://blahStore/blahCollection/blahID");
+
+            var sut = MakeSUT();
 
             GetMock(sut.Client)
                 .Setup(x => x.ReadDocumentAsync<RoutingDetail>(testPath, pKey))
@@ -316,30 +328,137 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             Assert.IsType<RoutingDetail>(result);
         }
 
+        [Fact]
+        public async Task CreateDocumentQueryMeetsVerification()
+        {
+            // arrange
+            var testPath = new Uri("http://blahStore/blahCollection");
+
+            var sut = MakeSUT();
+
+            GetMock(sut.SafeOperations)
+                .Setup(x => x.Try(
+                    It.IsAny<Func<Task<IReadOnlyCollection<RoutingDetail>>>>(),
+                    It.IsAny<Func<Exception, Task<IReadOnlyCollection<RoutingDetail>>>>()))
+                .Returns(Task.FromResult<IReadOnlyCollection<RoutingDetail>>(new List<RoutingDetail>()));
+
+            // act
+            var result = await sut.CreateDocumentQuery<RoutingDetail>(testPath);
+
+            // assert
+            GetMock(sut.Client).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
+        [Fact]
+        public async Task ProcessCreateDocumentQueryMeetsVerification()
+        {
+            // arrange
+            const string sqlCommand = "any old SQL command";
+            var testPath = new Uri("http://blahStore/blahCollection");
+
+            var documentQuery = MakeStrictMock<IDocumentQuery<RoutingDetail>>();
+            GetMock(documentQuery)
+                .Setup(x => x.Dispose());
+            GetMock(documentQuery)
+                .Setup(x => x.HasMoreResults)
+                .ReturnsInOrder(true, false);
+            GetMock(documentQuery)
+                .Setup(x => x.ExecuteNextAsync<RoutingDetail>(CancellationToken.None))
+                .Returns(Task.FromResult(new FeedResponse<RoutingDetail>(new RoutingDetail[] { new RoutingDetail { }, new RoutingDetail { } })));
+
+            var sut = MakeSUT();
+            GetMock(sut.Client)
+                .Setup(x => x.CreateDocumentQuery<RoutingDetail>(testPath, sqlCommand))
+                .Returns(documentQuery);
+
+            // act
+            var result = await sut.ProcessCreateDocumentQuery<RoutingDetail>(testPath, sqlCommand);
+
+            // assert
+            Assert.Equal(2, result.Count);
+            GetMock(documentQuery)
+                .Verify(x => x.ExecuteNextAsync<RoutingDetail>(CancellationToken.None), Times.Exactly(1));
+            GetMock(sut.Client).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
         /// <summary>
-        /// process get document error handler throws malformed request exception for null incoming exception
+        /// delete document meets verification
         /// </summary>
         /// <returns>the currently running (test) task</returns>
         [Fact]
-        public async Task ProcessGetDocumentErrorHandlerThrowsMalformedRequestForIncomingNull()
+        public async Task DeleteDocumentMeetsVerification()
+        {
+            // arrange
+            const string pKey = "any old partition key";
+            var testPath = new Uri("http://blahStore/blahCollection/blahID");
+
+            var sut = MakeSUT();
+
+            GetMock(sut.SafeOperations)
+                .Setup(x => x.Try(It.IsAny<Func<Task>>(), It.IsAny<Func<Exception, Task>>()))
+                .Returns(Task.CompletedTask);
+
+            // act
+            await sut.DeleteDocument(testPath, pKey);
+
+            // assert
+            GetMock(sut.Client).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
+        /// <summary>
+        /// process delete document meets verification
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task ProcessDeleteDocumentMeetsVerification()
+        {
+            // arrange
+            const string pKey = "any old partition key";
+            var testPath = new Uri("http://blahStore/blahCollection/blahID");
+
+            var sut = MakeSUT();
+
+            GetMock(sut.Client)
+                .Setup(x => x.DeleteDocumentAsync(testPath, pKey))
+                .Returns(Task.CompletedTask);
+
+            // act
+            await sut.ProcessDeleteDocument(testPath, pKey);
+
+            // assert
+            GetMock(sut.Client).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
+        }
+
+        /// <summary>
+        /// process document error handler throws malformed request exception for null incoming exception
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task ProcessDocumentErrorHandlerThrowsMalformedRequestForIncomingNull()
         {
             // arrange
             var sut = MakeSUT();
 
             // act / assert
-            await Assert.ThrowsAsync<MalformedRequestException>(() => sut.ProcessDocumentErrorHandler<RoutingDetail>(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ProcessDocumentErrorHandler<RoutingDetail>(null));
         }
 
         /// <summary>
-        /// process get document error handler meets expectation
+        /// process document error handler meets expectation
         /// </summary>
         /// <param name="httpCode">the http code</param>
         /// <param name="expectedException">the expected exception</param>
         /// <returns>the currently running (test) task</returns>
         [Theory]
         [InlineData(HttpStatusCode.NotFound, typeof(NoContentException))]
-        [InlineData(HttpStatusCode.TooManyRequests, typeof(MalformedRequestException))]
-        public async Task ProcessGetDocumentErrorHandlerMeetsExpectation(HttpStatusCode httpCode, Type expectedException)
+        [InlineData(HttpStatusCode.Conflict, typeof(ConflictingResourceException))]
+        [InlineData(HttpStatusCode.TooManyRequests, typeof(DocumentClientException))]
+        [InlineData(HttpStatusCode.RequestTimeout, typeof(DocumentClientException))]
+        public async Task ProcessDocumentErrorHandlerMeetsExpectation(HttpStatusCode httpCode, Type expectedException)
         {
             // arrange
             var sut = MakeSUT();
@@ -350,12 +469,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// process get document error handler with null http status code
+        /// process document error handler with null http status code
         /// this shouldn't happen and is the test in place only for code coverage
         /// </summary>
         /// <returns>the currently running (test) task</returns>
         [Fact]
-        public async Task ProcessGetDocumentErrorHandlerWithNullHttpStatusCode()
+        public async Task ProcessDocumentErrorHandlerWithNullHttpStatusCode()
         {
             // arrange
             var sut = MakeSUT();
@@ -363,6 +482,24 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 
             // act / assert
             await Assert.ThrowsAsync<DocumentClientException>(() => sut.ProcessDocumentErrorHandler<RoutingDetail>(exception));
+        }
+
+        /// <summary>
+        /// process document client error with null passes witout event
+        /// this shouldn't happen and is the test in place only for code coverage
+        /// </summary>
+        [Fact]
+        public void ProcessDocumentClientErrorWithNullPassesWithoutEvent()
+        {
+            // arrange
+            var sut = MakeSUT();
+
+            // act
+            sut.ProcessDocumentClientError(null);
+
+            // assert
+            GetMock(sut.Client).VerifyAll();
+            GetMock(sut.SafeOperations).VerifyAll();
         }
 
         /// <summary>
