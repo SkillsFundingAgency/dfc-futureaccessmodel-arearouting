@@ -8,6 +8,7 @@ using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
 using DFC.FutureAccessModel.AreaRouting.Storage;
+using DFC.FutureAccessModel.AreaRouting.Validation;
 using DFC.HTTP.Standard;
 using Newtonsoft.Json;
 
@@ -40,6 +41,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         public IStoreAreaRoutingDetails RoutingDetails { get; }
 
         /// <summary>
+        /// i validate routing details
+        /// </summary>
+        public IValidateRoutingDetails RoutingDetail { get; }
+
+        /// <summary>
         /// i analyse expressions
         /// </summary>
         public IAnalyseExpresssions Analyser { get; }
@@ -63,6 +69,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             IProvideFaultResponses faultResponses,
             IProvideSafeOperations safeOperations,
             IStoreAreaRoutingDetails routingDetails,
+            IValidateRoutingDetails validator,
             IAnalyseExpresssions analyser,
             IProvideExpressionActions actions)
         {
@@ -74,6 +81,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .AsGuard<ArgumentNullException>(nameof(safeOperations));
             It.IsNull(routingDetails)
                 .AsGuard<ArgumentNullException>(nameof(routingDetails));
+            It.IsNull(validator)
+                .AsGuard<ArgumentNullException>(nameof(validator));
             It.IsNull(analyser)
                 .AsGuard<ArgumentNullException>(nameof(analyser));
             It.IsNull(actions)
@@ -83,6 +92,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             Faults = faultResponses;
             SafeOperations = safeOperations;
             RoutingDetails = routingDetails;
+            RoutingDetail = validator;
             Analyser = analyser;
             Actions = actions;
         }
@@ -116,17 +126,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
             It.IsNull(theDetail)
                 .AsGuard<MalformedRequestException>(theTouchpointID);
-            It.IsEmpty(theDetail.TouchpointID)
-                .AsGuard<MalformedRequestException>(theTouchpointID);
 
             await inScope.Information($"candidate search complete: '{theDetail.TouchpointID}'");
-
             await inScope.Information($"preparing response...");
 
             var response = Respond.Ok().SetContent(theDetail);
 
             await inScope.Information($"preparation complete...");
-
             await inScope.ExitMethod();
 
             return response;
@@ -170,6 +176,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
             var theTouchpoint = await actionDo(theLocation, inScope);
 
+            await inScope.Information($"action execution complete...");
             await inScope.ExitMethod();
 
             return await ProcessGetAreaRoutingDetailFor(theTouchpoint, inScope);
@@ -208,17 +215,24 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
             await inScope.Information("deserialisation complete...");
 
-            It.IsEmpty(theCandidate?.TouchpointID)
+            It.IsNull(theCandidate)
                 .AsGuard<MalformedRequestException>();
 
-            await inScope.Information($"adding the area routing candidate: '{theCandidate?.TouchpointID}'");
+            await inScope.Information($"validating the candidate: '{theCandidate.TouchpointID}'");
+
+            await RoutingDetail.Validate(theCandidate);
+
+            await inScope.Information($"validation complete...");
+            await inScope.Information($"adding the candidate: '{theCandidate.TouchpointID}'");
 
             var result = await RoutingDetails.Add(theCandidate);
 
             await inScope.Information($"candidate addition complete...");
+            await inScope.Information($"preparing response...");
 
             var response = Respond.Created().SetContent(result);
 
+            await inScope.Information($"preparation complete...");
             await inScope.ExitMethod();
 
             return response;
@@ -240,7 +254,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         internal async Task<HttpResponseMessage> ProcessGetAllRouteIDs(IScopeLoggingContext inScope)
         {
             await inScope.EnterMethod();
-
             await inScope.Information("seeking all routing ids");
 
             var result = await RoutingDetails.GetAllIDs();
@@ -250,13 +263,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             var theCandidate = $"{{ [{string.Join(", ", result.Select(x => $"\"{x}\""))}] }}";
 
             await inScope.Information($"candidate content: '{theCandidate}'");
-
             await inScope.Information($"preparing response...");
 
             var response = Respond.Ok().SetContent(theCandidate);
 
             await inScope.Information($"preparation complete...");
-
             await inScope.ExitMethod();
 
             return response;
@@ -280,7 +291,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         internal async Task<HttpResponseMessage> ProcessDeleteAreaRoutingDetailUsing(string theTouchpointID, IScopeLoggingContext inScope)
         {
             await inScope.EnterMethod();
-
             await inScope.Information($"deleting the routing details for '{theTouchpointID}'");
 
             await RoutingDetails.Delete(theTouchpointID);
@@ -290,7 +300,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             var response = Respond.Ok();
 
             await inScope.Information($"preparation complete...");
-
             await inScope.ExitMethod();
 
             return response;

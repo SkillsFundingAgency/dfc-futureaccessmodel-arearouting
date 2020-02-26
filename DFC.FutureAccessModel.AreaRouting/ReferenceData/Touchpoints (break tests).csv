@@ -1,0 +1,21 @@
+TouchpointID,Area,Email,Telephone,SMS,TestText,PostExpectation,DeleteExpectation
+"00000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,07890 123456,Touchpoint too long,422,204
+"000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,07890 123456,Touchpoint too short,422,204
+"A000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,07890 123456,Touchpoint illegal character start,422,204
+"0000X00101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,07890 123456,Touchpoint illegal character middle,422,204
+"000000010Z",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,07890 123456,Touchpoint illegal character end,422,204
+"0000000101",East,digital.first.careers.fake@fakemail.com,0800 123 456,07890 123456,Area too short,422,204
+"0000000101",Fake Portion Of England with a CountyZZZZZZZZZZZZZZ,digital.first.careers.fake@fakemail.com,0800 123 456,07890 123456,Area too long,422,204
+"0000000101",#Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,07890 123456,Area illegal character start,422,204
+"0000000101",East of England # and Buckinghamshire,digital.first.careers.fake@fakemail.com,0800 123 456,07890 123456,Area illegal character middle,422,204
+"0000000101",Fake Portion Of England with a County#,digital.first.careers.fake@fakemail.com,0800 123 456,07890 123456,Area illegal character end,422,204
+"0000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 45,07890 123456,Phone number too short,422,204
+"0000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 45678,07890 123456,Phone number too long,422,204
+"0000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,Z800 123 456,07890 123456,Phone number illegal character start,422,204
+"0000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 12Z 456,07890 123456,Phone number illegal character middle,422,204
+"0000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 45Z,07890 123456,Phone number illegal character end,422,204
+"0000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,07890 12345,Mobile number too short,422,204
+"0000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,07890 1234567,Mobile number too long,422,204
+"0000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,Z7890 123456,Mobile number illegal character start,422,204
+"0000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,07890 Z23456,Mobile number illegal character middle,422,204
+"0000000101",Fake Portion Of England with a County,digital.first.careers.fake@fakemail.com,0800 123 456,07890 12345Z,Mobile number illegal character end,422,204

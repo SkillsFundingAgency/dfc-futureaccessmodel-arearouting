@@ -1,4 +1,4 @@
-﻿namespace DFC.FutureAccessModel.AreaRouting.Models
+﻿namespace DFC.FutureAccessModel.AreaRouting.Validation
 {
     /// <summary>
     /// regular expressions used during record validation
@@ -6,24 +6,29 @@
     public static class ValidationExpressions
     {
         /// <summary>
-        /// standard text validation expression
+        /// touchpoint identifier expression
         /// </summary>
-        public const string StandardText = @"^[a-zA-Z ]+((['\,\.\- ][a-zA-Z ])?[a-zA-Z ]*)*$";
+        public const string TouchpointID = @"^[0-9]*";
+
+        /// <summary>
+        /// town or region validation expression
+        /// </summary>
+        public const string TownOrRegion = @"^[A-Za-z' \-]*";
 
         /// <summary>
         /// email address validation expression
         /// </summary>
-        public const string EmailAddress = @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$";
+        public const string EmailAddress = @"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
 
         /// <summary>
         /// phone number validation expression
         /// </summary>
-        public const string PhoneNumber = @"^((\(?0\d{4}\)?\s?\d{3}\s?(\d{3}|\d{2}))|(\(?0\d{3}\)?\s?\d{3}\s?(\d{4}|\d{3}))|(\(?0\d{2}\)?\s?\d{4}\s?(\d{4}|\d{3})))(\s?\#(\d{4}|\d{3}))?$";
+        public const string PhoneNumber = @"^(((\+44\s?\d{3,4}|\(?0\d{3,4}\)?)\s?\d{3,4}\s?\d{3,4})|((\+44\s?\d{3,4}|\(?0\d{3,4}\)?)\s?\d{3,4}\s?\d{3,4})|((\+44\s?\d{2}|\(?0\d{2}\)?)\s?\d{4}\s?\d{4}))(\s?\#(\d{4}|\d{3}))?$";
 
         /// <summary>
         /// mobile number validation expression
         /// </summary>
-        public const string MobileNumber = @"^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?(\d{3}|\d{2})$";
+        public const string MobileNumber = @"^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$";
 
         /// <summary>
         /// postcode validation expression

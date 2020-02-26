@@ -1,0 +1,117 @@
+{
+	"info": {
+		"_postman_id": "0bd4db7b-44ea-49c4-bf8e-5b27befbc9bd",
+		"name": "2 touchpoint bulk upload",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "delete existing touchpoint",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "605f5738-be50-4436-bb19-c6584afaf1be",
+						"exec": [
+							"var expectedState = pm.variables.get(\"DeleteExpectation\");",
+							"",
+							"pm.test(\"Deleted ok\", function () {",
+							"    pm.response.to.have.status(expectedState);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "{{api_key}}",
+						"type": "text"
+					},
+					{
+						"key": "Version",
+						"value": "1.0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{local_url}}/{{TouchpointID}}",
+					"host": [
+						"{{local_url}}"
+					],
+					"path": [
+						"{{TouchpointID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add new touchpoint",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b19b568c-55ca-405f-9f07-da180cd47176",
+						"exec": [
+							"var breakType = pm.variables.get(\"TestText\");",
+							"var expectedState = pm.variables.get(\"PostExpectation\");",
+							"",
+							"pm.test(breakType, function () {",
+							"    pm.response.to.have.status(expectedState);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "{{api_key}}",
+						"type": "text"
+					},
+					{
+						"key": "Version",
+						"value": "1.0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"{{TouchpointID}}\",\n    \"Area\": \"{{Area}}\",\n    \"TelephoneNumber\": \"{{Telephone}}\",\n    \"SMSNumber\": \"{{SMS}}\",\n    \"EmailAddress\": \"{{Email}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{local_url}}",
+					"host": [
+						"{{local_url}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

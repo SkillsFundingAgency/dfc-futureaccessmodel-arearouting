@@ -120,7 +120,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Registration
             // assert
             GetMock(services).Verify(
                 x => x.Add(It.IsAny<ServiceDescriptor>()),
-                Times.Exactly(16),
+                Times.Exactly(18),
                 "check for changes in the 'Registration/AssemblyRegistrations.cs' file");
         }
 

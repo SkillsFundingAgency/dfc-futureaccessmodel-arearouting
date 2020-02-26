@@ -27,7 +27,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// </summary>
         /// <param name="message">message</param>
         public NoContentException(string message) :
-            base(GetMessage())
+            base(message)
         {
         }
 
@@ -37,7 +37,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// <param name="message">message</param>
         /// <param name="innerException">inner exception</param>
         public NoContentException(string message, Exception innerException) :
-            base(GetMessage(), innerException)
+            base(message, innerException)
         {
         }
 

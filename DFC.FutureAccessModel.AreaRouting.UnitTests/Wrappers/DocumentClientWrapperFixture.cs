@@ -202,7 +202,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         public void MakeDocumentPathForKeyValueAndCollectionMeetsExpectation(string keyValue, string collectionPath)
         {
             // arrange
-            var document = new LocalAuthority { LADCode = keyValue };
+            var document = new RoutingDetail { TouchpointID = keyValue };
             var collectionUri = new Uri(collectionPath, UriKind.Relative);
             var documentPath = $"{collectionPath}/docs/{keyValue}";
 
