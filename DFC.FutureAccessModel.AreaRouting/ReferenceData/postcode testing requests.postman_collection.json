@@ -6,22 +6,26 @@
 	},
 	"item": [
 		{
-			"name": "get touchpoint",
+			"name": "get touchpoint by postcode",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "38343bd5-e3b7-4392-b237-4259cbdb9a40",
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"// var breakType = pm.variables.get(\"TestText\");",
+							"var expectedState = pm.variables.get(\"Expectation\");",
+							"",
+							"pm.test(\"Expected response\", function () {",
+							"    pm.response.to.have.status(expectedState);",
 							"});",
 							"",
-							"var touchpoint = pm.variables.get(\"TouchpointID\");",
-							"pm.test(\"Body contains expected touchpoint\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"0000000\" + touchpoint + \"\\\"\");",
-							"});",
-							""
+							"if (expectedState == 200) {",
+							"    var touchpoint = pm.variables.get(\"TouchpointID\");",
+							"    pm.test(\"Body contains expected touchpoint\", function () {",
+							"        pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"\" + touchpoint + \"\\\"\");",
+							"    });",
+							"}"
 						],
 						"type": "text/javascript"
 					}
@@ -29,22 +33,152 @@
 			],
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "{{api_key}}",
+						"type": "text"
+					},
+					{
+						"key": "Version",
+						"value": "1.0",
+						"type": "text"
+					}
+				],
 				"url": {
-					"raw": "http://localhost:7071/api/areas?location={{Outward}}%20{{Inward}}",
-					"protocol": "http",
+					"raw": "{{local_url}}?location={{Outward}}%20{{Inward}}",
 					"host": [
-						"localhost"
-					],
-					"port": "7071",
-					"path": [
-						"api",
-						"areas"
+						"{{local_url}}"
 					],
 					"query": [
 						{
 							"key": "location",
 							"value": "{{Outward}}%20{{Inward}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get touchpoint by outward code",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "38343bd5-e3b7-4392-b237-4259cbdb9a40",
+						"exec": [
+							"// var breakType = pm.variables.get(\"TestText\");",
+							"var expectedState = pm.variables.get(\"Expectation\");",
+							"",
+							"pm.test(\"Expected response\", function () {",
+							"    pm.response.to.have.status(expectedState);",
+							"});",
+							"",
+							"if (expectedState == 200) {",
+							"    var touchpoint = pm.variables.get(\"TouchpointID\");",
+							"    pm.test(\"Body contains expected touchpoint\", function () {",
+							"        pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"\" + touchpoint + \"\\\"\");",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "{{api_key}}",
+						"type": "text"
+					},
+					{
+						"key": "Version",
+						"value": "1.0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{local_url}}?location={{Outward}}",
+					"host": [
+						"{{local_url}}"
+					],
+					"query": [
+						{
+							"key": "location",
+							"value": "{{Outward}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get touchpoint by town",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "38343bd5-e3b7-4392-b237-4259cbdb9a40",
+						"exec": [
+							"// var breakType = pm.variables.get(\"TestText\");",
+							"var expectedState = pm.variables.get(\"Expectation\");",
+							"",
+							"pm.test(\"Expected response\", function () {",
+							"    pm.response.to.have.status(expectedState);",
+							"});",
+							"",
+							"if (expectedState == 200) {",
+							"    var touchpoint = pm.variables.get(\"TouchpointID\");",
+							"    pm.test(\"Body contains expected touchpoint\", function () {",
+							"        pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"\" + touchpoint + \"\\\"\");",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "{{api_key}}",
+						"type": "text"
+					},
+					{
+						"key": "Version",
+						"value": "1.0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{local_url}}?location={{Town}}",
+					"host": [
+						"{{local_url}}"
+					],
+					"query": [
+						{
+							"key": "location",
+							"value": "{{Town}}"
 						}
 					]
 				}

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
-using DFC.FutureAccessModel.AreaRouting.Storage;
 using MarkEmbling.PostcodesIO.Exceptions;
 using Xunit;
 
@@ -16,11 +15,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
     public sealed class FaultResponseProviderFixture :
         MoqTestingFixture
     {
-        const string fallbackID = "0000000999";
-        const string fallbackArea = "National Careers Centre";
-        const string fallbackPhone = "0800 123456";
-        const string fallbackMail = "nationalcareersservice@education.gov.uk";
-        static readonly string fallbackContent = $"{{\"TouchpointID\":\"{fallbackID}\",\"Area\":\"{fallbackArea}\",\"TelephoneNumber\":\"{fallbackPhone}\",\"SMSNumber\":null,\"EmailAddress\":\"{fallbackMail}\"}}";
+        const string fallbackContent = "";
 
         /// <summary>
         /// the system under test supports it's service contract
@@ -30,16 +25,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange / act / assert
             Assert.IsAssignableFrom<IProvideFaultResponses>(MakeSUT());
-        }
-
-        /// <summary>
-        /// build with null store throws
-        /// </summary>
-        [Fact]
-        public void BuildWithNullStoreThrows()
-        {
-            // arrange / act / assert
-            Assert.Throws<ArgumentNullException>(() => MakeSUT(null));
         }
 
         /// <summary>
@@ -56,9 +41,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
-            GetMock(sut.Store)
-                .Setup(x => x.Get(fallbackID))
-                .Returns(Task.FromResult(MakeTestFallbackItem()));
 
             var logger = MakeLoggingContext($"Exception of type '{testException.FullName}' was thrown.");
             GetMock(logger)
@@ -71,8 +53,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var result = await sut.GetResponseFor(exception, TypeOfFunction.GetByLocation, logger);
 
             // assert
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal(fallbackContent, await result.Content.ReadAsStringAsync());
+            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.Equal(expectedMessage, await result.Content.ReadAsStringAsync());
         }
 
         /// <summary>
@@ -84,9 +66,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
-            GetMock(sut.Store)
-                .Setup(x => x.Get(fallbackID))
-                .Returns(Task.FromResult(MakeTestFallbackItem()));
 
             var theException = new PostcodesIOApiException(new Exception());
             var logger = MakeLoggingContext($"Exception of type '{typeof(PostcodesIOApiException).FullName}' was thrown.");
@@ -102,7 +81,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var result = await sut.GetResponseFor(theException, TypeOfFunction.GetByLocation, logger);
 
             // assert
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
             Assert.Equal(fallbackContent, await result.Content.ReadAsStringAsync());
         }
 
@@ -115,9 +94,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
-            GetMock(sut.Store)
-                .Setup(x => x.Get(fallbackID))
-                .Returns(Task.FromResult(MakeTestFallbackItem()));
 
             var theException = new PostcodesIOEmptyResponseException(HttpStatusCode.NotImplemented);
             var logger = MakeLoggingContext($"Exception of type '{typeof(PostcodesIOEmptyResponseException).FullName}' was thrown.");
@@ -129,7 +105,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var result = await sut.GetResponseFor(theException, TypeOfFunction.GetByLocation, logger);
 
             // assert
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
             Assert.Equal(fallbackContent, await result.Content.ReadAsStringAsync());
         }
 
@@ -141,8 +117,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <param name="expectedMessage">the expected message recording</param>
         /// <returns>the current (test) task</returns>
         [Theory]
-        [InlineData(typeof(UnauthorizedException), HttpStatusCode.Unauthorized, "")]
-        [InlineData(typeof(AccessForbiddenException), HttpStatusCode.Forbidden, "Insufficient access to this resource")]
         [InlineData(typeof(UnprocessableEntityException), HttpStatusCode.UnprocessableEntity, "")]
         public async Task GetResponseForTheExceptionMeetsExpectation(Type testException, HttpStatusCode expectedState, string expectedMessage)
         {
@@ -157,7 +131,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Returns(Task.CompletedTask);
 
             // act
-            var result = await sut.GetResponseFor(exception, TypeOfFunction.GetByLocation, logger);
+            var result = await sut.GetResponseFor(exception, TypeOfFunction.Post, logger);
 
             // assert
             Assert.Equal(expectedState, result.StatusCode);
@@ -177,9 +151,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
-            GetMock(sut.Store)
-                .Setup(x => x.Get(fallbackID))
-                .Returns(Task.FromResult(MakeTestFallbackItem()));
 
             var exception = (Exception)testException.Assembly.CreateInstance(testException.FullName);
 
@@ -192,7 +163,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var result = await sut.GetResponseFor(exception, TypeOfFunction.GetByLocation, logger);
 
             // assert
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
             Assert.Equal(fallbackContent, await result.Content.ReadAsStringAsync());
         }
 
@@ -204,10 +175,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
-            var exception = new Exception();
 
             // act
-            var result = sut.Malformed(exception);
+            var result = sut.Malformed(string.Empty);
 
             // assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -221,10 +191,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
-            var exception = new Exception();
 
             // act
-            var result = sut.Conflicted(exception);
+            var result = sut.Conflicted(string.Empty);
 
             // assert
             Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
@@ -238,30 +207,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
-            var exception = new Exception();
 
             // act
-            var result = sut.NoContent(exception);
+            var result = sut.NoContent(string.Empty);
 
             // assert
             Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
-        }
-
-        /// <summary>
-        /// forbidden meets expectation
-        /// </summary>
-        [Fact]
-        public void ForbiddenMeetsExpectation()
-        {
-            // arrange
-            var sut = MakeSUT();
-            var exception = new Exception();
-
-            // act
-            var result = sut.Forbidden(exception);
-
-            // assert
-            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
         /// <summary>
@@ -272,30 +223,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
-            var exception = new Exception();
 
             // act
-            var result = sut.UnprocessableEntity(exception);
+            var result = sut.UnprocessableEntity(string.Empty);
 
             // assert
             Assert.Equal((HttpStatusCode)422, result.StatusCode);
-        }
-
-        /// <summary>
-        /// unauthorized meets expectation
-        /// </summary>
-        [Fact]
-        public void UnauthorizedMeetsExpectation()
-        {
-            // arrange
-            var sut = MakeSUT();
-            var exception = new Exception();
-
-            // act
-            var result = sut.Unauthorized(exception);
-
-            // assert
-            Assert.Equal(HttpStatusCode.Unauthorized, result.StatusCode);
         }
 
         /// <summary>
@@ -306,27 +239,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             // arrange
             var sut = MakeSUT();
-            var exception = new Exception();
 
             // act
-            var result = sut.UnknownError(exception);
+            var result = sut.UnknownError(string.Empty);
 
             // assert
             Assert.Equal(HttpStatusCode.InternalServerError, result.StatusCode);
         }
-
-        /// <summary>
-        /// make a test fallback item
-        /// </summary>
-        /// <returns>a routing detail</returns>
-        internal IRoutingDetail MakeTestFallbackItem() =>
-            new RoutingDetail
-            {
-                TouchpointID = fallbackID,
-                Area = fallbackArea,
-                EmailAddress = fallbackMail,
-                TelephoneNumber = fallbackPhone
-            };
 
         /// <summary>
         /// make scope logging context 
@@ -348,13 +267,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <returns>the system under test</returns>
         internal FaultResponseProvider MakeSUT() =>
-            MakeSUT(MakeStrictMock<IStoreAreaRoutingDetails>());
-
-        /// <summary>
-        /// make a 'system under test'
-        /// </summary>
-        /// <returns>the system under test</returns>
-        internal FaultResponseProvider MakeSUT(IStoreAreaRoutingDetails store) =>
-            new FaultResponseProvider(store);
+            new FaultResponseProvider();
     }
 }
