@@ -7,7 +7,6 @@ using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
-using DFC.FutureAccessModel.AreaRouting.Storage;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
@@ -32,22 +31,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         private readonly MethodMaps _methodMap = new MethodMaps();
 
-        public IStoreAreaRoutingDetails Store { get; }
-
         /// <summary>
         /// initialises an instance of <see cref="FaultResponseProvider"/>
         /// </summary>
-        /// <param name="store">the routing detail 'fallback' store</param>
-        public FaultResponseProvider(IStoreAreaRoutingDetails store)
+        public FaultResponseProvider()
         {
-            It.IsNull(store)
-                .AsGuard<ArgumentNullException>(nameof(store));
-
-            Store = store;
-
             _methodMap.Add(TypeOfFunction.GetByLocation, GetByLocationFaultMap());
-            _methodMap.Add(TypeOfFunction.GetByID, GetByIDFaultMap());
-            _methodMap.Add(TypeOfFunction.GetAll, GetAllFaultMap());
+            _methodMap.Add(TypeOfFunction.GetByID, DefaultGetFaultMap());
+            _methodMap.Add(TypeOfFunction.GetAll, DefaultGetFaultMap());
             _methodMap.Add(TypeOfFunction.Delete, DeleteFaultMap());
             _methodMap.Add(TypeOfFunction.Post, PostFaultMap());
         }
@@ -60,14 +51,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(MalformedRequestException), Fallback);
-            _faultMap.Add(typeof(NoContentException), Fallback);
-            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
-            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
-            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
+            _faultMap.Add(typeof(MalformedRequestException), x => NoContent(string.Empty));
+            _faultMap.Add(typeof(NoContentException), x => NoContent(x.Message));
 
-            _faultMap.Add(typeof(InvalidPostcodeException), Fallback);
-            _faultMap.Add(typeof(FallbackActionException), Fallback);
+            _faultMap.Add(typeof(InvalidPostcodeException), x => NoContent(x.Message));
+            _faultMap.Add(typeof(FallbackActionException), x => NoContent(string.Empty));
 
             return _faultMap;
         }
@@ -76,36 +64,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// get's the 'by id' fault map
         /// </summary>
         /// <returns>a function map</returns>
-        public FunctionMaps GetByIDFaultMap()
+        public FunctionMaps DefaultGetFaultMap()
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(MalformedRequestException), Malformed);
-            _faultMap.Add(typeof(NoContentException), NoContent);
-            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
-            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
-            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
+            _faultMap.Add(typeof(MalformedRequestException), x => Malformed(x.Message));
+            _faultMap.Add(typeof(NoContentException), x => NoContent(x.Message));
 
-            _faultMap.Add(typeof(FallbackActionException), NoContent);
-
-            return _faultMap;
-        }
-
-        /// <summary>
-        /// get's the 'all id's' fault map
-        /// </summary>
-        /// <returns>a function map</returns>
-        public FunctionMaps GetAllFaultMap()
-        {
-            var _faultMap = new FunctionMaps();
-
-            _faultMap.Add(typeof(MalformedRequestException), Malformed);
-            _faultMap.Add(typeof(NoContentException), NoContent);
-            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
-            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
-            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
-
-            _faultMap.Add(typeof(FallbackActionException), CollectionFallback);
+            _faultMap.Add(typeof(FallbackActionException), x => NoContent(x.Message));
 
             return _faultMap;
         }
@@ -118,13 +84,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(MalformedRequestException), Malformed);
-            _faultMap.Add(typeof(NoContentException), NoContent);
-            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
-            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
-            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
+            _faultMap.Add(typeof(MalformedRequestException), x => Malformed(x.Message));
+            _faultMap.Add(typeof(NoContentException), x => NoContent(x.Message));
 
-            _faultMap.Add(typeof(FallbackActionException), UnknownError);
+            _faultMap.Add(typeof(FallbackActionException), x => UnknownError(x.Message));
 
             return _faultMap;
         }
@@ -137,14 +100,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(ConflictingResourceException), Conflicted);
-            _faultMap.Add(typeof(MalformedRequestException), Malformed);
-            _faultMap.Add(typeof(NoContentException), NoContent);
-            _faultMap.Add(typeof(UnprocessableEntityException), UnprocessableEntity);
-            _faultMap.Add(typeof(AccessForbiddenException), Forbidden);
-            _faultMap.Add(typeof(UnauthorizedException), Unauthorized);
+            _faultMap.Add(typeof(ConflictingResourceException), x => Conflicted(x.Message));
+            _faultMap.Add(typeof(MalformedRequestException), x => Malformed(x.Message));
+            _faultMap.Add(typeof(NoContentException), x => NoContent(x.Message));
+            _faultMap.Add(typeof(UnprocessableEntityException), x => UnprocessableEntity(x.Message));
 
-            _faultMap.Add(typeof(FallbackActionException), UnknownError);
+            _faultMap.Add(typeof(FallbackActionException), x => UnknownError(x.Message));
 
             return _faultMap;
         }
@@ -158,10 +119,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <returns>the currently running task containing the http response message</returns>
         public async Task<HttpResponseMessage> GetResponseFor(Exception theException, TypeOfFunction theMethod, IScopeLoggingContext useLoggingScope)
         {
-            if (_methodMap[theMethod].ContainsKey(theException.GetType()))
+            var exceptionType = theException.GetType();
+
+            if (_methodMap[theMethod].ContainsKey(exceptionType))
             {
                 await InformOn(theException, useLoggingScope);
-                return _methodMap[theMethod][theException.GetType()].Invoke(theException);
+                return _methodMap[theMethod][exceptionType].Invoke(theException);
             }
 
             await useLoggingScope.ExceptionDetail(theException);
@@ -186,86 +149,45 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         }
 
         /// <summary>
-        /// gets the latest version of the fallback values
-        /// </summary>
-        /// <returns></returns>
-        internal IRoutingDetail GetFallbackValue() =>
-            Store.Get(RoutingDetail.FallbackID).Result;
-
-        /// <summary>
-        /// the fallback message
-        /// </summary>
-        /// <param name="theException">the exception (is ignored in here)</param>
-        /// <returns>a 'fallback' message</returns>
-        internal HttpResponseMessage Fallback(Exception theException) =>
-            CreateMessage(HttpStatusCode.OK)
-                .SetContent(GetFallbackValue());
-
-        /// <summary>
-        /// the collection fallback ??
-        /// </summary>
-        /// <param name="theException">the exception (is ignored in here)</param>
-        /// <returns>a 'collection fallback' message</returns>
-        internal HttpResponseMessage CollectionFallback(Exception theException) =>
-            CreateMessage(HttpStatusCode.OK)
-                .SetContent("{ [ ] }");
-
-        /// <summary>
         /// the malformed request action
         /// </summary>
         /// <returns>a 'bad request' message</returns>
-        internal HttpResponseMessage Malformed(Exception theException) =>
+        internal HttpResponseMessage Malformed(string theMessage = "") =>
             CreateMessage(HttpStatusCode.BadRequest)
-                .SetContent(string.Empty);
+                .SetContent(theMessage);
 
         /// <summary>
         /// the conflicted request action
         /// </summary>
         /// <param name="theException">the exception</param>
         /// <returns>a conflicted message</returns>
-        internal HttpResponseMessage Conflicted(Exception theException) =>
+        internal HttpResponseMessage Conflicted(string theMessage = "") =>
             CreateMessage(HttpStatusCode.Conflict)
-                .SetContent(string.Empty);
-
-        /// <summary>
-        /// the forbidden action
-        /// </summary>
-        /// <returns>a 'forbidden' message</returns>
-        internal HttpResponseMessage Forbidden(Exception theException) =>
-            CreateMessage(HttpStatusCode.Forbidden)
-                .SetContent(theException.Message);
+                .SetContent(theMessage);
 
         /// <summary>
         /// the no content action
         /// </summary>
         /// <returns>a 'no content' message</returns>
-        internal HttpResponseMessage NoContent(Exception theException) =>
+        internal HttpResponseMessage NoContent(string theMessage = "") =>
             CreateMessage(HttpStatusCode.NoContent)
-                .SetContent(theException.Message);
+                .SetContent(theMessage);
 
         /// <summary>
         /// the unprocessable entity action
         /// </summary>
         /// <returns>a 'unprocessable entity' message</returns>
-        internal HttpResponseMessage UnprocessableEntity(Exception theException) =>
+        internal HttpResponseMessage UnprocessableEntity(string theMessage = "") =>
             CreateMessage(LocalHttpStatusCode.UnprocessableEntity.AsHttpStatusCode())
-                .SetContent(theException.Message);
-
-        /// <summary>
-        /// the unauthorised action
-        /// </summary>
-        /// <returns>an 'unauthorised' message</returns>
-        internal HttpResponseMessage Unauthorized(Exception theException) =>
-            CreateMessage(HttpStatusCode.Unauthorized)
-                .SetContent(string.Empty);
+                .SetContent(theMessage);
 
         /// <summary>
         /// the unknown error action
         /// </summary>
         /// <returns>an 'internal server error' message</returns>
-        internal HttpResponseMessage UnknownError(Exception theException) =>
+        internal HttpResponseMessage UnknownError(string theMessage = "") =>
              CreateMessage(HttpStatusCode.InternalServerError)
-                .SetContent(theException?.Message ?? string.Empty);
+                .SetContent(theMessage);
 
         /// <summary>
         /// create's the base http response message

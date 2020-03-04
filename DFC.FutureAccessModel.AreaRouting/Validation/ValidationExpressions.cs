@@ -13,7 +13,7 @@
         /// <summary>
         /// town or region validation expression
         /// </summary>
-        public const string TownOrRegion = @"^[A-Za-z' \-]*";
+        public const string TownOrRegion = @"^[A-Za-z',. \-]*";
 
         /// <summary>
         /// email address validation expression
