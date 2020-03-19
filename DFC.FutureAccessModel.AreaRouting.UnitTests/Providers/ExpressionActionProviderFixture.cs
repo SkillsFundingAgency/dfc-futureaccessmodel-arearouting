@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
@@ -124,7 +123,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// get touchpoint id from outward code with invalid candidate throws
         /// </summary>
         /// <param name="theCandidate"></param>
-        /// <returns></returns>
+        /// <returns>the current (test) task</returns>
         [Theory]
         [InlineData(null)]
         [InlineData("")]
@@ -137,15 +136,40 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             GetMock(theLoggingScope)
                 .Setup(x => x.EnterMethod("GetTouchpointIDFromOutwardCode"))
                 .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.EnterMethod("GetPostcodeUsing"))
+                .Returns(Task.CompletedTask);
 
             // act / assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => sut.GetTouchpointIDFromOutwardCode(theCandidate, theLoggingScope));
         }
 
         /// <summary>
+        /// get outward code from (the psotcode) meets expectation
+        /// </summary>
+        /// <param name="theCandidate">the candidate (postcode)</param>
+        /// <param name="theExpectation">the expectation</param>
+        [Theory]
+        [InlineData("SA38 9RD", "SA38")]
+        [InlineData("SA389RD", "SA38")]
+        [InlineData("NW1W 4ST", "NW1W")]
+        [InlineData("NW1W4ST", "NW1W")]
+        public void GetOutwardCodeFromMeetsExpectation(string theCandidate, string theExpectation)
+        {
+            // arrange
+            var sut = MakeSUT();
+
+            // act
+            var result = sut.GetOutwardCodeFrom(theCandidate);
+
+            // assert
+            Assert.Equal(theExpectation, result);
+        }
+
+        /// <summary>
         /// get touchpoint id from outward code meets expectation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the current (test) task</returns>
         [Fact]
         public async Task GetTouchpointIDFromOutwardCodeMeetsExpectation()
         {
@@ -175,6 +199,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
             GetMock(theLoggingScope)
                 .Setup(x => x.EnterMethod("GetTouchpointIDFromOutwardCode"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.EnterMethod("GetPostcodeUsing"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.ExitMethod("GetPostcodeUsing"))
                 .Returns(Task.CompletedTask);
             GetMock(theLoggingScope)
                 .Setup(x => x.Information($"seeking postcode via outward code: '{theOutwardCode}'"))
@@ -211,18 +241,22 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <summary>
         /// get touchpoint id from postcode with invalid postcode throws
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the current (test) task</returns>
         [Fact]
         public async Task GetTouchpointIDFromPostcodeWithInvalidPostcodeThrows()
         {
             // arrange
             const string thePostCode = "SA38 9RD";
+            const string theOutwardCode = "SA38";
 
             var sut = MakeSUT();
 
             GetMock(sut.Postcode)
                 .Setup(x => x.LookupAsync(thePostCode))
                 .Returns(Task.FromResult((PostcodeResult)null));
+            GetMock(sut.Postcode)
+                .Setup(x => x.LookupOutwardCodeAsync(theOutwardCode, 10))
+                .Returns(Task.FromResult<IReadOnlyCollection<string>>(new string[]{ thePostCode }));
 
             var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
             GetMock(theLoggingScope)
@@ -231,15 +265,55 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             GetMock(theLoggingScope)
                 .Setup(x => x.Information($"seeking postcode '{thePostCode}'"))
                 .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.EnterMethod("GetPostcodeUsing"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.ExitMethod("GetPostcodeUsing"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"postcode search failed for: '{thePostCode}'"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"seeking postcode via outward code: '{theOutwardCode}'"))
+                .Returns(Task.CompletedTask);
 
             // act / assert
             await Assert.ThrowsAsync<InvalidPostcodeException>(() => sut.GetTouchpointIDFromPostcode(thePostCode, theLoggingScope));
         }
 
         /// <summary>
+        /// get postcode using invalid outward code throws no content exception
+        /// </summary>
+        /// <returns>the current (test) task</returns>
+        [Fact]
+        public async Task GetPostcodeUsingInvalidOutwardCodeThrowsNoContentException()
+        {
+            // arrange
+            const string theOutwardCode = "SA38";
+
+            var sut = MakeSUT();
+
+            GetMock(sut.Postcode)
+                .Setup(x => x.LookupOutwardCodeAsync(theOutwardCode, 10))
+                .Returns(Task.FromResult<IReadOnlyCollection<string>>(new string[] { }));
+
+            var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
+            GetMock(theLoggingScope)
+                .Setup(x => x.EnterMethod("GetPostcodeUsing"))
+                .Returns(Task.CompletedTask);
+            GetMock(theLoggingScope)
+                .Setup(x => x.Information($"seeking postcode via outward code: '{theOutwardCode}'"))
+                .Returns(Task.CompletedTask);
+
+            // act / assert
+            await Assert.ThrowsAsync<NoContentException>(() => sut.GetPostcodeUsing(theOutwardCode, theLoggingScope));
+        }
+
+        /// <summary>
         /// get touchpoint id from postcode with valid postcode meets expectation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the current (test) task</returns>
         [Fact]
         public async Task GetTouchpointIDFromPostcodeWithValidPostcodeMeetsExpectation()
         {
@@ -292,7 +366,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <summary>
         /// get touchpoint id from town currently throws not supported
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the current (test) task</returns>
         [Fact]
         public async Task GetTouchpointIDFromTownCurrentlyThrowsNotSupported()
         {
@@ -309,7 +383,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <summary>
         /// unknown candidate type action records and throws
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the current (test) task</returns>
         [Fact]
         public async Task UnknownCandidateTypeActionRecordsAndThrows()
         {
