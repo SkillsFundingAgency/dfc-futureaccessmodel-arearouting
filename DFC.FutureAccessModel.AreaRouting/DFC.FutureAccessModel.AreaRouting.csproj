@@ -13,16 +13,16 @@
         <PackageReference Include="DFC.Functions.DI.Standard" Version="0.1.0" />
         <PackageReference Include="DFC.HTTP.Standard" Version="0.1.11" />
         <PackageReference Include="DFC.JSON.Standard" Version="0.1.4" />
-        <PackageReference Include="DFC.Swagger.Standard" Version="0.1.15" />
-        <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.9.4" />
+        <PackageReference Include="DFC.Swagger.Standard" Version="0.1.17" />
+        <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.10.1" />
         <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="3.0.5" />
-        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="4.1.0" />
-        <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.14" />
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.4.0.15306">
+        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="4.1.1" />
+        <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.16" />
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.5.0.15942">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.3" />
+        <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.5" />
         <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
         <PackageReference Include="MarkEmbling.PostcodesIO" Version="0.0.7" />
     </ItemGroup>

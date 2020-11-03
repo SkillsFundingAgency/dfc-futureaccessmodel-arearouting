@@ -13,19 +13,29 @@
 					"script": {
 						"id": "38343bd5-e3b7-4392-b237-4259cbdb9a40",
 						"exec": [
-							"// var breakType = pm.variables.get(\"TestText\");",
 							"var expectedState = pm.variables.get(\"Expectation\");",
+							"var touchpoint = pm.variables.get(\"TouchpointID\");",
+							"var boundary = pm.variables.get(\"Boundary\");",
+							"var outcome  = pm.variables.get(\"Outcome\");",
 							"",
-							"pm.test(\"Expected response\", function () {",
-							"    pm.response.to.have.status(expectedState);",
-							"});",
-							"",
-							"if (expectedState == 200) {",
-							"    var touchpoint = pm.variables.get(\"TouchpointID\");",
-							"    pm.test(\"Body contains expected touchpoint\", function () {",
-							"        pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"\" + touchpoint + \"\\\"\");",
+							"if (expectedState != pm.response.code) {",
+							"    if(boundary == \"Country\") {",
+							"        pm.test(boundary + \" boundary condition met\", function () {",
+							"            pm.response.to.have.status(outcome);",
+							"        });",
+							"    }",
+							"} else {",
+							"    pm.test(\"Expected response\", function () {",
+							"        pm.response.to.have.status(expectedState);",
 							"    });",
-							"}"
+							"}",
+							"",
+							"if (pm.response.code == 200) {",
+							"    pm.test(\"Body contains expected touchpoint\", function () {",
+							"        pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"0000000\" + touchpoint + \"\\\"\");",
+							"    });",
+							"}",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -73,19 +83,40 @@
 					"script": {
 						"id": "38343bd5-e3b7-4392-b237-4259cbdb9a40",
 						"exec": [
-							"// var breakType = pm.variables.get(\"TestText\");",
 							"var expectedState = pm.variables.get(\"Expectation\");",
+							"var touchpoint = pm.variables.get(\"TouchpointID\");",
+							"var boundary = pm.variables.get(\"Boundary\");",
+							"var outcome  = pm.variables.get(\"Outcome\");",
 							"",
-							"pm.test(\"Expected response\", function () {",
-							"    pm.response.to.have.status(expectedState);",
-							"});",
-							"",
-							"if (expectedState == 200) {",
-							"    var touchpoint = pm.variables.get(\"TouchpointID\");",
-							"    pm.test(\"Body contains expected touchpoint\", function () {",
-							"        pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"\" + touchpoint + \"\\\"\");",
+							"if (expectedState != pm.response.code) {",
+							"    if(boundary == \"Country\") {",
+							"        pm.test(boundary + \" boundary condition met\", function () {",
+							"            pm.response.to.have.status(outcome);",
+							"        });",
+							"    }",
+							"} else {",
+							"    pm.test(\"Expected response\", function () {",
+							"        pm.response.to.have.status(expectedState);",
 							"    });",
-							"}"
+							"}",
+							"",
+							"if (pm.response.code == 200) {",
+							"    if(boundary == \"Region\") {",
+							"        touchpoint = outcome;",
+							"        pm.test(\"Returning the wrong touchpoint\", function () {",
+							"            pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"0000000\" + outcome + \"\\\"\");",
+							"        });",
+							"    } else {",
+							"        var msg = \"Body contains expected touchpoint\";",
+							"        if(boundary == \"Country\" && expectedState == 204) {",
+							"            msg = \"Body contains a touchpoint when it shouldn't\";",
+							"        }",
+							"        pm.test(msg, function () {",
+							"            pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"0000000\" + touchpoint + \"\\\"\");",
+							"        });",
+							"    }",
+							"}",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -119,66 +150,6 @@
 						{
 							"key": "location",
 							"value": "{{Outward}}"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get touchpoint by town",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "38343bd5-e3b7-4392-b237-4259cbdb9a40",
-						"exec": [
-							"// var breakType = pm.variables.get(\"TestText\");",
-							"var expectedState = pm.variables.get(\"Expectation\");",
-							"",
-							"pm.test(\"Expected response\", function () {",
-							"    pm.response.to.have.status(expectedState);",
-							"});",
-							"",
-							"if (expectedState == 200) {",
-							"    var touchpoint = pm.variables.get(\"TouchpointID\");",
-							"    pm.test(\"Body contains expected touchpoint\", function () {",
-							"        pm.expect(pm.response.text()).to.include(\"\\\"TouchpointID\\\":\\\"\" + touchpoint + \"\\\"\");",
-							"    });",
-							"}"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Ocp-Apim-Subscription-Key",
-						"value": "{{api_key}}",
-						"type": "text"
-					},
-					{
-						"key": "Version",
-						"value": "1.0",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{local_url}}?location={{Town}}",
-					"host": [
-						"{{local_url}}"
-					],
-					"query": [
-						{
-							"key": "location",
-							"value": "{{Town}}"
 						}
 					]
 				}

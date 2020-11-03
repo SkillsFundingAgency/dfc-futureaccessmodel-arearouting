@@ -77,16 +77,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// this is the default unknown candidate type action
         /// </summary>
         /// <param name="theCandidate">the candidate</param>
-        /// <param name="usingScope">using scope</param>
+        /// <param name="inScope">in scope</param>
         /// <param name="forExpression">for (the) expression</param>
         /// <returns>nothing, this should throw</returns>
-        public async Task<string> UnknownCandidateTypeAction(string theCandidate, IScopeLoggingContext usingScope)
+        public async Task<string> UnknownCandidateTypeAction(string theCandidate, IScopeLoggingContext inScope)
         {
-            await usingScope.EnterMethod();
+            await inScope.EnterMethod();
 
-            await usingScope.Information($"malformed request candidate: '{theCandidate}'");
+            await inScope.Information($"malformed request candidate: '{theCandidate}'");
 
-            await usingScope.ExitMethod();
+            await inScope.ExitMethod();
 
             throw new MalformedRequestException(theCandidate);
         }
@@ -95,9 +95,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// get (the) touchpoint id from (the) town
         /// </summary>
         /// <param name="theCandidate">the candidate</param>
-        /// <param name="usingScope">using (the logging) scope</param>
+        /// <param name="inScope">in (the logging) scope</param>
         /// <returns>the LAD code</returns>
-        public async Task<string> GetTouchpointIDFromTown(string theCandidate, IScopeLoggingContext usingScope)
+        public async Task<string> GetTouchpointIDFromTown(string theCandidate, IScopeLoggingContext inScope)
         {
             await Task.CompletedTask;
             throw new NotSupportedException("GetTouchpointIDFromTown: this operation has not yet been coded");
@@ -107,54 +107,90 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// get (the) touchpoint id using the outward code
         /// </summary>
         /// <param name="theCandidate">the candidate</param>
-        /// <param name="usingScope">using (the logging) scope</param>
+        /// <param name="inScope">in (the logging) scope</param>
         /// <returns>the LAD code</returns>
-        public async Task<string> GetTouchpointIDFromOutwardCode(string theCandidate, IScopeLoggingContext usingScope)
+        public async Task<string> GetTouchpointIDFromOutwardCode(string theCandidate, IScopeLoggingContext inScope)
         {
-            await usingScope.EnterMethod();
+            await inScope.EnterMethod();
 
-            It.IsEmpty(theCandidate)
-                .AsGuard<ArgumentNullException>(nameof(theCandidate));
+            var candidate = await GetPostcodeUsing(theCandidate, inScope);
 
-            await usingScope.Information($"seeking postcode via outward code: '{theCandidate}'");
+            await inScope.ExitMethod();
 
-            var result = await Postcode.LookupOutwardCodeAsync(theCandidate);
-
-            It.IsEmpty(result)
-                .AsGuard<NoContentException>();
-
-            await usingScope.ExitMethod();
-
-            return await GetTouchpointIDFromPostcode(result.FirstOrDefault(), usingScope);
+            return await GetTouchpointIDFromPostcode(candidate, inScope);
         }
 
         /// <summary>
         /// get (the) touchpoint id from (the) Postcode
         /// </summary>
         /// <param name="theCandidate">the candidate</param>
-        /// <param name="usingScope">using (the logging) scope</param>
+        /// <param name="inScope">in (the logging) scope</param>
         /// <returns>the LAD code</returns>
-        public async Task<string> GetTouchpointIDFromPostcode(string theCandidate, IScopeLoggingContext usingScope)
+        public async Task<string> GetTouchpointIDFromPostcode(string theCandidate, IScopeLoggingContext inScope)
         {
-            await usingScope.EnterMethod();
-            await usingScope.Information($"seeking postcode '{theCandidate}'");
+            await inScope.EnterMethod();
+            await inScope.Information($"seeking postcode '{theCandidate}'");
 
             var result = await Postcode.LookupAsync(theCandidate);
 
-            It.IsNull(result)
-                .AsGuard<InvalidPostcodeException>(theCandidate);
-            It.IsEmpty(result.Postcode)
-                .AsGuard<InvalidPostcodeException>(theCandidate);
+            if (It.IsNull(result))
+            {
+                await inScope.Information($"postcode search failed for: '{theCandidate}'");
 
-            await usingScope.Information($"found postcode for '{result.Postcode}'");
-            await usingScope.Information($"seeking local authority '{result.Codes.AdminDistrict}'");
+                var theOutwardCode = GetOutwardCodeFrom(theCandidate);
+                var theNewCandidate = await GetPostcodeUsing(theOutwardCode, inScope);
+
+                result = await Postcode.LookupAsync(theNewCandidate);
+            }
+
+            It.IsNull(result)
+                .AsGuard<InvalidPostcodeException>();
+
+            await inScope.Information($"found postcode for '{result.Postcode}'");
+            await inScope.Information($"seeking local authority '{result.Codes.AdminDistrict}'");
 
             var authority = await Authority.Get(result.Codes.AdminDistrict);
 
-            await usingScope.Information($"found local authority '{authority.LADCode}'");
-            await usingScope.ExitMethod();
+            await inScope.Information($"found local authority '{authority.LADCode}'");
+            await inScope.ExitMethod();
 
             return authority.TouchpointID;
         }
+
+        /// <summary>
+        /// get postcode from outward code using...
+        /// </summary>
+        /// <param name="theOutwardCode">the outward code</param>
+        /// <param name="inScope">in scope</param>
+        /// <returns>the currently running task and the (full) postcode candidate</returns>
+        public async Task<string> GetPostcodeUsing(string theOutwardCode, IScopeLoggingContext inScope)
+        {
+            await inScope.EnterMethod();
+
+            It.IsEmpty(theOutwardCode)
+                .AsGuard<ArgumentNullException>(nameof(theOutwardCode));
+
+            await inScope.Information($"seeking postcode via outward code: '{theOutwardCode}'");
+
+            var result = await Postcode.LookupOutwardCodeAsync(theOutwardCode);
+
+            It.IsEmpty(result)
+                .AsGuard<NoContentException>();
+
+            await inScope.ExitMethod();
+
+            return result.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// get outward code from...
+        /// </summary>
+        /// <param name="thisPostcode">this postcode</param>
+        /// <returns>the first part of the postcode, assumes the postcode is already legit</returns>
+        public string GetOutwardCodeFrom(string thisPostcode) =>
+            thisPostcode.Contains(" ")
+                ? thisPostcode.Substring(0, thisPostcode.IndexOf(" ")).Trim()
+                : thisPostcode.Substring(0, thisPostcode.Length - 3).Trim();
+
     }
 }

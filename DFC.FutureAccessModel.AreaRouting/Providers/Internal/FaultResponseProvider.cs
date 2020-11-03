@@ -51,11 +51,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(MalformedRequestException), x => NoContent(string.Empty));
+            _faultMap.Add(typeof(MalformedRequestException), x => NoContent());
             _faultMap.Add(typeof(NoContentException), x => NoContent(x.Message));
 
             _faultMap.Add(typeof(InvalidPostcodeException), x => NoContent(x.Message));
-            _faultMap.Add(typeof(FallbackActionException), x => NoContent(string.Empty));
+            _faultMap.Add(typeof(FallbackActionException), x => NoContent());
 
             return _faultMap;
         }
