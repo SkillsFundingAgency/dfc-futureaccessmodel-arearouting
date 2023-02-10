@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <AzureFunctionsVersion>v2</AzureFunctionsVersion>
-    </PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+    		<AzureFunctionsVersion>v4</AzureFunctionsVersion>   
+	</PropertyGroup>
     <PropertyGroup>
         <!-- for future reference <ProjectGuid>{AABF51F1-63C6-4C6A-928F-22175D866A59}</ProjectGuid>-->
         <ProjectGuid>{AABF51F1-63C6-4C6A-928F-22175D866A59}</ProjectGuid>
@@ -13,21 +13,18 @@
         <PackageReference Include="DFC.Functions.DI.Standard" Version="0.1.0" />
         <PackageReference Include="DFC.HTTP.Standard" Version="0.1.11" />
         <PackageReference Include="DFC.JSON.Standard" Version="0.1.4" />
-        <PackageReference Include="DFC.Swagger.Standard" Version="0.1.17" />
-        <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.10.1" />
-        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="3.0.5" />
-        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="4.1.1" />
-        <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.16" />
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.5.0.15942">
+        <PackageReference Include="DFC.Swagger.Standard" Version="0.1.27" />
+        <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.32.0" />
+        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="4.0.0" />
+        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="5.8.1" />
+        <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.36" />
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.52.0.60960">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.5" />
-        <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
-        <PackageReference Include="MarkEmbling.PostcodesIO" Version="0.0.7" />
-    </ItemGroup>
-    <ItemGroup>
-        <Reference Include="Microsoft.CSharp" />
+        <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.3" />
+        <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
+        <PackageReference Include="MarkEmbling.PostcodesIO" Version="0.0.10" />
     </ItemGroup>
     <ItemGroup>
         <None Update="host.json">
