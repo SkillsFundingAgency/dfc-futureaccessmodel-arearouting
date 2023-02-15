@@ -453,6 +453,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .Setup(x => x.Information("deserialisation complete..."))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
+                .Setup(x => x.Information("mapping the deserialised content..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("mapping complete..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
                 .Setup(x => x.Information($"validating the candidate: ''"))
                 .Returns(Task.CompletedTask);
 
@@ -469,7 +475,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         {
             // arrange
             const string theTouchpoint = "0000000123";
-            var theContent = $"{{\"id\":\"{theTouchpoint}\", \"Area\": null, \"TelephoneNumber\": null, \"SMSNumber\": null, \"EmailAddress\": null }}";
+            var theContent = $"{{\"TouchpointID\":\"{theTouchpoint}\", \"Area\": null, \"TelephoneNumber\": null, \"SMSNumber\": null, \"EmailAddress\": null }}";
 
             var sut = MakeSUT();
             GetMock(sut.RoutingDetails)
@@ -491,6 +497,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
                 .Returns(Task.CompletedTask);
             GetMock(scope)
                 .Setup(x => x.Information("deserialisation complete..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("mapping the deserialised content..."))
+                .Returns(Task.CompletedTask);
+            GetMock(scope)
+                .Setup(x => x.Information("mapping complete..."))
                 .Returns(Task.CompletedTask);
             GetMock(scope)
                 .Setup(x => x.Information($"validating the candidate: '{theTouchpoint}'"))
