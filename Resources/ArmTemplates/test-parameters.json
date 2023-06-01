@@ -37,6 +37,9 @@
         },
         "apimApiSuffix": {
             "value": "api/suffix"
+        },
+        "appInsightsInstrumentationKey": {
+            "value": "appInsightsInstrumentationKey"
         }
     }
 }
