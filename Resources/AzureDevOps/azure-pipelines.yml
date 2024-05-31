@@ -116,13 +116,13 @@ stages:
     parameters:
       AzureSubscription: 'SFA-DIG-PreProd (931bc9f6-359c-4f65-a753-1ee191a1fd6c)'
       Environment: PP_FUTUREACCESSMODEL
-      FunctionAppName: dfc-pp-fam-arearoute-fa
+      FunctionAppName: '$(FunctionAppName)'
       ResourceGroup: dfc-pp-fam-arearoute-rg
       ApimResourceGroup: '$(sharedResourceGroup)'
       ApimInstanceName: '$(ApimServiceName)'
       ApimProductId: '${{ variables.ApimProductId }}'
       ApiName: '${{ variables.ApimApiName }}'
-      SwaggerSpecificationUrl: 'https://dfc-pp-fam-arearoute-fa.$(FunctionAppDomain)${{ variables.SwaggerDefinitionPath }}'
+      SwaggerSpecificationUrl: 'https://$(FunctionAppName).$(FunctionAppDomain)${{ variables.SwaggerDefinitionPath }}'
 
 - stage: DeployTo_PRD
   displayName: Deploy to PRD_FUTUREACCESSMODEL environment
