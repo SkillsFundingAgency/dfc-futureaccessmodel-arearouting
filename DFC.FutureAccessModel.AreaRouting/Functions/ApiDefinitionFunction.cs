@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.Swagger.Standard;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
@@ -46,7 +45,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="theRequest">the http request</param>
         /// <param name="theDocumentGenerator">the document generator</param>
         /// <returns>a http response containing the generated document</returns>
-        [FunctionName("ApiDefinition")]
+        [Function("ApiDefinition")]
         [Display(Name = "Get the API Definition", Description = @"Returns this swagger document")]
         public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/api-definition")]HttpRequest theRequest) =>
             await Task.Run(() =>

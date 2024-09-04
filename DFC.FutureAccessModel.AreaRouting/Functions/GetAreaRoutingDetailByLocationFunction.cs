@@ -8,9 +8,8 @@ using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Functions.Worker;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
@@ -38,7 +37,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="theRequest">the request</param>
         /// <param name="inScope">in scope</param>
         /// <returns>the http message response</returns>
-        public async Task<HttpResponseMessage> DoRequest(HttpRequest theRequest, IScopeLoggingContext inScope)
+        public async Task<IActionResult> DoRequest(HttpRequest theRequest, IScopeLoggingContext inScope)
         {
             var hasSelector = theRequest.Query.ContainsKey(LocationKey);
             var theLocation = theRequest.Query[LocationKey];
@@ -56,7 +55,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="factory">(the logging scope) factory</param>
         /// <param name="adapter">(the routing details) adapter</param>
         /// <returns>the http response to the operation</returns>
-        [FunctionName("GetAreaRoutingDetailByLocation")]
+        [Function("GetAreaRoutingDetailByLocation")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = FunctionDescription.ResourceFound, ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.NoContent, ShowSchema = false)]
@@ -73,7 +72,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
                     <li>?location=WS11 (search by outward code)</li>
                     <li>?location=Stafford (search by town proposed, not yet implemented)</li>
                 </ul>")]
-        public async Task<HttpResponseMessage> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas")]HttpRequest theRequest,
             ILogger usingTraceWriter) =>
                 await RunActionScope(theRequest, usingTraceWriter, x => DoRequest(theRequest, x));

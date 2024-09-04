@@ -8,9 +8,10 @@ using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using AuthorizationLevel = Microsoft.Azure.Functions.Worker.AuthorizationLevel;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
@@ -30,7 +31,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="theRequest">the request</param>
         /// <param name="inScope">in scope</param>
         /// <returns>the resulting message</returns>
-        public async Task<HttpResponseMessage> AddAreaRoutingDetailUsing(HttpRequest theRequest, IScopeLoggingContext inScope)
+        public async Task<IActionResult> AddAreaRoutingDetailUsing(HttpRequest theRequest, IScopeLoggingContext inScope)
         {
             var theContent = await theRequest.ReadAsStringAsync();
             return await Adapter.AddAreaRoutingDetailUsing(theContent, inScope);
@@ -42,7 +43,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="theRequest">the request</param>
         /// <param name="usingTraceWriter">using (the) trace writer</param>
         /// <returns>the http response to the operation</returns>
-        [FunctionName("PostAreaRoutingDetail")]
+        [Function("PostAreaRoutingDetail")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Created, Description = FunctionDescription.ResourceCreated, ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.NoParentContent, ShowSchema = false)]
@@ -51,7 +52,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Create a new Area Routing Detail", Description = "Ability to add an Area Routing Detail.")]
-        public async Task<HttpResponseMessage> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "areas")]HttpRequest theRequest,
             ILogger usingTraceWriter) =>
                 await RunActionScope(theRequest, usingTraceWriter, x => AddAreaRoutingDetailUsing(theRequest, x));

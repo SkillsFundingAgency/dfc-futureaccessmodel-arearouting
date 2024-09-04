@@ -8,9 +8,8 @@ using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Functions.Worker;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
@@ -30,7 +29,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="theTouchpoint">the touchpoint</param>
         /// <param name="inScope">in scope</param>
         /// <returns>a message result</returns>
-        public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpoint, IScopeLoggingContext inScope) =>
+        public async Task<IActionResult> GetAreaRoutingDetailFor(string theTouchpoint, IScopeLoggingContext inScope) =>
             await Adapter.GetAreaRoutingDetailFor(theTouchpoint, inScope);
 
         /// <summary>
@@ -52,7 +51,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="usingTraceWriter">using (the) trace writer</param>
         /// <param name="touchpointID">(the) touchpoint id</param>
         /// <returns>the http response to the operation</returns>
-        [FunctionName("GetAreaRoutingDetailByTouchpointID")]
+        [Function("GetAreaRoutingDetailByTouchpointID")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = FunctionDescription.ResourceFound, ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.NoContent, ShowSchema = false)]
@@ -60,7 +59,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Get an Area Routing Detail By ID", Description = "Ability to return a Routing Detail for the given Touchpoint.")]
-        public async Task<HttpResponseMessage> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/{touchpointID}")]HttpRequest theRequest,
             ILogger usingTraceWriter,
             string touchpointID) =>

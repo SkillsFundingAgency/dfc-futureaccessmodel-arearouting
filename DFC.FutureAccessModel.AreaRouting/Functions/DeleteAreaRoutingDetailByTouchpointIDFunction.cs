@@ -8,9 +8,8 @@ using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Functions.Worker;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
@@ -33,7 +32,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="theTouchpoint">the touchpoint (id)</param>
         /// <param name="inScope">in scope</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> DeleteAreaRoutingDetailUsing(string theTouchpoint, IScopeLoggingContext inScope) =>
+        public async Task<IActionResult> DeleteAreaRoutingDetailUsing(string theTouchpoint, IScopeLoggingContext inScope) =>
             await Adapter.DeleteAreaRoutingDetailUsing(theTouchpoint, inScope);
 
         /// <summary>
@@ -43,14 +42,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <param name="usingTraceWriter">using (the) trace writer</param>
         /// <param name="touchpointID">(the) touchpoint id</param>
         /// <returns>the http response to the operation</returns>
-        [FunctionName("DeleteAreaRoutingDetail")]
+        [Function("DeleteAreaRoutingDetail")]
         [ProducesResponseType(typeof(RoutingDetail), (int)HttpStatusCode.OK)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = FunctionDescription.NoContent, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = FunctionDescription.MalformedRequest, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = FunctionDescription.Unauthorised, ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Delete an Area Routing Detail by ID", Description = "Ability to delete an Area Routing Detail for the given Touchpoint.")]
-        public async Task<HttpResponseMessage> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "areas/{touchpointID}")]HttpRequest theRequest,
             ILogger usingTraceWriter,
             string touchpointID) =>

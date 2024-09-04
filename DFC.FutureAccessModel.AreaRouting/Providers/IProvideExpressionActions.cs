@@ -2,15 +2,13 @@
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Models;
-using DFC.FutureAccessModel.AreaRouting.Registration;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers
 {
     /// <summary>
     /// i provide expression actions
     /// </summary>
-    public interface IProvideExpressionActions :
-        ISupportServiceRegistration
+    public interface IProvideExpressionActions
     {
         /// <summary>
         ///  get action for

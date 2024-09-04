@@ -1,14 +1,12 @@
 ﻿using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Models;
-using DFC.FutureAccessModel.AreaRouting.Registration;
 
 namespace DFC.FutureAccessModel.AreaRouting.Validation
 {
     /// <summary>
     /// i validate routing details
     /// </summary>
-    public interface IValidateRoutingDetails :
-        ISupportServiceRegistration
+    public interface IValidateRoutingDetails
     {
         /// <summary>
         /// validate...

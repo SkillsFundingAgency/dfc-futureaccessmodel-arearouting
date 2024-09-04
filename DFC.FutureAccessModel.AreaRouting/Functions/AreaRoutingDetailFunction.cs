@@ -6,6 +6,7 @@ using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
@@ -28,10 +29,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
             Adapter = adapter;
         }
 
-        public async Task<HttpResponseMessage> RunActionScope(
+        public async Task<IActionResult> RunActionScope(
             HttpRequest theRequest,
             ILogger usingTraceWriter,
-            Func<IScopeLoggingContext, Task<HttpResponseMessage>> actionDo)
+            Func<IScopeLoggingContext, Task<IActionResult>> actionDo)
         {
             It.IsNull(theRequest)
                 .AsGuard<ArgumentNullException>(nameof(theRequest));

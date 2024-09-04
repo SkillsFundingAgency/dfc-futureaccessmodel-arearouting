@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web.Http;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
     /// <summary>
     /// function maps used inside the fault response provider
     /// </summary>
-    internal sealed class FunctionMaps : Dictionary<Type, Func<Exception, HttpResponseMessage>> { }
+    internal sealed class FunctionMaps : Dictionary<Type, Func<Exception, IActionResult>> { }
 
     /// <summary>
     /// methods maps used inside the fault response provider
@@ -51,11 +53,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(MalformedRequestException), x => NoContent());
-            _faultMap.Add(typeof(NoContentException), x => NoContent(x.Message));
+            _faultMap.Add(typeof(MalformedRequestException), x => new NoContentResult());
+            _faultMap.Add(typeof(NoContentException), x => new NoContentResult());
 
-            _faultMap.Add(typeof(InvalidPostcodeException), x => NoContent(x.Message));
-            _faultMap.Add(typeof(FallbackActionException), x => NoContent());
+            _faultMap.Add(typeof(InvalidPostcodeException), x => new NoContentResult());
+            _faultMap.Add(typeof(FallbackActionException), x => new NoContentResult());
 
             return _faultMap;
         }
@@ -68,10 +70,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(MalformedRequestException), x => Malformed(x.Message));
-            _faultMap.Add(typeof(NoContentException), x => NoContent(x.Message));
+            _faultMap.Add(typeof(MalformedRequestException), x => new BadRequestObjectResult(x.Message));
+            _faultMap.Add(typeof(NoContentException), x => new NoContentResult());
 
-            _faultMap.Add(typeof(FallbackActionException), x => NoContent(x.Message));
+            _faultMap.Add(typeof(FallbackActionException), x => new NoContentResult());
 
             return _faultMap;
         }
@@ -84,10 +86,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(MalformedRequestException), x => Malformed(x.Message));
-            _faultMap.Add(typeof(NoContentException), x => NoContent(x.Message));
+            _faultMap.Add(typeof(MalformedRequestException), x => new BadRequestObjectResult(new { x.Message}));
+            _faultMap.Add(typeof(NoContentException), x => new NoContentResult());
 
-            _faultMap.Add(typeof(FallbackActionException), x => UnknownError(x.Message));
+            _faultMap.Add(typeof(FallbackActionException), x => new InternalServerErrorResult());
 
             return _faultMap;
         }
@@ -100,12 +102,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(ConflictingResourceException), x => Conflicted(x.Message));
-            _faultMap.Add(typeof(MalformedRequestException), x => Malformed(x.Message));
-            _faultMap.Add(typeof(NoContentException), x => NoContent(x.Message));
-            _faultMap.Add(typeof(UnprocessableEntityException), x => UnprocessableEntity(x.Message));
+            _faultMap.Add(typeof(ConflictingResourceException), x => new ConflictObjectResult(x.Message));
+            _faultMap.Add(typeof(MalformedRequestException), x => new BadRequestObjectResult(x.Message));
+            _faultMap.Add(typeof(NoContentException), x => new NoContentResult());
+            _faultMap.Add(typeof(UnprocessableEntityException), x => new UnprocessableEntityObjectResult(x.Message));
 
-            _faultMap.Add(typeof(FallbackActionException), x => UnknownError(x.Message));
+            _faultMap.Add(typeof(FallbackActionException), x => new InternalServerErrorResult());
 
             return _faultMap;
         }
@@ -117,7 +119,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <param name="theMethod">the type of method</param>
         /// <param name="useLoggingScope">use (the) logging scope</param>
         /// <returns>the currently running task containing the http response message</returns>
-        public async Task<HttpResponseMessage> GetResponseFor(Exception theException, TypeOfFunction theMethod, IScopeLoggingContext useLoggingScope)
+        public async Task<IActionResult> GetResponseFor(Exception theException, TypeOfFunction theMethod, IScopeLoggingContext useLoggingScope)
         {
             var exceptionType = theException.GetType();
 
@@ -147,54 +149,5 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 await InformOn(theException.InnerException, useLoggingScope);
             }
         }
-
-        /// <summary>
-        /// the malformed request action
-        /// </summary>
-        /// <returns>a 'bad request' message</returns>
-        internal HttpResponseMessage Malformed(string theMessage = "") =>
-            CreateMessage(HttpStatusCode.BadRequest)
-                .SetContent(theMessage);
-
-        /// <summary>
-        /// the conflicted request action
-        /// </summary>
-        /// <param name="theException">the exception</param>
-        /// <returns>a conflicted message</returns>
-        internal HttpResponseMessage Conflicted(string theMessage = "") =>
-            CreateMessage(HttpStatusCode.Conflict)
-                .SetContent(theMessage);
-
-        /// <summary>
-        /// the no content action
-        /// </summary>
-        /// <returns>a 'no content' message</returns>
-        internal HttpResponseMessage NoContent(string theMessage = "") =>
-            CreateMessage(HttpStatusCode.NoContent)
-                .SetContent(theMessage);
-
-        /// <summary>
-        /// the unprocessable entity action
-        /// </summary>
-        /// <returns>a 'unprocessable entity' message</returns>
-        internal HttpResponseMessage UnprocessableEntity(string theMessage = "") =>
-            CreateMessage(LocalHttpStatusCode.UnprocessableEntity.AsHttpStatusCode())
-                .SetContent(theMessage);
-
-        /// <summary>
-        /// the unknown error action
-        /// </summary>
-        /// <returns>an 'internal server error' message</returns>
-        internal HttpResponseMessage UnknownError(string theMessage = "") =>
-             CreateMessage(HttpStatusCode.InternalServerError)
-                .SetContent(theMessage);
-
-        /// <summary>
-        /// create's the base http response message
-        /// </summary>
-        /// <param name="forCode">for (the given) coe</param>
-        /// <returns>a http response message</returns>
-        internal HttpResponseMessage CreateMessage(HttpStatusCode forCode) =>
-            new HttpResponseMessage(forCode);
     }
 }
