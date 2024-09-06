@@ -1,11 +1,10 @@
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
@@ -95,13 +94,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
                 .Returns(Task.FromResult(scope));
             GetMock(sut.Adapter)
                 .Setup(x => x.DeleteAreaRoutingDetailUsing(theTouchpoint, scope))
-                .Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)));
+                .Returns(Task.FromResult<IActionResult>(new OkResult()));
 
             // act
             var result = await sut.Run(request, trace, theTouchpoint);
 
             // assert
-            Assert.IsAssignableFrom<HttpResponseMessage>(result);
+            Assert.IsAssignableFrom<OkResult>(result);
         }
 
         /// <summary>

@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
@@ -101,14 +103,17 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
                 .Returns(Task.FromResult(scope));
             GetMock(sut.Adapter)
                 .Setup(x => x.AddAreaRoutingDetailUsing(theContent, scope))
-                .Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.Created)));
+                .Returns(Task.FromResult<IActionResult>(new JsonResult(theContent, new JsonSerializerSettings())
+                    { StatusCode = (int)HttpStatusCode.Created })
+                );
 
             // act
             var result = await sut.Run(request, trace);
+            var resultResponse = result as JsonResult;
 
             // assert
-            Assert.Equal(HttpStatusCode.Created, result.StatusCode);
-            Assert.IsAssignableFrom<HttpResponseMessage>(result);
+            Assert.Equal((int)HttpStatusCode.Created, resultResponse.StatusCode);
+            Assert.IsAssignableFrom<IActionResult>(result);
         }
 
         /// <summary>
