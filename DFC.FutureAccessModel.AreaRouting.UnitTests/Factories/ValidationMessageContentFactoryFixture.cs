@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories.Internal;
+using System.ComponentModel.DataAnnotations;
 using Xunit;
 
-namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Factories
 {
     /// <summary>
     /// the validation message content factory fixture

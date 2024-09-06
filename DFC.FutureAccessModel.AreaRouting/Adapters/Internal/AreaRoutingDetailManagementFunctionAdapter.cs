@@ -5,14 +5,12 @@ using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.FutureAccessModel.AreaRouting.Validation;
-using DFC.HTTP.Standard;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
 namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 {
@@ -31,11 +29,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// the safe operations (provider)
         /// </summary>
         public IProvideSafeOperations SafeOperations { get; }
-
-        /// <summary>
-        /// the response (helper)
-        /// </summary>
-        public IHttpResponseMessageHelper Respond { get; }
 
         /// <summary>
         /// the (area) routing details (storage provider)
@@ -61,13 +54,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// create an instance of <see cref="AreaRoutingDetailManagementFunctionAdapter"/>
         /// </summary>
         /// <param name="routingDetails">the storage provider</param>
-        /// <param name="responseHelper">the response helper</param>
         /// <param name="faultResponses">the fault responses (provider)</param>
         /// <param name="safeOperations">the safe operations (provider)</param>
         /// <param name="analyser">the expression analyser</param>
         /// <param name="actions">the expression action provider</param>
         public AreaRoutingDetailManagementFunctionAdapter(
-            IHttpResponseMessageHelper responseHelper,
             IProvideFaultResponses faultResponses,
             IProvideSafeOperations safeOperations,
             IStoreAreaRoutingDetails routingDetails,
@@ -75,8 +66,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             IAnalyseExpresssions analyser,
             IProvideExpressionActions actions)
         {
-            It.IsNull(responseHelper)
-                .AsGuard<ArgumentNullException>(nameof(responseHelper));
             It.IsNull(faultResponses)
                 .AsGuard<ArgumentNullException>(nameof(faultResponses));
             It.IsNull(safeOperations)
@@ -90,7 +79,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             It.IsNull(actions)
                 .AsGuard<ArgumentNullException>(nameof(actions));
 
-            Respond = responseHelper;
             Faults = faultResponses;
             SafeOperations = safeOperations;
             RoutingDetails = routingDetails;
@@ -134,7 +122,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await inScope.Information($"candidate search complete: '{theDetail.TouchpointID}'");
             await inScope.Information($"preparing response...");
 
-            //var response = Respond.Ok().SetContent(theDetail);
             var response = new OkObjectResult(theDetail);
 
             await inScope.Information($"preparation complete...");
@@ -255,7 +242,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await inScope.Information($"candidate addition complete...");
             await inScope.Information($"preparing response...");
 
-            //var response = Respond.Created().SetContent(result);
             var response = new JsonResult(result, new JsonSerializerSettings())
             {
                 StatusCode = (int)HttpStatusCode.Created
@@ -296,7 +282,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await inScope.Information($"candidate content: '{theCandidate}'");
             await inScope.Information($"preparing response...");
 
-            //var response = Respond.Ok().SetContent(theCandidate);
             var response = new OkObjectResult(theCandidate);
 
             await inScope.Information($"preparation complete...");
@@ -331,7 +316,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
             await inScope.Information($"preparing response...");
 
-            //var response = Respond.Ok();
             var response = new OkResult();
 
             await inScope.Information($"preparation complete...");

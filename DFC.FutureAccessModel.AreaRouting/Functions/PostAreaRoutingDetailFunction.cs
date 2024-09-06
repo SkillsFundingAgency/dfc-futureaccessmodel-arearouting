@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;

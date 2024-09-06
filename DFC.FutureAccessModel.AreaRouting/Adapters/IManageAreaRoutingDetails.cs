@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,6 +1,7 @@
-﻿using Xunit;
+﻿using DFC.FutureAccessModel.AreaRouting.Providers.Internal;
+using Xunit;
 
-namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Providers
 {
     /// <summary>
     /// the application settings provider fixture

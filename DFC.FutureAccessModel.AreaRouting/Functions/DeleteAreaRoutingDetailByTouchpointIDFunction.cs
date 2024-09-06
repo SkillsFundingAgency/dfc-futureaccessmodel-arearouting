@@ -1,15 +1,14 @@
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {

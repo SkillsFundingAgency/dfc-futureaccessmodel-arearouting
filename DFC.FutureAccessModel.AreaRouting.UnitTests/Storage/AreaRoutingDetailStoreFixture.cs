@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
-using Moq;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
