@@ -1,13 +1,12 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
-using System.Threading.Tasks;
-using DFC.FutureAccessModel.AreaRouting.Helpers;
+﻿using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.Swagger.Standard;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
@@ -42,19 +41,18 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <summary>
         /// run... (the api document generator function)
         /// </summary>
-        /// <param name="theRequest">the http request</param>
-        /// <param name="theDocumentGenerator">the document generator</param>
+        /// <param name="request">the http request</param>
         /// <returns>a http response containing the generated document</returns>
         [Function("ApiDefinition")]
         [Display(Name = "Get the API Definition", Description = @"Returns this swagger document")]
-        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/api-definition")]HttpRequest theRequest) =>
-            await Task.Run(() =>
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/api-definition")]HttpRequest request) =>
+            await Task.Run<IActionResult>(() =>
             {
-                It.IsNull(theRequest)
-                    .AsGuard<ArgumentNullException>(nameof(theRequest));
+                It.IsNull(request)
+                    .AsGuard<ArgumentNullException>(nameof(request));
 
-                var theDocument = Generator.GenerateSwaggerDocument(
-                    theRequest,
+                var document = Generator.GenerateSwaggerDocument(
+                    request,
                     ApiTitle,
                     ApiDescription,
                     ApiDefinitionName,
@@ -62,10 +60,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
                     Assembly.GetExecutingAssembly(),
                     false, false); // don't include some irrelevant default parameters
 
-                return new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(theDocument)
-                };
+                if (string.IsNullOrEmpty(document))
+                    return new NoContentResult();
+
+                return new OkObjectResult(document);
             });
     }
 }
