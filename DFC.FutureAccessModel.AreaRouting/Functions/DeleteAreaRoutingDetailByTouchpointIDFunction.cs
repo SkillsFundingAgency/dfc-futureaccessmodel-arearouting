@@ -13,32 +13,40 @@ using System.Threading.Tasks;
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
     /// <summary>
-    /// the delete area rouing detail by touchpoint id function
+    /// the delete area routing detail by touchpoint id function
     /// </summary>
     public sealed class DeleteAreaRoutingDetailByTouchpointIDFunction :
         AreaRoutingDetailFunction
     {
+        private readonly ILogger<DeleteAreaRoutingDetailByTouchpointIDFunction> _logger;
+
         /// <summary>
         /// initialises an instance of the <see cref="DeleteAreaRoutingDetailByTouchpointIDFunction"/>
         /// </summary>
         /// <param name="factory">the logging scope factory</param>
         /// <param name="adapter">the area routing detail management function adapter</param>
-        public DeleteAreaRoutingDetailByTouchpointIDFunction(ICreateLoggingContextScopes factory, IManageAreaRoutingDetails adapter) : base(factory, adapter) { }
+        /// <param name="logger">The logger instance</param>
+        public DeleteAreaRoutingDetailByTouchpointIDFunction(
+            ICreateLoggingContextScopes factory,
+            IManageAreaRoutingDetails adapter,
+            ILogger<DeleteAreaRoutingDetailByTouchpointIDFunction> logger) : base(factory, adapter)
+        {
+            _logger = logger;
+        }
 
         /// <summary>
         /// delete an area routing detail using...
         /// </summary>
-        /// <param name="theTouchpoint">the touchpoint (id)</param>
+        /// <param name="touchpoint">the touchpoint (id)</param>
         /// <param name="inScope">in scope</param>
         /// <returns></returns>
-        public async Task<IActionResult> DeleteAreaRoutingDetailUsing(string theTouchpoint, IScopeLoggingContext inScope) =>
-            await Adapter.DeleteAreaRoutingDetailUsing(theTouchpoint, inScope);
+        public async Task<IActionResult> DeleteAreaRoutingDetailUsing(string touchpoint, IScopeLoggingContext inScope) =>
+            await Adapter.DeleteAreaRoutingDetailUsing(touchpoint, inScope);
 
         /// <summary>
         /// run...
         /// </summary>
-        /// <param name="theRequest">the request</param>
-        /// <param name="usingTraceWriter">using (the) trace writer</param>
+        /// <param name="request">the request</param>
         /// <param name="touchpointID">(the) touchpoint id</param>
         /// <returns>the http response to the operation</returns>
         [Function("DeleteAreaRoutingDetail")]
@@ -49,9 +57,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Delete an Area Routing Detail by ID", Description = "Ability to delete an Area Routing Detail for the given Touchpoint.")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "areas/{touchpointID}")]HttpRequest theRequest,
-            ILogger usingTraceWriter,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "areas/{touchpointID}")]
+            HttpRequest request,
             string touchpointID) =>
-                await RunActionScope(theRequest, usingTraceWriter, x => DeleteAreaRoutingDetailUsing(touchpointID, x));
+                await RunActionScope(request, _logger, x => DeleteAreaRoutingDetailUsing(touchpointID, x));
     }
 }

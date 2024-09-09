@@ -1,26 +1,35 @@
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
     public sealed class GetAreaRoutingDetailByTouchpointIDFunction :
         AreaRoutingDetailFunction
     {
+        private readonly ILogger<GetAreaRoutingDetailByTouchpointIDFunction> _logger;
+
         /// <summary>
         /// initialises an instance of the <see cref="GetAreaRoutingDetailByTouchpointIDFunction"/>
         /// </summary>
         /// <param name="factory">the logging scope factory</param>
         /// <param name="adapter">the area routing detail management function adapter</param>
-        public GetAreaRoutingDetailByTouchpointIDFunction(ICreateLoggingContextScopes factory, IManageAreaRoutingDetails adapter) : base(factory, adapter) { }
+        /// <param name="logger">The logger instance</param>
+        public GetAreaRoutingDetailByTouchpointIDFunction(
+            ICreateLoggingContextScopes factory,
+            IManageAreaRoutingDetails adapter,
+            ILogger<GetAreaRoutingDetailByTouchpointIDFunction> logger) : base(factory, adapter)
+        {
+            _logger = logger;
+        }
 
         /// <summary>
         /// get area routing detail for...
@@ -46,8 +55,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// 0000000999, National Careers Helpline
         /// 1000000000, Digital
         /// </summary>
-        /// <param name="theRequest">the request</param>
-        /// <param name="usingTraceWriter">using (the) trace writer</param>
+        /// <param name="request">the request</param>
         /// <param name="touchpointID">(the) touchpoint id</param>
         /// <returns>the http response to the operation</returns>
         [Function("GetAreaRoutingDetailByTouchpointID")]
@@ -59,9 +67,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Get an Area Routing Detail By ID", Description = "Ability to return a Routing Detail for the given Touchpoint.")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/{touchpointID}")]HttpRequest theRequest,
-            ILogger usingTraceWriter,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/{touchpointID}")]
+            HttpRequest request,
             string touchpointID) =>
-                await RunActionScope(theRequest, usingTraceWriter, x => GetAreaRoutingDetailFor(touchpointID, x));
+                await RunActionScope(request, _logger, x => GetAreaRoutingDetailFor(touchpointID, x));
     }
 }
