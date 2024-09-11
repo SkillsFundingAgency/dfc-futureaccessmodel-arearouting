@@ -29,16 +29,16 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         }
 
         public async Task<IActionResult> RunActionScope(
-            HttpRequest theRequest,
+            HttpRequest request,
             ILogger usingTraceWriter,
             Func<IScopeLoggingContext, Task<IActionResult>> actionDo)
         {
-            It.IsNull(theRequest)
-                .AsGuard<ArgumentNullException>(nameof(theRequest));
+            It.IsNull(request)
+                .AsGuard<ArgumentNullException>(nameof(request));
             It.IsNull(usingTraceWriter)
                 .AsGuard<ArgumentNullException>(nameof(usingTraceWriter));
 
-            using (var inScope = await Factory.BeginScopeFor(theRequest, usingTraceWriter))
+            using (var inScope = await Factory.BeginScopeFor(request, usingTraceWriter))
             {
                 return await actionDo(inScope);
             }
