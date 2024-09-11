@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
@@ -92,7 +93,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
                 .Returns(Task.FromResult(scope.Object));
             GetMock(sut.Adapter)
                 .Setup(x => x.AddAreaRoutingDetailUsing(theContent, scope.Object))
-                .Returns(Task.FromResult<IActionResult>(new JsonResult(theContent, new JsonSerializerSettings())
+                .Returns(Task.FromResult<IActionResult>(new JsonResult(theContent, new JsonSerializerOptions())
                 { StatusCode = (int)HttpStatusCode.Created })
                 );
 

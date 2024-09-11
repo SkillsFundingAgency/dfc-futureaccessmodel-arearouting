@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
@@ -242,7 +243,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await inScope.Information($"candidate addition complete...");
             await inScope.Information($"preparing response...");
 
-            var response = new JsonResult(result, new JsonSerializerSettings())
+            var response = new JsonResult(result, new JsonSerializerOptions())
             {
                 StatusCode = (int)HttpStatusCode.Created
             };
