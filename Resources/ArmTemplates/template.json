@@ -110,6 +110,9 @@
                     },
                     "nonASETier": {
                         "value": "[parameters('aspTier')]"
+                    },
+                    "netVersion": {
+                        "value": "v8.0"
                     }
                 }
             }
