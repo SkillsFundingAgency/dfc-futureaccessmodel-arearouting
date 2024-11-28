@@ -110,9 +110,6 @@
                     },
                     "nonASETier": {
                         "value": "[parameters('aspTier')]"
-                    },
-                    "netVersion": {
-                        "value": "v8.0"
                     }
                 }
             }
@@ -168,6 +165,9 @@
                     },
                     "deployStagingSlot": {
                         "value": true
+                    },
+                    "netVersion": {
+                        "value": "v8.0"
                     },
                     "appServiceAppSettings": {
                         "value": [
