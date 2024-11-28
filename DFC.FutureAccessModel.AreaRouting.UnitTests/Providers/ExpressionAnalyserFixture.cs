@@ -1,5 +1,4 @@
-﻿using System;
-using DFC.FutureAccessModel.AreaRouting.Models;
+﻿using DFC.FutureAccessModel.AreaRouting.Models;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal

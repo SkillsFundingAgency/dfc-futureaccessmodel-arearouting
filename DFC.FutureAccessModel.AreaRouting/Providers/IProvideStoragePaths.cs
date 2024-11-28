@@ -1,13 +1,11 @@
 ﻿using System;
-using DFC.FutureAccessModel.AreaRouting.Registration;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers
 {
     /// <summary>
     /// i provide storage paths
     /// </summary>
-    public interface IProvideStoragePaths :
-        ISupportServiceRegistration
+    public interface IProvideStoragePaths
     {
         /// <summary>
         /// the routing detail collection (path), used for new documents

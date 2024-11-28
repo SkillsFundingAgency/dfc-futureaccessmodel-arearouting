@@ -1,5 +1,4 @@
 ﻿using System;
-using DFC.FutureAccessModel.AreaRouting.Registration;
 using DFC.FutureAccessModel.AreaRouting.Wrappers;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories
@@ -7,8 +6,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
     /// <summary>
     /// i create document clients
     /// </summary>
-    public interface ICreateDocumentClients :
-        ISupportServiceRegistration
+    public interface ICreateDocumentClients
     {
         /// <summary>
         /// create client...

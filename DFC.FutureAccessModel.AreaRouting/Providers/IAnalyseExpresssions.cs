@@ -1,13 +1,11 @@
 ﻿using DFC.FutureAccessModel.AreaRouting.Models;
-using DFC.FutureAccessModel.AreaRouting.Registration;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers
 {
     /// <summary>
     /// i analyse expressions
     /// </summary>
-    public interface IAnalyseExpresssions :
-        ISupportServiceRegistration
+    public interface IAnalyseExpresssions
     {
         /// <summary>
         /// get type of expression for...

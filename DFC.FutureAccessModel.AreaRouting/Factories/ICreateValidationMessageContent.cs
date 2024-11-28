@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using DFC.FutureAccessModel.AreaRouting.Registration;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories
 {
     /// <summary>
     /// i create validation messages
     /// </summary>
-    public interface ICreateValidationMessageContent :
-        ISupportServiceRegistration
+    public interface ICreateValidationMessageContent
     {
         /// <summary>
         /// create... transforms a collection of <seealso cref="ValidationResult"/>

@@ -1,8 +1,9 @@
-﻿using DFC.FutureAccessModel.AreaRouting.Wrappers;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories.Internal;
+using DFC.FutureAccessModel.AreaRouting.Wrappers;
 using DFC.FutureAccessModel.AreaRouting.Wrappers.Internal;
 using Xunit;
 
-namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Factories
 {
     /// <summary>
     ///  the postcodes client factory fixture

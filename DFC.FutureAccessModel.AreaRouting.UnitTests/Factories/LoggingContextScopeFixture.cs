@@ -1,14 +1,12 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using DFC.Common.Standard.Logging;
+﻿using DFC.Common.Standard.Logging;
+using DFC.FutureAccessModel.AreaRouting.Factories.Internal;
 using DFC.FutureAccessModel.AreaRouting.Faults;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Moq;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
-namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Factories
 {
     /// <summary>
     /// the logging context scope factory fixture

@@ -1,11 +1,11 @@
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {
@@ -28,17 +28,17 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
             Adapter = adapter;
         }
 
-        public async Task<HttpResponseMessage> RunActionScope(
-            HttpRequest theRequest,
+        public async Task<IActionResult> RunActionScope(
+            HttpRequest request,
             ILogger usingTraceWriter,
-            Func<IScopeLoggingContext, Task<HttpResponseMessage>> actionDo)
+            Func<IScopeLoggingContext, Task<IActionResult>> actionDo)
         {
-            It.IsNull(theRequest)
-                .AsGuard<ArgumentNullException>(nameof(theRequest));
+            It.IsNull(request)
+                .AsGuard<ArgumentNullException>(nameof(request));
             It.IsNull(usingTraceWriter)
                 .AsGuard<ArgumentNullException>(nameof(usingTraceWriter));
 
-            using (var inScope = await Factory.BeginScopeFor(theRequest, usingTraceWriter))
+            using (var inScope = await Factory.BeginScopeFor(request, usingTraceWriter))
             {
                 return await actionDo(inScope);
             }
