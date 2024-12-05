@@ -1,12 +1,10 @@
-﻿using DFC.FutureAccessModel.AreaRouting.Registration;
-
+﻿
 namespace DFC.FutureAccessModel.AreaRouting.Providers
 {
     /// <summary>
     /// i provide application settings
     /// </summary>
-    public interface IProvideApplicationSettings :
-        ISupportServiceRegistration
+    public interface IProvideApplicationSettings
     {
         /// <summary>
         /// get (the) variable

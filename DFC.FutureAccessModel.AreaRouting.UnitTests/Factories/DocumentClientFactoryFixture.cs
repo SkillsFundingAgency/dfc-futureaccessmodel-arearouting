@@ -1,9 +1,10 @@
-﻿using System;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories.Internal;
 using DFC.FutureAccessModel.AreaRouting.Wrappers;
 using DFC.FutureAccessModel.AreaRouting.Wrappers.Internal;
+using System;
 using Xunit;
 
-namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Factories
 {
     public sealed class DocumentClientFactoryFixture :
         MoqTestingFixture

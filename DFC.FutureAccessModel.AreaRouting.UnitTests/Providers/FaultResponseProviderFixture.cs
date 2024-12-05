@@ -5,6 +5,7 @@ using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using MarkEmbling.PostcodesIO.Exceptions;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
@@ -51,10 +52,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             // act
             var result = await sut.GetResponseFor(exception, TypeOfFunction.GetByLocation, logger);
+            var resultResponse = result as NoContentResult;
 
             // assert
-            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
-            Assert.Equal(expectedMessage, await result.Content.ReadAsStringAsync());
+            Assert.Equal((int)HttpStatusCode.NoContent, resultResponse.StatusCode);
         }
 
         /// <summary>
@@ -79,10 +80,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             // act
             var result = await sut.GetResponseFor(theException, TypeOfFunction.GetByLocation, logger);
+            var resultResponse = result as NoContentResult;
 
             // assert
-            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
-            Assert.Equal(fallbackContent, await result.Content.ReadAsStringAsync());
+            Assert.Equal((int)HttpStatusCode.NoContent, resultResponse.StatusCode);
         }
 
         /// <summary>
@@ -103,10 +104,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             // act
             var result = await sut.GetResponseFor(theException, TypeOfFunction.GetByLocation, logger);
+            var resultResponse = result as NoContentResult;
 
             // assert
-            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
-            Assert.Equal(fallbackContent, await result.Content.ReadAsStringAsync());
+            Assert.Equal((int)HttpStatusCode.NoContent, resultResponse.StatusCode);
         }
 
         /// <summary>
@@ -132,10 +133,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             // act
             var result = await sut.GetResponseFor(exception, TypeOfFunction.Post, logger);
+            var resultResponse = result as ObjectResult;
 
             // assert
-            Assert.Equal(expectedState, result.StatusCode);
-            Assert.Equal(expectedMessage, await result.Content.ReadAsStringAsync());
+            Assert.Equal((int)expectedState, resultResponse.StatusCode);
+            Assert.Equal(fallbackContent, resultResponse.Value.ToString());
         }
 
         /// <summary>
@@ -161,90 +163,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             // act
             var result = await sut.GetResponseFor(exception, TypeOfFunction.GetByLocation, logger);
+            var resultResponse = result as NoContentResult;
 
             // assert
-            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
-            Assert.Equal(fallbackContent, await result.Content.ReadAsStringAsync());
-        }
-
-        /// <summary>
-        /// malformed meets expectation
-        /// </summary>
-        [Fact]
-        public void MalformedMeetsExpectation()
-        {
-            // arrange
-            var sut = MakeSUT();
-
-            // act
-            var result = sut.Malformed(string.Empty);
-
-            // assert
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-        }
-
-        /// <summary>
-        /// conflicted meets expectation
-        /// </summary>
-        [Fact]
-        public void ConflictedMeetsExpectation()
-        {
-            // arrange
-            var sut = MakeSUT();
-
-            // act
-            var result = sut.Conflicted(string.Empty);
-
-            // assert
-            Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
-        }
-
-        /// <summary>
-        /// no content meets expectation
-        /// </summary>
-        [Fact]
-        public void NoContentMeetsExpectation()
-        {
-            // arrange
-            var sut = MakeSUT();
-
-            // act
-            var result = sut.NoContent(string.Empty);
-
-            // assert
-            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
-        }
-
-        /// <summary>
-        /// unprocessable entity meets expectation
-        /// </summary>
-        [Fact]
-        public void UnprocessableEntityMeetsExpectation()
-        {
-            // arrange
-            var sut = MakeSUT();
-
-            // act
-            var result = sut.UnprocessableEntity(string.Empty);
-
-            // assert
-            Assert.Equal((HttpStatusCode)422, result.StatusCode);
-        }
-
-        /// <summary>
-        /// unknown meets expectation
-        /// </summary>
-        [Fact]
-        public void UnknownErrorMeetsExpectation()
-        {
-            // arrange
-            var sut = MakeSUT();
-
-            // act
-            var result = sut.UnknownError(string.Empty);
-
-            // assert
-            Assert.Equal(HttpStatusCode.InternalServerError, result.StatusCode);
+            Assert.Equal((int)HttpStatusCode.NoContent, resultResponse.StatusCode);
         }
 
         /// <summary>

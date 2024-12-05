@@ -1,13 +1,11 @@
-﻿using DFC.FutureAccessModel.AreaRouting.Registration;
-using DFC.FutureAccessModel.AreaRouting.Wrappers;
+﻿using DFC.FutureAccessModel.AreaRouting.Wrappers;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories
 {
     /// <summary>
     /// i create postcodes clients
     /// </summary>
-    public interface ICreatePostcodeClients :
-        ISupportServiceRegistration
+    public interface ICreatePostcodeClients
     {
         /// <summary>
         /// create client...

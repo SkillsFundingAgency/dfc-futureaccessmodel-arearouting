@@ -5,11 +5,12 @@ using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Providers;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.FutureAccessModel.AreaRouting.Validation;
-using DFC.HTTP.Standard;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
-using System.Net.Http;
+using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
@@ -29,11 +30,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// the safe operations (provider)
         /// </summary>
         public IProvideSafeOperations SafeOperations { get; }
-
-        /// <summary>
-        /// the response (helper)
-        /// </summary>
-        public IHttpResponseMessageHelper Respond { get; }
 
         /// <summary>
         /// the (area) routing details (storage provider)
@@ -59,13 +55,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// create an instance of <see cref="AreaRoutingDetailManagementFunctionAdapter"/>
         /// </summary>
         /// <param name="routingDetails">the storage provider</param>
-        /// <param name="responseHelper">the response helper</param>
         /// <param name="faultResponses">the fault responses (provider)</param>
         /// <param name="safeOperations">the safe operations (provider)</param>
         /// <param name="analyser">the expression analyser</param>
         /// <param name="actions">the expression action provider</param>
         public AreaRoutingDetailManagementFunctionAdapter(
-            IHttpResponseMessageHelper responseHelper,
             IProvideFaultResponses faultResponses,
             IProvideSafeOperations safeOperations,
             IStoreAreaRoutingDetails routingDetails,
@@ -73,8 +67,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             IAnalyseExpresssions analyser,
             IProvideExpressionActions actions)
         {
-            It.IsNull(responseHelper)
-                .AsGuard<ArgumentNullException>(nameof(responseHelper));
             It.IsNull(faultResponses)
                 .AsGuard<ArgumentNullException>(nameof(faultResponses));
             It.IsNull(safeOperations)
@@ -88,7 +80,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             It.IsNull(actions)
                 .AsGuard<ArgumentNullException>(nameof(actions));
 
-            Respond = responseHelper;
             Faults = faultResponses;
             SafeOperations = safeOperations;
             RoutingDetails = routingDetails;
@@ -104,8 +95,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="theTouchpointID">the touchpoint id</param>
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        public async Task<HttpResponseMessage> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inScope)
-        {
+        public async Task<IActionResult> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inScope)
+        { 
             return await SafeOperations.Try(() => ProcessGetAreaRoutingDetailFor(theTouchpointID, inScope), x => Faults.GetResponseFor(x, TypeOfFunction.GetByID, inScope));
         }
 
@@ -115,7 +106,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="theTouchpointID">the touchpoint id</param>
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success only)</returns>
-        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inScope)
+        internal async Task<IActionResult> ProcessGetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inScope)
         {
             await inScope.EnterMethod();
 
@@ -132,7 +123,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await inScope.Information($"candidate search complete: '{theDetail.TouchpointID}'");
             await inScope.Information($"preparing response...");
 
-            var response = Respond.Ok().SetContent(theDetail);
+            var response = new OkObjectResult(theDetail);
 
             await inScope.Information($"preparation complete...");
             await inScope.ExitMethod();
@@ -147,7 +138,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="theLocation">the location</param>
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        public async Task<HttpResponseMessage> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inScope)
+        public async Task<IActionResult> GetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inScope)
         {
             return await SafeOperations.Try(() => ProcessGetAreaRoutingDetailBy(theLocation, inScope), x => Faults.GetResponseFor(x, TypeOfFunction.GetByLocation, inScope));
         }
@@ -158,7 +149,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="theLocation">the location</param>
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        internal async Task<HttpResponseMessage> ProcessGetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inScope)
+        internal async Task<IActionResult> ProcessGetAreaRoutingDetailBy(string theLocation, IScopeLoggingContext inScope)
         {
             await inScope.EnterMethod();
 
@@ -194,7 +185,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="usingContent">using content</param>
         /// <param name="inScope">in scope</param>
         /// <returns>the result of the operation</returns>
-        public async Task<HttpResponseMessage> AddAreaRoutingDetailUsing(string theContent, IScopeLoggingContext inScope)
+        public async Task<IActionResult> AddAreaRoutingDetailUsing(string theContent, IScopeLoggingContext inScope)
         {
             return await SafeOperations.Try(() => ProcessAddAreaRoutingDetailUsing(theContent, inScope), x => Faults.GetResponseFor(x, TypeOfFunction.Post, inScope));
         }
@@ -206,7 +197,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="usingContent">using content</param>
         /// <param name="inScope">in scope</param>
         /// <returns>the result of the operation</returns>
-        public async Task<HttpResponseMessage> ProcessAddAreaRoutingDetailUsing(
+        public async Task<IActionResult> ProcessAddAreaRoutingDetailUsing(
             string theContent,
             IScopeLoggingContext inScope)
         {
@@ -252,7 +243,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await inScope.Information($"candidate addition complete...");
             await inScope.Information($"preparing response...");
 
-            var response = Respond.Created().SetContent(result);
+            var response = new JsonResult(result, new JsonSerializerOptions())
+            {
+                StatusCode = (int)HttpStatusCode.Created
+            };
 
             await inScope.Information($"preparation complete...");
             await inScope.ExitMethod();
@@ -265,7 +259,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// </summary>
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        public async Task<HttpResponseMessage> GetAllRouteIDs(IScopeLoggingContext inScope)
+        public async Task<IActionResult> GetAllRouteIDs(IScopeLoggingContext inScope)
         {
             return await SafeOperations.Try(() => ProcessGetAllRouteIDs(inScope), x => Faults.GetResponseFor(x, TypeOfFunction.GetAll, inScope));
         }
@@ -275,7 +269,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// </summary>
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success only)</returns>
-        internal async Task<HttpResponseMessage> ProcessGetAllRouteIDs(IScopeLoggingContext inScope)
+        internal async Task<IActionResult> ProcessGetAllRouteIDs(IScopeLoggingContext inScope)
         {
             await inScope.EnterMethod();
             await inScope.Information("seeking all routing ids");
@@ -289,7 +283,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
             await inScope.Information($"candidate content: '{theCandidate}'");
             await inScope.Information($"preparing response...");
 
-            var response = Respond.Ok().SetContent(theCandidate);
+            var response = new OkObjectResult(theCandidate);
 
             await inScope.Information($"preparation complete...");
             await inScope.ExitMethod();
@@ -303,7 +297,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="theTouchpointID">the touchpoint id</param>
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        public async Task<HttpResponseMessage> DeleteAreaRoutingDetailUsing(string theTouchpointID, IScopeLoggingContext inScope)
+        public async Task<IActionResult> DeleteAreaRoutingDetailUsing(string theTouchpointID, IScopeLoggingContext inScope)
         {
             return await SafeOperations.Try(() => ProcessDeleteAreaRoutingDetailUsing(theTouchpointID, inScope), x => Faults.GetResponseFor(x, TypeOfFunction.Delete, inScope));
         }
@@ -314,7 +308,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="theTouchpointID">the touchpoint id</param>
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
-        internal async Task<HttpResponseMessage> ProcessDeleteAreaRoutingDetailUsing(string theTouchpointID, IScopeLoggingContext inScope)
+        internal async Task<IActionResult> ProcessDeleteAreaRoutingDetailUsing(string theTouchpointID, IScopeLoggingContext inScope)
         {
             await inScope.EnterMethod();
             await inScope.Information($"deleting the routing details for '{theTouchpointID}'");
@@ -323,7 +317,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
 
             await inScope.Information($"preparing response...");
 
-            var response = Respond.Ok();
+            var response = new OkResult();
 
             await inScope.Information($"preparation complete...");
             await inScope.ExitMethod();

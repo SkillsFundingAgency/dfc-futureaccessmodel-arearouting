@@ -1,14 +1,12 @@
 ﻿using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Models;
-using DFC.FutureAccessModel.AreaRouting.Registration;
 
 namespace DFC.FutureAccessModel.AreaRouting.Storage
 {
     /// <summary>
     /// i store local authorities
     /// </summary>
-    public interface IStoreLocalAuthorities :
-        ISupportServiceRegistration
+    public interface IStoreLocalAuthorities
     {
         /// <summary>
         /// get...

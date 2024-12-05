@@ -1,6 +1,7 @@
-﻿using Xunit;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories.Internal;
+using Xunit;
 
-namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
+namespace DFC.FutureAccessModel.AreaRouting.Factories
 {
     /// <summary>
     /// the validation message fixture
