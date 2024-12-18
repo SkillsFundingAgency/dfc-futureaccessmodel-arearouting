@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.Azure.Documents.Linq;
+using System;
 using System.Threading.Tasks;
-using Microsoft.Azure.Documents.Linq;
 
 namespace DFC.FutureAccessModel.AreaRouting.Wrappers
 {

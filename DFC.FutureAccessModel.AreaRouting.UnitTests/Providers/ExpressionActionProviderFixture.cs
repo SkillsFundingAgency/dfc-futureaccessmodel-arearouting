@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using DFC.FutureAccessModel.AreaRouting.Factories;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.FutureAccessModel.AreaRouting.Wrappers;
 using MarkEmbling.PostcodesIO.Results;
+using System;
+using System.Collections.Generic;
 using Xunit;
 using Task = System.Threading.Tasks.Task;
 
@@ -256,7 +256,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Returns(Task.FromResult((PostcodeResult)null));
             GetMock(sut.Postcode)
                 .Setup(x => x.LookupOutwardCodeAsync(theOutwardCode, 10))
-                .Returns(Task.FromResult<IReadOnlyCollection<string>>(new string[]{ thePostCode }));
+                .Returns(Task.FromResult<IReadOnlyCollection<string>>(new string[] { thePostCode }));
 
             var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
             GetMock(theLoggingScope)

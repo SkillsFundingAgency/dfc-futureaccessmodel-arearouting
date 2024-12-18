@@ -1,4 +1,3 @@
-using DFC.Common.Standard.Logging;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Adapters.Internal;
 using DFC.FutureAccessModel.AreaRouting.Factories;
@@ -23,7 +22,6 @@ var host = new HostBuilder()
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
         services.AddLogging();
-        services.AddSingleton<ILoggerHelper, LoggerHelper>();
         services.AddSingleton<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();
         services.AddSingleton<IManageAreaRoutingDetails, AreaRoutingDetailManagementFunctionAdapter>();
         services.AddSingleton<ICreatePostcodeClients, PostcodeClientFactory>();

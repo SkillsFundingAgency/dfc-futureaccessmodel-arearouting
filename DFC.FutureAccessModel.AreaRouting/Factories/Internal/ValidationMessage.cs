@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using DFC.FutureAccessModel.AreaRouting.Helpers;
+﻿using DFC.FutureAccessModel.AreaRouting.Helpers;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
 {

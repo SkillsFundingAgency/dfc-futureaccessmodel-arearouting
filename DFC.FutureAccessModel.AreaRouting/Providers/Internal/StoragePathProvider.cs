@@ -1,6 +1,6 @@
-﻿using System;
-using DFC.FutureAccessModel.AreaRouting.Helpers;
+﻿using DFC.FutureAccessModel.AreaRouting.Helpers;
 using Microsoft.Azure.Documents.Client;
+using System;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {

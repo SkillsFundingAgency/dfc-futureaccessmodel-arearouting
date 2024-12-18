@@ -1,6 +1,6 @@
-﻿using System.Text.RegularExpressions;
-using DFC.FutureAccessModel.AreaRouting.Models;
+﻿using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Validation;
+using System.Text.RegularExpressions;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {

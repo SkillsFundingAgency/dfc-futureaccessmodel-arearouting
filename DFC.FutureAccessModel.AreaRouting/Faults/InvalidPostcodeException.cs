@@ -1,7 +1,7 @@
-﻿using System;
+﻿using DFC.FutureAccessModel.AreaRouting.Helpers;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using DFC.FutureAccessModel.AreaRouting.Helpers;
 
 namespace DFC.FutureAccessModel.AreaRouting.Faults
 {

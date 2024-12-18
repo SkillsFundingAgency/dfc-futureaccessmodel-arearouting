@@ -1,11 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using DFC.FutureAccessModel.AreaRouting.Factories;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using MarkEmbling.PostcodesIO.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Net;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Web.Http;
-using DFC.FutureAccessModel.AreaRouting.Factories;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
@@ -84,7 +84,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(MalformedRequestException), x => new BadRequestObjectResult(new { x.Message}));
+            _faultMap.Add(typeof(MalformedRequestException), x => new BadRequestObjectResult(new { x.Message }));
             _faultMap.Add(typeof(NoContentException), x => new NoContentResult());
 
             _faultMap.Add(typeof(FallbackActionException), x => new InternalServerErrorResult());

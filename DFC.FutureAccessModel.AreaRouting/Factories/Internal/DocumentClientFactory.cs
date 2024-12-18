@@ -1,6 +1,6 @@
-﻿using System;
-using DFC.FutureAccessModel.AreaRouting.Wrappers;
+﻿using DFC.FutureAccessModel.AreaRouting.Wrappers;
 using DFC.FutureAccessModel.AreaRouting.Wrappers.Internal;
+using System;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
 {
