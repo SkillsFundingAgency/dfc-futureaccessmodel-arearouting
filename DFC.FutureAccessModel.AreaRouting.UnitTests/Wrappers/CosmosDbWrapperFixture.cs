@@ -1,8 +1,11 @@
-﻿using Microsoft.Azure.Cosmos;
+﻿using DFC.FutureAccessModel.AreaRouting.Models;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
@@ -10,33 +13,48 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
     public class CosmosDbWrapperFixture :
         MoqTestingFixture
     {
+        private readonly Mock<CosmosClient> _mockCosmosClient;
+        private readonly Mock<IOptions<ConfigurationSettings>> _mockConfigSettings;
+        private readonly Mock<ILogger<CosmosDbWrapper>> _mockLogger;
+
+        const string DocumentStoreID = "database";
+        const string RoutingDetailCollectionID = "area";
+        const string LocalAuthorityCollectionID = "localauthority";
+
+        public CosmosDbWrapperFixture()
+        {
+            _mockCosmosClient = new Mock<CosmosClient>();
+            _mockConfigSettings = new Mock<IOptions<ConfigurationSettings>>();
+            _mockLogger = new Mock<ILogger<CosmosDbWrapper>>();
+
+            var configSettings = new ConfigurationSettings
+            {
+                DocumentStoreID = DocumentStoreID,
+                DocumentStoreAccountKey = "sdafsdkfjsdalfkjasdfkld",
+                DocumentStoreEndpointAddress = "asdflksjadfksdjfklsd",
+                RoutingDetailCollectionID = RoutingDetailCollectionID,
+                LocalAuthorityCollectionID = LocalAuthorityCollectionID,
+                MSDEPLOY_RENAME_LOCKED_FILES = "1",
+                WEBSITE_RUN_FROM_PACKAGE = "abc",
+            };
+
+            var mockContainer = new Mock<Container>();
+            var mockItemResponse = new Mock<ItemResponse<RoutingDetail>>();
+
+            _mockCosmosClient.Setup(x => x.GetContainer(configSettings.DocumentStoreID, configSettings.RoutingDetailCollectionID)).Returns(mockContainer.Object);
+            mockContainer.Setup(x => x.CreateItemAsync(It.IsAny<RoutingDetail>(), new PartitionKey("not_required"), null, It.IsAny<CancellationToken>())).ReturnsAsync(mockItemResponse.Object);
+
+            _mockConfigSettings.SetupGet(c => c.Value).Returns(configSettings);
+        }
+
         /// <summary>
         /// the system under test supports it's service contract
         /// </summary>
         [Fact]
         public void TheSystemUnderTestSupportsItsServiceContract()
         {
-            // arrange
-            var cosmosClient = new Mock<CosmosClient>();
-            var mockConfigSettings = new Mock<IOptions<Models.ConfigurationSettings>>();
-            var logger = new Mock<ILogger<CosmosDbWrapper>>();
-
-            var configSettings = new Models.ConfigurationSettings
-            {
-                DocumentStoreID = "database",
-                DocumentStoreAccountKey = "sdafsdkfjsdalfkjasdfkld",
-                DocumentStoreEndpointAddress = "asdflksjadfksdjfklsd",
-                RoutingDetailCollectionID = "area",
-                LocalAuthorityCollectionID = "localauthority",
-                MSDEPLOY_RENAME_LOCKED_FILES = "1",
-                WEBSITE_RUN_FROM_PACKAGE = "abc",
-            };
-
-            mockConfigSettings.SetupGet(c => c.Value).Returns(configSettings);
-
-
-            //  act / assert
-            Assert.IsAssignableFrom<IWrapCosmosDbClient>(MakeSUT(cosmosClient.Object, mockConfigSettings.Object, logger.Object));
+            // arrange / act / assert
+            Assert.IsAssignableFrom<IWrapCosmosDbClient>(MakeSUT(_mockCosmosClient.Object, _mockConfigSettings.Object, _mockLogger.Object));
         }
 
         /// <summary>
@@ -45,23 +63,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         [Fact]
         public void BuildWithNullClientThrows()
         {
-            var mockConfigSettings = new Mock<IOptions<Models.ConfigurationSettings>>();
-            var logger = new Mock<ILogger<CosmosDbWrapper>>();
-            var configSettings = new Models.ConfigurationSettings
-            {
-                DocumentStoreID = "database",
-                DocumentStoreAccountKey = "sdafsdkfjsdalfkjasdfkld",
-                DocumentStoreEndpointAddress = "asdflksjadfksdjfklsd",
-                RoutingDetailCollectionID = "area",
-                LocalAuthorityCollectionID = "localauthority",
-                MSDEPLOY_RENAME_LOCKED_FILES = "1",
-                WEBSITE_RUN_FROM_PACKAGE = "abc",
-            };
-
-            mockConfigSettings.SetupGet(c => c.Value).Returns(configSettings);
-
             // arrange / act / assert
-            Assert.Throws<ArgumentNullException>(() => MakeSUT(null, mockConfigSettings.Object, logger.Object));
+            Assert.Throws<ArgumentNullException>(() => MakeSUT(null, _mockConfigSettings.Object, _mockLogger.Object));
         }
 
         /// <summary>
@@ -83,33 +86,71 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
         [Fact]
         public void BuildWithNullLoggerThrows()
         {
-            // arrange
-            var cosmosClient = new Mock<CosmosClient>();
-            var mockConfigSettings = new Mock<IOptions<Models.ConfigurationSettings>>();
+            // arrange / act / assert
+            Assert.Throws<ArgumentNullException>(() => MakeSUT(_mockCosmosClient.Object, _mockConfigSettings.Object, null));
+        }
 
-            var configSettings = new Models.ConfigurationSettings
+        /// <summary>
+        /// create area routing detail (async) meets expectation
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task CreateAreaRoutingDetailAsyncMeetsExpectation()
+        {
+            // arrange
+            const string keyValue = "0000000209";
+            const string partitionKey = "not_required";
+
+            var sut = MakeSUT(_mockCosmosClient.Object, _mockConfigSettings.Object, _mockLogger.Object);
+
+            var routingDetail = new RoutingDetail
             {
-                DocumentStoreID = "database",
-                DocumentStoreAccountKey = "sdafsdkfjsdalfkjasdfkld",
-                DocumentStoreEndpointAddress = "asdflksjadfksdjfklsd",
-                RoutingDetailCollectionID = "area",
-                LocalAuthorityCollectionID = "localauthority",
-                MSDEPLOY_RENAME_LOCKED_FILES = "1",
-                WEBSITE_RUN_FROM_PACKAGE = "abc",
+                TouchpointID = keyValue,
+                Area = "Yorkshire and the Humber",
+                TelephoneNumber = "0191 500 8736",
+                SMSNumber = "07766 413219",
+                EmailAddress = "digital.first.careers+SIT_YRKHUM@gmail.com"
             };
 
-            mockConfigSettings.SetupGet(c => c.Value).Returns(configSettings);
 
+            // act
+            var result = await sut.CreateAreaRoutingDetailAsync(routingDetail, partitionKey);
 
-            //  act / assert
-            Assert.Throws<ArgumentNullException>(() => MakeSUT(cosmosClient.Object, mockConfigSettings.Object, null));
+            // assert
+            Assert.IsAssignableFrom<ItemResponse<RoutingDetail>>(result);
+        }
+
+        /// <summary>
+        /// CreateAreaRoutingDetailAsync method returns exception when input parameter RoutingDetail is null
+        /// </summary>
+        /// <returns>the currently running (test) task</returns>
+        [Fact]
+        public async Task CreateAreaRoutingDetailAsyncThrowsExceptionWhenRoutingDetailObjectIsNull()
+        {
+            // arrange
+            const string keyValue = "0000000209";
+            const string partitionKey = "not_required";
+
+            var sut = MakeSUT(_mockCosmosClient.Object, _mockConfigSettings.Object, _mockLogger.Object);
+
+            var routingDetail = new RoutingDetail
+            {
+                TouchpointID = keyValue,
+                Area = "Yorkshire and the Humber",
+                TelephoneNumber = "0191 500 8736",
+                SMSNumber = "07766 413219",
+                EmailAddress = "digital.first.careers+SIT_YRKHUM@gmail.com"
+            };
+
+            // act / assert
+            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.CreateAreaRoutingDetailAsync(null, partitionKey));
         }
 
         /// <summary>
         /// make a 'system under test'
         /// </summary>
         /// <returns>a system under test</returns>
-        internal CosmosDbWrapper MakeSUT(CosmosClient client, IOptions<Models.ConfigurationSettings> configOptions, ILogger<CosmosDbWrapper> logger) =>
+        internal CosmosDbWrapper MakeSUT(CosmosClient client, IOptions<ConfigurationSettings> configOptions, ILogger<CosmosDbWrapper> logger) =>
             new CosmosDbWrapper(client, configOptions, logger);
     }
 }

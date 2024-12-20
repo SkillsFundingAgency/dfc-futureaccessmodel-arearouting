@@ -8,7 +8,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
     /// constructors and decorators are here to satisfy the static analysis tool
     /// as a consequence, excluded from coverage as they can't be tested properly
     /// </summary>
-    
+
     [ExcludeFromCodeCoverage]
     public class UnprocessableEntityException :
             Exception

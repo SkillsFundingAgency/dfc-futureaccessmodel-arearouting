@@ -129,7 +129,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while retrieving local authority for the district: {TheAdminDistrict}. Message: {Message}", theAdminDistrict, ex.Message);               
+                _logger.LogError(ex, "Error occurred while retrieving local authority for the district: {TheAdminDistrict}. Message: {Message}", theAdminDistrict, ex.Message);
                 return null;
             }
         }
