@@ -49,7 +49,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
             // assert
             GetMock(sut.Log).VerifyAll();
 
-            VerifyLogger(sut.Log, LogLevel.Information, "entering method: 'EnterMethodLoggerMeetsVerification'");            
+            VerifyLogger(sut.Log, LogLevel.Information, "entering method: 'EnterMethodLoggerMeetsVerification'");
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
             // assert
             GetMock(sut.Log).VerifyAll();
 
-            VerifyLogger(sut.Log, LogLevel.Information, message);            
+            VerifyLogger(sut.Log, LogLevel.Information, message);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
         {
             // arrange
             var exception = new MalformedRequestException();
-            var sut = MakeSUT();            
+            var sut = MakeSUT();
 
             SetupLogger(sut.Log, LogLevel.Error, string.Empty, exception);
 
@@ -162,7 +162,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
                 logLevel,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => string.IsNullOrEmpty(message) ? true : v.ToString().Contains(message)),
-                exception == null? It.IsAny<Exception>() : exception,
+                exception == null ? It.IsAny<Exception>() : exception,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Exactly(1));
         }

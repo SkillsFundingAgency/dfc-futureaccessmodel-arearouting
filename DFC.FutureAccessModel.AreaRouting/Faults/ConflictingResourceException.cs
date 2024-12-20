@@ -50,7 +50,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// initialises an instance of the <see cref="AccessForbiddenException"/>
         /// </summary>
         /// <param name="info">info</param>
-        /// <param name="context">context</param>
+        /// <param name="context">context</param>        
         protected ConflictingResourceException(SerializationInfo info, StreamingContext context) :
             base(info, context)
         {

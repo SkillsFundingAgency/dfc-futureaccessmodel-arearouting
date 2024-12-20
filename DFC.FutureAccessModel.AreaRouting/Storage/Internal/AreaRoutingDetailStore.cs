@@ -1,7 +1,7 @@
 ﻿using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
-using DFC.FutureAccessModel.AreaRouting.Providers;
+using DFC.FutureAccessModel.AreaRouting.Wrappers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,14 +18,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         const string _partitionKey = "not_required";
 
         /// <summary>
-        /// storage paths
+        /// cosmos db provider
         /// </summary>
-        public IProvideStoragePaths StoragePaths { get; }
-
-        /// <summary>
-        /// the (underlying) document store
-        /// </summary>
-        public IStoreDocuments DocumentStore { get; }
+        public IWrapCosmosDbClient CosmosDbProvider { get; }
 
         /// <summary>
         /// create an instance of hte <see cref="AreaRoutingDetailStore"/>
@@ -33,16 +28,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <param name="paths">the storage paths (provider)</param>
         /// <param name="store">the document store</param>
         public AreaRoutingDetailStore(
-            IProvideStoragePaths paths,
-            IStoreDocuments store)
+            IWrapCosmosDbClient cosmosDbProvider)
         {
-            It.IsNull(paths)
-                .AsGuard<ArgumentNullException>(nameof(paths));
-            It.IsNull(store)
-                .AsGuard<ArgumentNullException>(nameof(store));
+            It.IsNull(cosmosDbProvider)
+                .AsGuard<ArgumentNullException>(nameof(cosmosDbProvider));
 
-            StoragePaths = paths;
-            DocumentStore = store;
+            CosmosDbProvider = cosmosDbProvider;
         }
 
         /// <summary>
@@ -52,8 +43,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>an area routing detail (the touchpoint)</returns>
         public async Task<IRoutingDetail> Get(string theTouchpoint)
         {
-            var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
-            return await DocumentStore.GetDocument<RoutingDetail>(usingPath, _partitionKey);
+            return await CosmosDbProvider.GetAreaRoutingDetailAsync(theTouchpoint);
         }
 
         /// <summary>
@@ -70,12 +60,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             It.IsEmpty(theTouchpoint)
                 .AsGuard<ArgumentNullException>(nameof(theTouchpoint));
 
-            var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
-
-            (await DocumentStore.DocumentExists<RoutingDetail>(usingPath, _partitionKey))
+            (await CosmosDbProvider.AreaRoutingDetailExistsAsync(theTouchpoint, _partitionKey))
                 .AsGuard<ConflictingResourceException>();
 
-            return await DocumentStore.AddDocument(theCandidate, StoragePaths.RoutingDetailCollection);
+            var response = await CosmosDbProvider.CreateAreaRoutingDetailAsync(theCandidate, _partitionKey);
+
+            return response.Resource;
         }
 
         /// <summary>
@@ -84,7 +74,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>the full list of routing detail id's</returns>
         public async Task<IReadOnlyCollection<string>> GetAllIDs()
         {
-            var result = await DocumentStore.CreateDocumentQuery<RoutingDetail>(StoragePaths.RoutingDetailCollection);
+            var result = await CosmosDbProvider.GetAllAreaRoutingsAsync();
+
             return result.Select(x => x.TouchpointID).AsSafeReadOnlyList();
         }
 
@@ -98,12 +89,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             It.IsEmpty(theTouchpoint)
                 .AsGuard<ArgumentNullException>(nameof(theTouchpoint));
 
-            var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
-
-            (!await DocumentStore.DocumentExists<RoutingDetail>(usingPath, _partitionKey))
+            (!await CosmosDbProvider.AreaRoutingDetailExistsAsync(theTouchpoint, _partitionKey))
                 .AsGuard<NoContentException>();
 
-            await DocumentStore.DeleteDocument(usingPath, _partitionKey);
+            await CosmosDbProvider.DeleteAreaRoutingDetailAsync(theTouchpoint, _partitionKey);
         }
     }
 }

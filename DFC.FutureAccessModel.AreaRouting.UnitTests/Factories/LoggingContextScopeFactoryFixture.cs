@@ -177,7 +177,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
                 .Returns(context);
 
             return request;
-        }        
+        }
 
         /// <summary>
         /// make a 'system under test'

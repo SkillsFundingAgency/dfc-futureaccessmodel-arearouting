@@ -10,8 +10,7 @@
 		<!-- for future reference <ProjectGuid>{AABF51F1-63C6-4C6A-928F-22175D866A59}</ProjectGuid>-->
 		<ProjectGuid>{AABF51F1-63C6-4C6A-928F-22175D866A59}</ProjectGuid>
 	</PropertyGroup>	
-	<ItemGroup>
-		<PackageReference Include="DFC.Common.Standard" Version="0.1.4" />
+	<ItemGroup>		
 		<PackageReference Include="DFC.Functions.DI.Standard" Version="0.1.0" />
 		<PackageReference Include="DFC.HTTP.Standard" Version="0.1.11" />
 		<PackageReference Include="DFC.JSON.Standard" Version="0.1.4" />
@@ -40,13 +39,9 @@
 	<ItemGroup>
 		<Folder Include="Adapters\Internal\" />
 		<Folder Include="Functions\" />
-		<Folder Include="Providers\" />
-		<Folder Include="Providers\Internal\" />
 		<Folder Include="Faults\" />
 		<Folder Include="Factories\" />
 		<Folder Include="Factories\Internal\" />
-		<Folder Include="Wrappers\" />
-		<Folder Include="Wrappers\Internal\" />
 		<Folder Include="ReferenceData\" />
 	</ItemGroup>
 	<ItemGroup>

@@ -151,6 +151,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 
             var authority = await Authority.Get(result.Codes.AdminDistrict);
 
+            if (It.IsNull(authority))
+            {
+                await inScope.Information($"No local authority found '{result.Codes.AdminDistrict}'");
+                await inScope.ExitMethod();
+                return null;
+            }
+
             await inScope.Information($"found local authority '{authority.LADCode}'");
             await inScope.ExitMethod();
 
