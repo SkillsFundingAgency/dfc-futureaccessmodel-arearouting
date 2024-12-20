@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Web.Http;
-using DFC.FutureAccessModel.AreaRouting.Factories;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
 {
@@ -47,7 +47,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// get's the 'by location' fault map
         /// </summary>
         /// <returns>a function map</returns>
-        public FunctionMaps GetByLocationFaultMap()
+        public static FunctionMaps GetByLocationFaultMap()
         {
             var _faultMap = new FunctionMaps();
 
@@ -64,7 +64,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// get's the 'by id' fault map
         /// </summary>
         /// <returns>a function map</returns>
-        public FunctionMaps DefaultGetFaultMap()
+        public static FunctionMaps DefaultGetFaultMap()
         {
             var _faultMap = new FunctionMaps();
 
@@ -80,11 +80,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// the 'delete' fault map
         /// </summary>
         /// <returns>a function map</returns>
-        public FunctionMaps DeleteFaultMap()
+        public static FunctionMaps DeleteFaultMap()
         {
             var _faultMap = new FunctionMaps();
 
-            _faultMap.Add(typeof(MalformedRequestException), x => new BadRequestObjectResult(new { x.Message}));
+            _faultMap.Add(typeof(MalformedRequestException), x => new BadRequestObjectResult(new { x.Message }));
             _faultMap.Add(typeof(NoContentException), x => new NoContentResult());
 
             _faultMap.Add(typeof(FallbackActionException), x => new InternalServerErrorResult());
@@ -96,7 +96,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// the 'post' fault map
         /// </summary>
         /// <returns>a function map</returns>
-        public FunctionMaps PostFaultMap()
+        public static FunctionMaps PostFaultMap()
         {
             var _faultMap = new FunctionMaps();
 

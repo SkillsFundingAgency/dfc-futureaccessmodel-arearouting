@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Moq.Language.Flow;
+﻿using Moq.Language.Flow;
+using System.Collections.Generic;
 
 namespace DFC.FutureAccessModel.AreaRouting
 {

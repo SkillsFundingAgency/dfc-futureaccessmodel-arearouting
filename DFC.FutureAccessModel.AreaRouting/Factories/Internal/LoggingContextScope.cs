@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using DFC.Common.Standard.Logging;
-using Microsoft.Extensions.Logging;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
 {
@@ -18,11 +17,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         public ILogger Log { get; }
 
         /// <summary>
-        /// the DFC standard logger helper
-        /// </summary>
-        public ILoggerHelper LoggerHelper { get; }
-
-        /// <summary>
         /// a 'correlation' id
         /// not sure of the benefit here, but it seems to be needed for some calls
         /// </summary>
@@ -34,10 +28,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <param name="log">the microsoft log</param>
         /// <param name="helper">the DFC logger helper</param>
         /// <param name="initialisingRoutine">the calling routine</param>
-        public LoggingContextScope(ILogger log, ILoggerHelper helper, string initialisingRoutine)
+        public LoggingContextScope(ILogger log, string initialisingRoutine)
         {
             Log = log;
-            LoggerHelper = helper;
 
             CorrelationID = Guid.NewGuid();
 
@@ -66,7 +59,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <param name="theMessage">the message</param>
         /// <returns>the currently running task</returns>
         public async Task Information(string theMessage) =>
-            await Task.Run(() => LoggerHelper.LogInformationMessage(Log, CorrelationID, theMessage));
+            await Task.Run(() => Log.LogInformation("CorrelationId: {CorrelationId} Message: {TheMessage}", CorrelationID, theMessage));
 
         /// <summary>
         /// (log) exception detail
@@ -74,14 +67,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <param name="theException">the exception</param>
         /// <returns>the currently running task</returns>
         public async Task ExceptionDetail(Exception theException) =>
-            await Task.Run(() => LoggerHelper.LogException(Log, CorrelationID, theException));
+            await Task.Run(() => Log.LogError(theException, "CorrelationId: {CorrelationId} Message: {TheMessage} Exception: {TheException}", CorrelationID, string.Empty, theException));
 
         /// <summary>
         /// dispose, as this is used in a 'using' clause disposal should be guaranteed
         /// </summary>
         public void Dispose()
         {
-            LoggerHelper.LogInformationMessage(Log, CorrelationID, "request completed");
+            Log.LogInformation("CorrelationId: {CorrelationId} Message: request completed", CorrelationID);
         }
     }
 }

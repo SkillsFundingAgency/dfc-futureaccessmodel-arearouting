@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-using DFC.FutureAccessModel.AreaRouting.Validation;
+﻿using DFC.FutureAccessModel.AreaRouting.Validation;
 using DFC.Swagger.Standard.Annotations;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace DFC.FutureAccessModel.AreaRouting.Models
 {
-    public  class RoutingDetail :
+    public class RoutingDetail :
         IRoutingDetail
     {
         /// <summary>

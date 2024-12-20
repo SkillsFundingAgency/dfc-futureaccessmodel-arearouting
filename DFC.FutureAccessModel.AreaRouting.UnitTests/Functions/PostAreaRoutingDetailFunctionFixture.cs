@@ -1,16 +1,15 @@
-using System;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Net;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
@@ -74,15 +73,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         {
             // arrange
             const string theContent = "{ \"TouchpointID\": \"00000000112\", \"SomeProperty\": \"Some Value...\" }";
-            
+
             var factory = new Mock<ICreateLoggingContextScopes>();
             var adapter = new Mock<IManageAreaRoutingDetails>();
             var logger = new Mock<ILogger<PostAreaRoutingDetailFunction>>();
             var scope = new Mock<IScopeLoggingContext>();
             var request = new Mock<HttpRequest>();
-            
+
             var sut = new PostAreaRoutingDetailFunction(factory.Object, adapter.Object, logger.Object);
-            
+
             GetMock(request.Object)
                 .Setup(x => x.Body)
                 .Returns(new MemoryStream(Encoding.UTF8.GetBytes(theContent)));

@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using DFC.FutureAccessModel.AreaRouting.Factories;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Adapters
 {

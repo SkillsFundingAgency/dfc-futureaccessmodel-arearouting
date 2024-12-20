@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using DFC.FutureAccessModel.AreaRouting.Helpers;
+﻿using DFC.FutureAccessModel.AreaRouting.Helpers;
 using DFC.FutureAccessModel.AreaRouting.Models;
-using DFC.FutureAccessModel.AreaRouting.Providers;
+using DFC.FutureAccessModel.AreaRouting.Wrappers;
+using System;
+using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 {
@@ -12,34 +12,21 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
     internal sealed class LocalAuthorityStore :
         IStoreLocalAuthorities
     {
-        const string _partitionKey = "not_required";
-
         /// <summary>
-        /// storage paths
+        /// the cosmos db wrapper
         /// </summary>
-        public IProvideStoragePaths StoragePaths { get; }
-
-        /// <summary>
-        /// the (underlying) document store
-        /// </summary>
-        public IStoreDocuments DocumentStore { get; }
+        public IWrapCosmosDbClient CosmosDbWrapper { get; }
 
         /// <summary>
         /// create an instance of hte <see cref="LocalAuthorityStore"/>
-        /// </summary>
-        /// <param name="paths">the storage paths (provider)</param>
-        /// <param name="store">the document store</param>
+        /// </summary>        
         public LocalAuthorityStore(
-            IProvideStoragePaths paths,
-            IStoreDocuments store)
+            IWrapCosmosDbClient cosmosDbWrapper)
         {
-            It.IsNull(paths)
-                .AsGuard<ArgumentNullException>(nameof(paths));
-            It.IsNull(store)
-                .AsGuard<ArgumentNullException>(nameof(store));
+            It.IsNull(cosmosDbWrapper)
+                .AsGuard<ArgumentNullException>(nameof(cosmosDbWrapper));
 
-            StoragePaths = paths;
-            DocumentStore = store;
+            CosmosDbWrapper = cosmosDbWrapper;
         }
 
         /// <summary>
@@ -49,8 +36,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>a local authority</returns>
         public async Task<ILocalAuthority> Get(string theAdminDistrict)
         {
-            var usingPath = StoragePaths.GetLocalAuthorityResourcePathFor(theAdminDistrict);
-            return await DocumentStore.GetDocument<LocalAuthority>(usingPath, _partitionKey);
+            return await CosmosDbWrapper.GetLocalAuthorityAsync(theAdminDistrict);
         }
     }
 }

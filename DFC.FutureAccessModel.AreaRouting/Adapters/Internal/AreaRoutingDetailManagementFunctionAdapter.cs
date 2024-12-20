@@ -96,7 +96,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Adapters.Internal
         /// <param name="inScope">in logging scope</param>
         /// <returns>the currently running task containing the response message (success or fail)</returns>
         public async Task<IActionResult> GetAreaRoutingDetailFor(string theTouchpointID, IScopeLoggingContext inScope)
-        { 
+        {
             return await SafeOperations.Try(() => ProcessGetAreaRoutingDetailFor(theTouchpointID, inScope), x => Faults.GetResponseFor(x, TypeOfFunction.GetByID, inScope));
         }
 

@@ -1,5 +1,4 @@
-﻿using DFC.Common.Standard.Logging;
-using DFC.FutureAccessModel.AreaRouting.Factories.Internal;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -59,6 +58,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
             var request = MakeRequest();
             var log = MakeStrictMock<ILogger>();
 
+            SetupLogger(log, LogLevel.Information, string.Empty);
+
             // act
             var scope = await sut.BeginScopeFor(request, log);
 
@@ -77,6 +78,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
             var sut = MakeSUT();
             var request = MakeRequest();
             var log = MakeStrictMock<ILogger>();
+
+            SetupLogger(log, LogLevel.Information, string.Empty);
 
             // act
             var scope = await sut.BeginScopeFor(request, log);
@@ -98,6 +101,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
             var request = MakeRequest();
             var log = MakeStrictMock<ILogger>();
 
+            SetupLogger(log, LogLevel.Information, string.Empty);
+
             // act
             var scope = await sut.BeginScopeFor(request, log);
 
@@ -117,12 +122,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
             var request = MakeRequest();
             var log = MakeStrictMock<ILogger>();
 
+            SetupLogger(log, LogLevel.Information, string.Empty);
+
             // act
             _ = await sut.BeginScopeFor(request, log);
 
             // assert
-            GetMock(sut.LoggerHelper)
-                .Verify(x => x.LogInformationMessage(log, It.IsAny<Guid>(), It.IsAny<string>()), Times.Exactly(7));
+            var noOfTimes = 7;
+            VerifyLogger(log, LogLevel.Information, string.Empty, noOfTimes);
         }
 
         /// <summary>
@@ -173,23 +180,31 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories
         }
 
         /// <summary>
-        /// make (a) 'system under test'
-        /// </summary>
-        /// <returns>the system under test</returns>
-        internal LoggingContextScopeFactory MakeSUT()
-        {
-            var helper = MakeStrictMock<ILoggerHelper>();
-            GetMock(helper)
-                .Setup(x => x.LogInformationMessage(It.IsAny<ILogger>(), It.IsAny<Guid>(), It.IsAny<string>()));
-
-            return MakeSUT(helper);
-        }
-
-        /// <summary>
         /// make a 'system under test'
         /// </summary>
         /// <returns>the system under test</returns>
-        internal LoggingContextScopeFactory MakeSUT(ILoggerHelper logHelper) =>
-            new LoggingContextScopeFactory(logHelper);
+        internal LoggingContextScopeFactory MakeSUT() =>
+            new LoggingContextScopeFactory();
+
+        private void VerifyLogger(ILogger logger, LogLevel logLevel, string message, int callCount = 1, Exception exception = null)
+        {
+            GetMock(logger).Verify(l => l.Log(
+                logLevel,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => string.IsNullOrEmpty(message) ? true : v.ToString().Contains(message)),
+                exception == null ? It.IsAny<Exception>() : exception,
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                Times.Exactly(callCount));
+        }
+
+        private void SetupLogger(ILogger logger, LogLevel logLevel, string message, Exception exception = null)
+        {
+            GetMock(logger).Setup(l => l.Log(
+                            logLevel,
+                            It.IsAny<EventId>(),
+                            It.Is<It.IsAnyType>((state, t) => string.IsNullOrEmpty(message) ? true : state.ToString().Contains(message)),
+                            exception == null ? It.IsAny<Exception>() : exception,
+                            It.IsAny<Func<It.IsAnyType, Exception, string>>()));
+        }
     }
 }

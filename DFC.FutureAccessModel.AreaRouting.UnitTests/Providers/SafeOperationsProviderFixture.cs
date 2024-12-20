@@ -1,6 +1,6 @@
-﻿using System;
+﻿using DFC.FutureAccessModel.AreaRouting.Faults;
+using System;
 using System.Threading.Tasks;
-using DFC.FutureAccessModel.AreaRouting.Faults;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
