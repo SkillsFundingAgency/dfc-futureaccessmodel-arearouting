@@ -63,7 +63,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while retrieving Area Routing(s). Message: {Message}", ex.Message);
-                throw;
+                return null;
             }
         }
 
@@ -90,7 +90,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while retrieving routing detail for the touchpoint: {TheTouchpoint}. Message: {Message}", theTouchpoint, ex.Message);
-                throw;
+                return null;
             }
         }
 
@@ -129,8 +129,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while retrieving local authority for the district: {TheAdminDistrict}. Message: {Message}", theAdminDistrict, ex.Message);
-                throw;
+                _logger.LogError(ex, "Error occurred while retrieving local authority for the district: {TheAdminDistrict}. Message: {Message}", theAdminDistrict, ex.Message);               
+                return null;
             }
         }
 
@@ -153,7 +153,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to create area routing detail with touchpoint: {Touchpoint}", routingDetail.TouchpointID);
-                throw;
+                return null;
             }
         }
 
@@ -176,7 +176,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to delete area routing detail with touchpoint: {Touchpoint}", theTouchpoint);
-                throw;
+                return null;
             }
         }
 

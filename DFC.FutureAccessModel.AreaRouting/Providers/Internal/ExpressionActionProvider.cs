@@ -70,7 +70,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <param name="forExpression">for the expression</param>
         /// <returns>nothing, it just throws</returns>
-        public Func<string, IScopeLoggingContext, Task<string>> DefaultAction() =>
+        public static Func<string, IScopeLoggingContext, Task<string>> DefaultAction() =>
             UnknownCandidateTypeAction;
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <param name="inScope">in scope</param>
         /// <param name="forExpression">for (the) expression</param>
         /// <returns>nothing, this should throw</returns>
-        public async Task<string> UnknownCandidateTypeAction(string theCandidate, IScopeLoggingContext inScope)
+        public static async Task<string> UnknownCandidateTypeAction(string theCandidate, IScopeLoggingContext inScope)
         {
             await inScope.EnterMethod();
 
@@ -97,7 +97,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <param name="theCandidate">the candidate</param>
         /// <param name="inScope">in (the logging) scope</param>
         /// <returns>the LAD code</returns>
-        public async Task<string> GetTouchpointIDFromTown(string theCandidate, IScopeLoggingContext inScope)
+        public static async Task<string> GetTouchpointIDFromTown(string theCandidate, IScopeLoggingContext inScope)
         {
             await Task.CompletedTask;
             throw new NotSupportedException("GetTouchpointIDFromTown: this operation has not yet been coded");
@@ -194,7 +194,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// </summary>
         /// <param name="thisPostcode">this postcode</param>
         /// <returns>the first part of the postcode, assumes the postcode is already legit</returns>
-        public string GetOutwardCodeFrom(string thisPostcode) =>
+        public static string GetOutwardCodeFrom(string thisPostcode) =>
             thisPostcode.Contains(" ")
                 ? thisPostcode.Substring(0, thisPostcode.IndexOf(" ")).Trim()
                 : thisPostcode.Substring(0, thisPostcode.Length - 3).Trim();

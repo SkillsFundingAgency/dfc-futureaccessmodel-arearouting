@@ -56,7 +56,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// <param name="theMatch">the match</param>
         /// <param name="theCandidate">the candidate</param>
         /// <returns></returns>
-        internal bool Matches(Match theMatch, string theCandidate) =>
+        internal static bool Matches(Match theMatch, string theCandidate) =>
             theMatch.Success
                 && theMatch.Captures.Count == 1
                 && theMatch.Length == theCandidate.Length;

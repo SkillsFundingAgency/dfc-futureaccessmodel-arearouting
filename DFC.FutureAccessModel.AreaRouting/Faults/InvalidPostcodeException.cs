@@ -1,14 +1,12 @@
 ﻿using DFC.FutureAccessModel.AreaRouting.Helpers;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
 
 namespace DFC.FutureAccessModel.AreaRouting.Faults
 {
     /// <summary>
     /// the invalid postcode exception
-    /// </summary>
-    [Serializable]
+    /// </summary>    
     [ExcludeFromCodeCoverage]
     public class InvalidPostcodeException :
         Exception
@@ -47,16 +45,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         /// <param name="innerException">inner exception</param>
         public InvalidPostcodeException(string message, Exception innerException) :
             base(GetMessage(message), innerException)
-        {
-        }
-
-        /// <summary>
-        /// instaniates a new instance of <see cref="InvalidPostcodeException"/>
-        /// </summary>
-        /// <param name="info">info</param>
-        /// <param name="context">context</param>
-        protected InvalidPostcodeException(SerializationInfo info, StreamingContext context) :
-            base(info, context)
         {
         }
     }

@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting
 {
-    internal class Program
+    internal static class Program
     {
         private static async Task Main(string[] args)
         {

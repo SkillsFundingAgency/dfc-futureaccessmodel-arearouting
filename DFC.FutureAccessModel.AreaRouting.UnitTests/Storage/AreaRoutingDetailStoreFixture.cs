@@ -30,7 +30,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// build with null cosmos db provider throws
         /// </summary>
         [Fact]
-        public void BuildWithNullCosmosDbProviderThrows()
+        public void BuildWithNullCosmosDbWrapperThrows()
         {
             // act / assert
             Assert.Throws<ArgumentNullException>(() => MakeSUT(null));
@@ -43,13 +43,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         public void BuildMeetsVerification()
         {
             // arrange            
-            var cosmosDbProvider = MakeStrictMock<IWrapCosmosDbClient>();
+            var cosmosDbWrapper = MakeStrictMock<IWrapCosmosDbClient>();
 
             // act
-            var sut = MakeSUT(cosmosDbProvider);
+            var sut = MakeSUT(cosmosDbWrapper);
 
             // assert
-            GetMock(sut.CosmosDbProvider).VerifyAll();
+            GetMock(sut.CosmosDbWrapper).VerifyAll();
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             const string touchpoint = "0000000001";
             var documentPath = new Uri("/", UriKind.Relative);
 
-            GetMock(sut.CosmosDbProvider)
+            GetMock(sut.CosmosDbWrapper)
                 .Setup(x => x.GetAreaRoutingDetailAsync(touchpoint))
                 .Returns(Task.FromResult(new RoutingDetail()));
 
@@ -72,7 +72,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var result = await sut.Get(touchpoint);
 
             // assert
-            GetMock(sut.CosmosDbProvider).VerifyAll();
+            GetMock(sut.CosmosDbWrapper).VerifyAll();
             Assert.IsAssignableFrom<IRoutingDetail>(result);
         }
 
@@ -92,7 +92,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 
             var sut = MakeSUT();
 
-            GetMock(sut.CosmosDbProvider)
+            GetMock(sut.CosmosDbWrapper)
                 .Setup(x => x.GetAllAreaRoutingsAsync())
                 .Returns(Task.FromResult(touchpoints.ToList()));
 
@@ -129,7 +129,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             var sut = MakeSUT();
             const string touchpoint = "0000000001";
 
-            GetMock(sut.CosmosDbProvider)
+            GetMock(sut.CosmosDbWrapper)
                 .Setup(x => x.AreaRoutingDetailExistsAsync(touchpoint, "not_required"))
                 .Returns(Task.FromResult(false));
 
@@ -150,10 +150,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 
             var mockItemResponse = new Mock<ItemResponse<RoutingDetail>>();
 
-            GetMock(sut.CosmosDbProvider)
+            GetMock(sut.CosmosDbWrapper)
                 .Setup(x => x.AreaRoutingDetailExistsAsync(touchpoint, "not_required"))
                 .Returns(Task.FromResult(true));
-            GetMock(sut.CosmosDbProvider)
+            GetMock(sut.CosmosDbWrapper)
                 .Setup(x => x.DeleteAreaRoutingDetailAsync(touchpoint, "not_required"))
                 .Returns(Task.FromResult(mockItemResponse.Object));
 
@@ -161,7 +161,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             await sut.Delete(touchpoint);
 
             // assert
-            GetMock(sut.CosmosDbProvider).VerifyAll();
+            GetMock(sut.CosmosDbWrapper).VerifyAll();
         }
 
         /// <summary>
@@ -170,9 +170,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>the system under test</returns>
         internal AreaRoutingDetailStore MakeSUT()
         {
-            var cosmosDbProvider = MakeStrictMock<IWrapCosmosDbClient>();
+            var cosmosDbWrapper = MakeStrictMock<IWrapCosmosDbClient>();
 
-            return MakeSUT(cosmosDbProvider);
+            return MakeSUT(cosmosDbWrapper);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <param name="store">the document store</param>
         /// <returns>the system under test</returns>
         internal AreaRoutingDetailStore MakeSUT(
-            IWrapCosmosDbClient cosmosDbProvider) =>
-            new AreaRoutingDetailStore(cosmosDbProvider);
+            IWrapCosmosDbClient cosmosDbWrapper) =>
+            new AreaRoutingDetailStore(cosmosDbWrapper);
     }
 }

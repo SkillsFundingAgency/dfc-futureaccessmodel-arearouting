@@ -47,7 +47,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// get's the 'by location' fault map
         /// </summary>
         /// <returns>a function map</returns>
-        public FunctionMaps GetByLocationFaultMap()
+        public static FunctionMaps GetByLocationFaultMap()
         {
             var _faultMap = new FunctionMaps();
 
@@ -64,7 +64,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// get's the 'by id' fault map
         /// </summary>
         /// <returns>a function map</returns>
-        public FunctionMaps DefaultGetFaultMap()
+        public static FunctionMaps DefaultGetFaultMap()
         {
             var _faultMap = new FunctionMaps();
 
@@ -80,7 +80,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// the 'delete' fault map
         /// </summary>
         /// <returns>a function map</returns>
-        public FunctionMaps DeleteFaultMap()
+        public static FunctionMaps DeleteFaultMap()
         {
             var _faultMap = new FunctionMaps();
 
@@ -96,7 +96,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         /// the 'post' fault map
         /// </summary>
         /// <returns>a function map</returns>
-        public FunctionMaps PostFaultMap()
+        public static FunctionMaps PostFaultMap()
         {
             var _faultMap = new FunctionMaps();
 

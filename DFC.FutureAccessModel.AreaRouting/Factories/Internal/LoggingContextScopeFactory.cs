@@ -37,23 +37,23 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <summary>
         /// begin scope
         /// </summary>
-        /// <param name="request">the request</param>
+        /// <param name="theRequest">the request</param>
         /// <param name="usingTraceWriter">using (the) trace writer</param>
         /// <param name="initialisingRoutine">initalising routine</param>
         /// <returns>a new logging scope</returns>
         public async Task<IScopeLoggingContext> BeginScopeFor(
-            HttpRequest request,
+            HttpRequest theRequest,
             ILogger usingTraceWriter,
             [CallerMemberName] string initialisingRoutine = null)
         {
             var scope = new LoggingContextScope(usingTraceWriter, initialisingRoutine);
 
-            await scope.Information($"beginning scope for remote host, address: '{request.HttpContext.Connection.RemoteIpAddress}' port: '{request.HttpContext.Connection.RemotePort}'");
-            await scope.Information($"request verb: '{request.Method}'");
-            await scope.Information($"request content type: '{request.ContentType}'");
-            await scope.Information($"request query string: '{request.QueryString}'");
-            await scope.Information($"requested API Version: '{GetHeaderItemFrom(request, HeaderVersion)}'");
-            await scope.Information($"request API Key: '{GetHeaderItemFrom(request, HeaderAPIKey)}'");
+            await scope.Information($"beginning scope for remote host, address: '{theRequest.HttpContext.Connection.RemoteIpAddress}' port: '{theRequest.HttpContext.Connection.RemotePort}'");
+            await scope.Information($"request verb: '{theRequest.Method}'");
+            await scope.Information($"request content type: '{theRequest.ContentType}'");
+            await scope.Information($"request query string: '{theRequest.QueryString}'");
+            await scope.Information($"requested API Version: '{GetHeaderItemFrom(theRequest, HeaderVersion)}'");
+            await scope.Information($"request API Key: '{GetHeaderItemFrom(theRequest, HeaderAPIKey)}'");
 
             return scope;
         }
@@ -64,7 +64,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
         /// <param name="request">the request</param>
         /// <param name="headerItem">the header item</param>
         /// <returns>the header item value or a default string '(not found)'</returns>
-        internal string GetHeaderItemFrom(HttpRequest request, string headerItem) =>
+        internal static string GetHeaderItemFrom(HttpRequest request, string headerItem) =>
             request.Headers.ContainsKey(headerItem)
                 ? request.Headers[headerItem].FirstOrDefault()
                 : ValueNotFound;

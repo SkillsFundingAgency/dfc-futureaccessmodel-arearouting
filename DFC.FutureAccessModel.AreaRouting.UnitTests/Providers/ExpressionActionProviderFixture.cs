@@ -160,7 +160,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var sut = MakeSUT();
 
             // act
-            var result = sut.GetOutwardCodeFrom(theCandidate);
+            var result = ExpressionActionProvider.GetOutwardCodeFrom(theCandidate);
 
             // assert
             Assert.Equal(theExpectation, result);
@@ -377,7 +377,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
 
             // act / assert
-            await Assert.ThrowsAsync<NotSupportedException>(() => sut.GetTouchpointIDFromTown(theCandidate, theLoggingScope));
+            await Assert.ThrowsAsync<NotSupportedException>(() => ExpressionActionProvider.GetTouchpointIDFromTown(theCandidate, theLoggingScope));
         }
 
         /// <summary>
@@ -408,7 +408,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Returns(Task.CompletedTask);
 
             // act / assert
-            await Assert.ThrowsAsync<MalformedRequestException>(() => sut.UnknownCandidateTypeAction(thePostCode, theLoggingScope));
+            await Assert.ThrowsAsync<MalformedRequestException>(() => ExpressionActionProvider.UnknownCandidateTypeAction(thePostCode, theLoggingScope));
         }
 
         /// <summary>
