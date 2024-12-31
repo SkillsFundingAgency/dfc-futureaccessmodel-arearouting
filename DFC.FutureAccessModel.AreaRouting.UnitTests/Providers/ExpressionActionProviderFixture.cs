@@ -156,9 +156,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         [InlineData("NW1W4ST", "NW1W")]
         public void GetOutwardCodeFromMeetsExpectation(string theCandidate, string theExpectation)
         {
-            // arrange
-            var sut = MakeSUT();
-
             // act
             var result = ExpressionActionProvider.GetOutwardCodeFrom(theCandidate);
 
