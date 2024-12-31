@@ -43,7 +43,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>an area routing detail (the touchpoint)</returns>
         public async Task<IRoutingDetail> Get(string theTouchpoint)
         {
-            return await CosmosDbWrapper.GetAreaRoutingDetailAsync(theTouchpoint);
+            var areaRoutingDetail = await CosmosDbWrapper.GetAreaRoutingDetailAsync(theTouchpoint);
+
+            It.IsNull(areaRoutingDetail)
+                .AsGuard<NoContentException>(theTouchpoint);
+
+            return areaRoutingDetail;
         }
 
         /// <summary>
