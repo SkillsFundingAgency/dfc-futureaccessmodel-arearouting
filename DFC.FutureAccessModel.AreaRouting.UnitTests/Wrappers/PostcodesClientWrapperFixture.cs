@@ -1,9 +1,9 @@
-﻿using System;
+﻿using MarkEmbling.PostcodesIO;
+using MarkEmbling.PostcodesIO.Results;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MarkEmbling.PostcodesIO;
-using MarkEmbling.PostcodesIO.Results;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal

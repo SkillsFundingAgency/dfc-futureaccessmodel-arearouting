@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using DFC.FutureAccessModel.AreaRouting.Helpers;
+﻿using DFC.FutureAccessModel.AreaRouting.Helpers;
 using MarkEmbling.PostcodesIO;
 using MarkEmbling.PostcodesIO.Results;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Wrappers.Internal
 {

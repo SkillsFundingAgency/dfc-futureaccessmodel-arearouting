@@ -1,7 +1,7 @@
-﻿using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories
 {

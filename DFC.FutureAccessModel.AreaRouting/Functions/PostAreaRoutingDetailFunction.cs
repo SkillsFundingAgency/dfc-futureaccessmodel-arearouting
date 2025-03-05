@@ -60,7 +60,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = FunctionDescription.Forbidden, ShowSchema = false)]
         [Display(Name = "Create a new Area Routing Detail", Description = "Ability to add an Area Routing Detail.")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "areas")]HttpRequest request) =>
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "areas")] HttpRequest request) =>
                 await RunActionScope(request, _logger, x => AddAreaRoutingDetailUsing(request, x));
     }
 }

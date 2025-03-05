@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DFC.FutureAccessModel.AreaRouting.Faults;
+using DFC.FutureAccessModel.AreaRouting.Models;
+using DFC.FutureAccessModel.AreaRouting.Wrappers;
+using Microsoft.Azure.Cosmos;
+using Moq;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using DFC.FutureAccessModel.AreaRouting.Faults;
-using DFC.FutureAccessModel.AreaRouting.Models;
-using DFC.FutureAccessModel.AreaRouting.Providers;
 using Xunit;
 
 namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
@@ -26,29 +27,13 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         }
 
         /// <summary>
-        /// build with null paths throws
+        /// build with null cosmos db provider throws
         /// </summary>
         [Fact]
-        public void BuildWithNullPathsThrows()
+        public void BuildWithNullCosmosDbWrapperThrows()
         {
-            // arrange
-            var store = MakeStrictMock<IStoreDocuments>();
-
             // act / assert
-            Assert.Throws<ArgumentNullException>(() => MakeSUT(null, store));
-        }
-
-        /// <summary>
-        /// build with null store throws
-        /// </summary>
-        [Fact]
-        public void BuildWithNullStoreThrows()
-        {
-            // arrange
-            var paths = MakeStrictMock<IProvideStoragePaths>();
-
-            // act / assert
-            Assert.Throws<ArgumentNullException>(() => MakeSUT(paths, null));
+            Assert.Throws<ArgumentNullException>(() => MakeSUT(null));
         }
 
         /// <summary>
@@ -57,16 +42,14 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         [Fact]
         public void BuildMeetsVerification()
         {
-            // arrange
-            var paths = MakeStrictMock<IProvideStoragePaths>();
-            var store = MakeStrictMock<IStoreDocuments>();
+            // arrange            
+            var cosmosDbWrapper = MakeStrictMock<IWrapCosmosDbClient>();
 
             // act
-            var sut = MakeSUT(paths, store);
+            var sut = MakeSUT(cosmosDbWrapper);
 
             // assert
-            GetMock(sut.DocumentStore).VerifyAll();
-            GetMock(sut.StoragePaths).VerifyAll();
+            GetMock(sut.CosmosDbWrapper).VerifyAll();
         }
 
         /// <summary>
@@ -81,19 +64,15 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             const string touchpoint = "0000000001";
             var documentPath = new Uri("/", UriKind.Relative);
 
-            GetMock(sut.DocumentStore)
-                .Setup(x => x.GetDocument<RoutingDetail>(documentPath, "not_required"))
+            GetMock(sut.CosmosDbWrapper)
+                .Setup(x => x.GetAreaRoutingDetailAsync(touchpoint))
                 .Returns(Task.FromResult(new RoutingDetail()));
-            GetMock(sut.StoragePaths)
-                .Setup(x => x.GetRoutingDetailResourcePathFor(touchpoint))
-                .Returns(documentPath);
 
             // act
             var result = await sut.Get(touchpoint);
 
             // assert
-            GetMock(sut.DocumentStore).VerifyAll();
-            GetMock(sut.StoragePaths).VerifyAll();
+            GetMock(sut.CosmosDbWrapper).VerifyAll();
             Assert.IsAssignableFrom<IRoutingDetail>(result);
         }
 
@@ -111,16 +90,11 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
                 new RoutingDetail { TouchpointID = "000103" }
             };
 
-            var collectionPath = new Uri("dbs/cosmicThingy/colls/collectionThingy", UriKind.Relative);
-
             var sut = MakeSUT();
 
-            GetMock(sut.StoragePaths)
-                .SetupGet(x => x.RoutingDetailCollection)
-                .Returns(collectionPath);
-            GetMock(sut.DocumentStore)
-                .Setup(x => x.CreateDocumentQuery<RoutingDetail>(collectionPath, "select * from c"))
-                .Returns(Task.FromResult<IReadOnlyCollection<RoutingDetail>>(touchpoints));
+            GetMock(sut.CosmosDbWrapper)
+                .Setup(x => x.GetAllAreaRoutingsAsync())
+                .Returns(Task.FromResult(touchpoints.ToList()));
 
             // act
             var result = await sut.GetAllIDs();
@@ -154,14 +128,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             // arrange
             var sut = MakeSUT();
             const string touchpoint = "0000000001";
-            var documentPath = new Uri("/", UriKind.Relative);
 
-            GetMock(sut.DocumentStore)
-                .Setup(x => x.DocumentExists<RoutingDetail>(documentPath, "not_required"))
+            GetMock(sut.CosmosDbWrapper)
+                .Setup(x => x.AreaRoutingDetailExistsAsync(touchpoint, "not_required"))
                 .Returns(Task.FromResult(false));
-            GetMock(sut.StoragePaths)
-                .Setup(x => x.GetRoutingDetailResourcePathFor(touchpoint))
-                .Returns(documentPath);
 
             // act / assert
             await Assert.ThrowsAsync<NoContentException>(() => sut.Delete(touchpoint));
@@ -177,24 +147,21 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             // arrange
             var sut = MakeSUT();
             const string touchpoint = "0000000001";
-            var documentPath = new Uri("/", UriKind.Relative);
 
-            GetMock(sut.DocumentStore)
-                .Setup(x => x.DocumentExists<RoutingDetail>(documentPath, "not_required"))
+            var mockItemResponse = new Mock<ItemResponse<RoutingDetail>>();
+
+            GetMock(sut.CosmosDbWrapper)
+                .Setup(x => x.AreaRoutingDetailExistsAsync(touchpoint, "not_required"))
                 .Returns(Task.FromResult(true));
-            GetMock(sut.DocumentStore)
-                .Setup(x => x.DeleteDocument(documentPath, "not_required"))
-                .Returns(Task.CompletedTask);
-            GetMock(sut.StoragePaths)
-                .Setup(x => x.GetRoutingDetailResourcePathFor(touchpoint))
-                .Returns(documentPath);
+            GetMock(sut.CosmosDbWrapper)
+                .Setup(x => x.DeleteAreaRoutingDetailAsync(touchpoint, "not_required"))
+                .Returns(Task.FromResult(mockItemResponse.Object));
 
             // act
             await sut.Delete(touchpoint);
 
             // assert
-            GetMock(sut.DocumentStore).VerifyAll();
-            GetMock(sut.StoragePaths).VerifyAll();
+            GetMock(sut.CosmosDbWrapper).VerifyAll();
         }
 
         /// <summary>
@@ -203,10 +170,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>the system under test</returns>
         internal AreaRoutingDetailStore MakeSUT()
         {
-            var paths = MakeStrictMock<IProvideStoragePaths>();
-            var store = MakeStrictMock<IStoreDocuments>();
+            var cosmosDbWrapper = MakeStrictMock<IWrapCosmosDbClient>();
 
-            return MakeSUT(paths, store);
+            return MakeSUT(cosmosDbWrapper);
         }
 
         /// <summary>
@@ -216,8 +182,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <param name="store">the document store</param>
         /// <returns>the system under test</returns>
         internal AreaRoutingDetailStore MakeSUT(
-            IProvideStoragePaths paths,
-            IStoreDocuments store) =>
-            new AreaRoutingDetailStore(paths, store);
+            IWrapCosmosDbClient cosmosDbWrapper) =>
+            new AreaRoutingDetailStore(cosmosDbWrapper);
     }
 }

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using DFC.FutureAccessModel.AreaRouting.Faults;
+using DFC.FutureAccessModel.AreaRouting.Helpers;
+using DFC.FutureAccessModel.AreaRouting.Models;
+using DFC.FutureAccessModel.AreaRouting.Wrappers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DFC.FutureAccessModel.AreaRouting.Faults;
-using DFC.FutureAccessModel.AreaRouting.Helpers;
-using DFC.FutureAccessModel.AreaRouting.Models;
-using DFC.FutureAccessModel.AreaRouting.Providers;
 
 namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
 {
@@ -18,14 +18,9 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         const string _partitionKey = "not_required";
 
         /// <summary>
-        /// storage paths
+        /// cosmos db provider
         /// </summary>
-        public IProvideStoragePaths StoragePaths { get; }
-
-        /// <summary>
-        /// the (underlying) document store
-        /// </summary>
-        public IStoreDocuments DocumentStore { get; }
+        public IWrapCosmosDbClient CosmosDbWrapper { get; }
 
         /// <summary>
         /// create an instance of hte <see cref="AreaRoutingDetailStore"/>
@@ -33,16 +28,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <param name="paths">the storage paths (provider)</param>
         /// <param name="store">the document store</param>
         public AreaRoutingDetailStore(
-            IProvideStoragePaths paths,
-            IStoreDocuments store)
+            IWrapCosmosDbClient cosmosDbWrapper)
         {
-            It.IsNull(paths)
-                .AsGuard<ArgumentNullException>(nameof(paths));
-            It.IsNull(store)
-                .AsGuard<ArgumentNullException>(nameof(store));
+            It.IsNull(cosmosDbWrapper)
+                .AsGuard<ArgumentNullException>(nameof(cosmosDbWrapper));
 
-            StoragePaths = paths;
-            DocumentStore = store;
+            CosmosDbWrapper = cosmosDbWrapper;
         }
 
         /// <summary>
@@ -52,8 +43,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>an area routing detail (the touchpoint)</returns>
         public async Task<IRoutingDetail> Get(string theTouchpoint)
         {
-            var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
-            return await DocumentStore.GetDocument<RoutingDetail>(usingPath, _partitionKey);
+            var areaRoutingDetail = await CosmosDbWrapper.GetAreaRoutingDetailAsync(theTouchpoint);
+
+            It.IsNull(areaRoutingDetail)
+                .AsGuard<NoContentException>(theTouchpoint);
+
+            return areaRoutingDetail;
         }
 
         /// <summary>
@@ -70,12 +65,12 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             It.IsEmpty(theTouchpoint)
                 .AsGuard<ArgumentNullException>(nameof(theTouchpoint));
 
-            var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
-
-            (await DocumentStore.DocumentExists<RoutingDetail>(usingPath, _partitionKey))
+            (await CosmosDbWrapper.AreaRoutingDetailExistsAsync(theTouchpoint, _partitionKey))
                 .AsGuard<ConflictingResourceException>();
 
-            return await DocumentStore.AddDocument(theCandidate, StoragePaths.RoutingDetailCollection);
+            var response = await CosmosDbWrapper.CreateAreaRoutingDetailAsync(theCandidate, _partitionKey);
+
+            return response.Resource;
         }
 
         /// <summary>
@@ -84,7 +79,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
         /// <returns>the full list of routing detail id's</returns>
         public async Task<IReadOnlyCollection<string>> GetAllIDs()
         {
-            var result = await DocumentStore.CreateDocumentQuery<RoutingDetail>(StoragePaths.RoutingDetailCollection);
+            var result = await CosmosDbWrapper.GetAllAreaRoutingsAsync();
+
             return result.Select(x => x.TouchpointID).AsSafeReadOnlyList();
         }
 
@@ -98,12 +94,10 @@ namespace DFC.FutureAccessModel.AreaRouting.Storage.Internal
             It.IsEmpty(theTouchpoint)
                 .AsGuard<ArgumentNullException>(nameof(theTouchpoint));
 
-            var usingPath = StoragePaths.GetRoutingDetailResourcePathFor(theTouchpoint);
-
-            (!await DocumentStore.DocumentExists<RoutingDetail>(usingPath, _partitionKey))
+            (!await CosmosDbWrapper.AreaRoutingDetailExistsAsync(theTouchpoint, _partitionKey))
                 .AsGuard<NoContentException>();
 
-            await DocumentStore.DeleteDocument(usingPath, _partitionKey);
+            await CosmosDbWrapper.DeleteAreaRoutingDetailAsync(theTouchpoint, _partitionKey);
         }
     }
 }
