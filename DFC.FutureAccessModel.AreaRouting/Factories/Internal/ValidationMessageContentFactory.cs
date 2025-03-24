@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using DFC.FutureAccessModel.AreaRouting.Helpers;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using DFC.FutureAccessModel.AreaRouting.Helpers;
 
 namespace DFC.FutureAccessModel.AreaRouting.Factories.Internal
 {

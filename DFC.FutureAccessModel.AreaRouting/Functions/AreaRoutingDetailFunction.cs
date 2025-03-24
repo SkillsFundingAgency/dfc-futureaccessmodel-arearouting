@@ -1,11 +1,11 @@
-using System;
-using System.Threading.Tasks;
 using DFC.FutureAccessModel.AreaRouting.Adapters;
 using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Helpers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace DFC.FutureAccessModel.AreaRouting.Functions
 {

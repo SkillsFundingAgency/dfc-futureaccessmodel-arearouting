@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
 
 namespace DFC.FutureAccessModel.AreaRouting.Faults
 {
@@ -8,8 +7,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
     /// the fallback action exception is onlused in the fault response
     /// provider tho detaermine the correct fallback process
     /// for any given method
-    /// </summary>
-    [Serializable]
+    /// </summary>    
     [ExcludeFromCodeCoverage]
     public class FallbackActionException :
         Exception
@@ -23,10 +21,6 @@ namespace DFC.FutureAccessModel.AreaRouting.Faults
         }
 
         public FallbackActionException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected FallbackActionException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

@@ -45,7 +45,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Functions
         /// <returns>a http response containing the generated document</returns>
         [Function("ApiDefinition")]
         [Display(Name = "Get the API Definition", Description = @"Returns this swagger document")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/api-definition")]HttpRequest request) =>
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "areas/api-definition")] HttpRequest request) =>
             await Task.Run<IActionResult>(() =>
             {
                 It.IsNull(request)

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using DFC.FutureAccessModel.AreaRouting.Factories;
+﻿using DFC.FutureAccessModel.AreaRouting.Factories;
 using DFC.FutureAccessModel.AreaRouting.Faults;
 using DFC.FutureAccessModel.AreaRouting.Models;
 using DFC.FutureAccessModel.AreaRouting.Storage;
 using DFC.FutureAccessModel.AreaRouting.Wrappers;
 using MarkEmbling.PostcodesIO.Results;
+using System;
+using System.Collections.Generic;
 using Xunit;
 using Task = System.Threading.Tasks.Task;
 
@@ -156,11 +156,8 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
         [InlineData("NW1W4ST", "NW1W")]
         public void GetOutwardCodeFromMeetsExpectation(string theCandidate, string theExpectation)
         {
-            // arrange
-            var sut = MakeSUT();
-
             // act
-            var result = sut.GetOutwardCodeFrom(theCandidate);
+            var result = ExpressionActionProvider.GetOutwardCodeFrom(theCandidate);
 
             // assert
             Assert.Equal(theExpectation, result);
@@ -256,7 +253,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Returns(Task.FromResult((PostcodeResult)null));
             GetMock(sut.Postcode)
                 .Setup(x => x.LookupOutwardCodeAsync(theOutwardCode, 10))
-                .Returns(Task.FromResult<IReadOnlyCollection<string>>(new string[]{ thePostCode }));
+                .Returns(Task.FromResult<IReadOnlyCollection<string>>(new string[] { thePostCode }));
 
             var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
             GetMock(theLoggingScope)
@@ -377,7 +374,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
             var theLoggingScope = MakeStrictMock<IScopeLoggingContext>();
 
             // act / assert
-            await Assert.ThrowsAsync<NotSupportedException>(() => sut.GetTouchpointIDFromTown(theCandidate, theLoggingScope));
+            await Assert.ThrowsAsync<NotSupportedException>(() => ExpressionActionProvider.GetTouchpointIDFromTown(theCandidate, theLoggingScope));
         }
 
         /// <summary>
@@ -408,7 +405,7 @@ namespace DFC.FutureAccessModel.AreaRouting.Providers.Internal
                 .Returns(Task.CompletedTask);
 
             // act / assert
-            await Assert.ThrowsAsync<MalformedRequestException>(() => sut.UnknownCandidateTypeAction(thePostCode, theLoggingScope));
+            await Assert.ThrowsAsync<MalformedRequestException>(() => ExpressionActionProvider.UnknownCandidateTypeAction(thePostCode, theLoggingScope));
         }
 
         /// <summary>
