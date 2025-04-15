@@ -19,8 +19,8 @@
         }
     },
     "variables": {
-        "sharedAppInsightsResourceGroup": "[format('dfc-{0}-shared-monitor-rg', parameters('environment'))]",
-        "sharedAppInsightsName": "[format('dfc-{0}-shared-ai')]"
+        "sharedAppInsightsResourceGroup": "[format('dfc-{0}-shared-monitor-rg', toLower(parameters('environment')))]",
+        "sharedAppInsightsName": "[format('dfc-{0}-shared-ai', toLower(parameters('environment')))]"
     },
     "resources": [
         {
